@@ -1,0 +1,29 @@
+{
+    "fontFamily": "Kanit",
+    "prefix": {
+        "countryCode": {
+            "TH": "TH"
+        }
+    },
+    "menu": [
+        {
+            "key": "PROFESSOR-INFO",
+            "name": "ข้อมูลอาจารย์",
+            "link": "/professor-info"
+        },
+        {
+            "key": "CLASS_SCHEDULE",
+            "name": "ตารางสอน",
+            "link": "/schedule"
+        },
+        {
+            "key": "DISBURSEMENT",
+            "name": "เบิกค่าสอน",
+            "link": "/disbursement"
+        }
+    ],
+    "role": {
+        "ADMIN": "ADMIN",
+        "USER": "USER"
+    }
+}
