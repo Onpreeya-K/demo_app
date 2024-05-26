@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\Teacher;
+use App\Models\Entities\Teacher;
 
 class TeacherRepository
 {

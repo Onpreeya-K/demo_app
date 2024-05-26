@@ -14,8 +14,9 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Firebase\JWT\JWT;
 use Slim\Factory\AppFactory;
 
-use App\Middleware\AuthMiddleware;
+use Symfony\Component\Validator\Validation;
 
+use App\Middleware\AuthMiddleware;
 // Load environment variables
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
@@ -65,6 +66,23 @@ $app->get('/key', function (Request $request, Response $response, $args) use ($s
 });
 
 $app->get('/111', function (Request $request, Response $response, $args) {
+
+    $reqData = new App\Models\TeacherDTO();
+    $reqData->teacher_id = true;
+
+    // Validate the DTO
+    $validator = Validation::createValidator();
+    $violations = $validator->validate($reqData);
+    print_r($violations);
+    if (count($violations) > 0) {
+        $errors = [];
+        foreach ($violations as $violation) {
+            $errors[$violation->getPropertyPath()] = $violation->getMessage();
+        }
+        echo "asdff";
+        print_r($errors);
+    }
+
     $response->getBody()->write("Hello world!");
     return $response;
 })->add(new AuthMiddleware($secret));
