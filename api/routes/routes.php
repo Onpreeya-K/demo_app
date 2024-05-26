@@ -4,6 +4,13 @@ use App\Middleware\AuthMiddleware;
 use Slim\Routing\RouteCollectorProxy as Group;
 
 $secret = "abcd";
+
+// Handle preflight requests
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+    return $response;
+});
+
+
 // Define routes for teacher
 $app->group('/teachers', function (Group $group) {
     $group->get('', 'App\Controllers\TeacherController:fetch');

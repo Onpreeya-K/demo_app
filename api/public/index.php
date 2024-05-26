@@ -17,12 +17,16 @@ use Slim\Factory\AppFactory;
 use Symfony\Component\Validator\Validation;
 
 use App\Middleware\AuthMiddleware;
+use App\Middleware\CorsMiddleware;
 // Load environment variables
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 // Load database configuration
 $dbConfig = require __DIR__ . '/../configs/database.php';
+
+// Load routes from the separate file
+require __DIR__ . '/../routes/routes.php';
 
 
 // Create Container
@@ -87,22 +91,5 @@ $app->get('/111', function (Request $request, Response $response, $args) {
     return $response;
 })->add(new AuthMiddleware($secret));
 
-// $app->get('/teachers', 'App\Controllers\TeacherController:fetch')->add(new AuthMiddleware($secret));
-// $app->get('/teachers/{id}', 'App\Controllers\TeacherController:fetchByID')->add(new AuthMiddleware($secret));
-// $app->post('/teachers', 'App\Controllers\TeacherController:create')->add(new AuthMiddleware($secret));
-// $app->put('/teachers/{id}', 'App\Controllers\TeacherController:update')->add(new AuthMiddleware($secret));
-// $app->delete('/teachers/{id}', 'App\Controllers\TeacherController:delete')->add(new AuthMiddleware($secret));
-
-// $app->group('/teachers', function (\Slim\Routing\RouteCollectorProxy $group) {
-//     $group->get('', 'App\Controllers\TeacherController:fetch');
-//     $group->get('/{id}', 'App\Controllers\TeacherController:fetchByID');
-//     $group->post('', 'App\Controllers\TeacherController:create');
-//     $group->put('/{id}', 'App\Controllers\TeacherController:update');
-//     $group->delete('/{id}', 'App\Controllers\TeacherController:delete');
-// })->add(new AuthMiddleware($secret));
-
-// Load routes from the separate file
-require __DIR__ . '/../routes/routes.php';
-// $routes($app);
-
+$app->add(CorsMiddleware::class);
 $app->run();
