@@ -9,6 +9,7 @@ use Psr\Http\Server\MiddlewareInterface;
 
 class CorsMiddleware implements MiddlewareInterface
 {
+
     public function process(Request $request, RequestHandler $handler): Response
     {
         $response = $handler->handle($request);

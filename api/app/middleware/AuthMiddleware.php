@@ -31,7 +31,6 @@ class AuthMiddleware implements MiddlewareInterface
                 // If decoding successful, you can proceed with the request
                 return $handler->handle($request);
             } catch (\Exception $e) {
-                // echo 'Other error: ', $e->getMessage();
                 // If decoding fails, return unauthorized response
                 $message = array('message' => $e->getMessage());
                 $payload = json_encode($message);

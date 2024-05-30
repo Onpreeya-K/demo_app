@@ -18,15 +18,14 @@ use Symfony\Component\Validator\Validation;
 
 use App\Middleware\AuthMiddleware;
 use App\Middleware\CorsMiddleware;
+use App\Middleware\ResponseMiddleware;
+use Slim\Middleware\BodyParsingMiddleware;
 // Load environment variables
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 // Load database configuration
 $dbConfig = require __DIR__ . '/../configs/database.php';
-
-// Load routes from the separate file
-require __DIR__ . '/../routes/routes.php';
 
 
 // Create Container
@@ -35,15 +34,22 @@ AppFactory::setContainer($container);
 
 // Create App
 $app = AppFactory::create();
-$app->setBasePath('/api');
+$app->setBasePath('/api/v1');
 
 $app->addRoutingMiddleware();
+
+// Add BodyParsingMiddleware
+$app->addBodyParsingMiddleware();
+
 // Set up Eloquent ORM
 $capsule = new Capsule;
 $capsule->addConnection($dbConfig);
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
-$secret = "abcd";
+$secret = $_ENV['SECRET_KEY'];
+
+// Load routes file
+require __DIR__ . '/../routes/routes.php';
 
 
 
@@ -59,7 +65,7 @@ $app->get('/key', function (Request $request, Response $response, $args) use ($s
         "sub" => "abc",
     ];
     
-    $token = JWT::encode($payload, $secret , "HS256");
+    $token = JWT::encode($payload, $secret , $_ENV["ALGRO"]);
     $resp = array('token' => $token);
     $payload = json_encode($resp);
     $response->getBody()->write($payload);
@@ -70,26 +76,19 @@ $app->get('/key', function (Request $request, Response $response, $args) use ($s
 });
 
 $app->get('/111', function (Request $request, Response $response, $args) {
+    $data = $request->getParsedBody();
 
-    $reqData = new App\Models\TeacherDTO();
-    $reqData->teacher_id = true;
-
-    // Validate the DTO
-    $validator = Validation::createValidator();
-    $violations = $validator->validate($reqData);
-    print_r($violations);
-    if (count($violations) > 0) {
-        $errors = [];
-        foreach ($violations as $violation) {
-            $errors[$violation->getPropertyPath()] = $violation->getMessage();
-        }
-        echo "asdff";
-        print_r($errors);
+    // If the body is JSON, it will be an associative array
+    if (is_array($data)) {
+        $response->getBody()->write(json_encode($data));
+    } else {
+        $response->getBody()->write('Invalid JSON');
     }
 
-    $response->getBody()->write("Hello world!");
-    return $response;
+    return $response->withHeader('Content-Type', 'application/json');
 })->add(new AuthMiddleware($secret));
 
+$app->add(ResponseMiddleware::class);
 $app->add(CorsMiddleware::class);
+
 $app->run();

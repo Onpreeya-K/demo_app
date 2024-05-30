@@ -18,6 +18,7 @@ class TeacherRepository
 
     public function createTeacher($data)
     {
+        
         return Teacher::create($data);
     }
 
@@ -28,6 +29,6 @@ class TeacherRepository
 
     public function deleteTeacher($id)
     {
-        return Teacher::where('teacher_id', $id)->delete();
+        return Teacher::where('teacher_id', $id)->update(array('is_active'=> 0));
     }
 }
