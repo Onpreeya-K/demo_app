@@ -3,7 +3,6 @@
 use App\Middleware\AuthMiddleware;
 use Slim\Routing\RouteCollectorProxy as Group;
 
-$secret = "abcd";
 
 // Handle preflight requests
 $app->options('/{routes:.+}', function ($request, $response, $args) {
@@ -11,10 +10,10 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 });
 
 // Define routes for auth
-$app->group('/auth', function (Group $group) use ($secret){
+$app->group('/auth', function (Group $group) {
     $group->post('/signup', 'App\Controllers\AuthController:signUp');
     $group->post('/login', 'App\Controllers\AuthController:login');
-    $group->get('/logout', 'App\Controllers\AuthController:logout')->add(new AuthMiddleware($secret));
+    $group->get('/logout', 'App\Controllers\AuthController:logout')->add(new AuthMiddleware($_ENV['SECRET_KEY']));
 });
 
 // Define routes for teacher
@@ -24,7 +23,7 @@ $app->group('/teacher', function (Group $group) {
     $group->post('', 'App\Controllers\TeacherController:create');
     $group->put('/{id}', 'App\Controllers\TeacherController:update');
     $group->delete('/{id}', 'App\Controllers\TeacherController:delete');
-})->add(new AuthMiddleware($secret));
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
 
 // Define routes for user
 $app->group('/user', function (Group $group) {
@@ -33,4 +32,4 @@ $app->group('/user', function (Group $group) {
     $group->post('', 'App\Controllers\UserController:create');
     $group->put('/{id}', 'App\Controllers\UserController:update');
     $group->delete('/{id}', 'App\Controllers\UserController:delete');
-})->add(new AuthMiddleware($secret));
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
