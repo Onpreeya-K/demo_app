@@ -7,7 +7,6 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import MenuDrawer from '../../components/drawer/Drawer-menu';
 import {
     DataGrid,
     GridColDef,
@@ -122,7 +121,7 @@ const DisbursementPage = () => {
             headerName: 'levelID',
             align: 'center',
             headerAlign: 'center',
-            // width: 200,
+            width: 200,
             valueGetter: (params) => params,
         },
         {
@@ -130,6 +129,7 @@ const DisbursementPage = () => {
             headerName: 'courseCode',
             align: 'center',
             headerAlign: 'center',
+            width: 200,
             valueGetter: (params) => params,
         },
         {
@@ -137,7 +137,7 @@ const DisbursementPage = () => {
             headerName: 'Sec',
             align: 'center',
             headerAlign: 'center',
-            // width: 150,
+            width: 200,
             valueGetter: (params) => params,
         },
         {
@@ -145,7 +145,7 @@ const DisbursementPage = () => {
             headerName: 'courseNameEng',
             align: 'left',
             headerAlign: 'center',
-            // width: 200,
+            minWidth: 200,
             flex: 1,
             valueGetter: (params) => params,
         },
@@ -154,7 +154,7 @@ const DisbursementPage = () => {
             headerName: 'courseUnit',
             align: 'center',
             headerAlign: 'center',
-            // flex: 1,
+            width: 200,
             valueGetter: (params) => params,
         },
         {
@@ -162,6 +162,7 @@ const DisbursementPage = () => {
             headerName: 'totalSeat',
             align: 'center',
             headerAlign: 'center',
+            width: 200,
             valueGetter: (params) => params,
         },
         {
@@ -169,7 +170,7 @@ const DisbursementPage = () => {
             headerName: 'enrollSeat',
             align: 'center',
             headerAlign: 'center',
-            // width: 150,
+            width: 200,
             valueGetter: (params) => params,
         },
         {
@@ -177,7 +178,7 @@ const DisbursementPage = () => {
             headerName: 'date',
             align: 'center',
             headerAlign: 'center',
-            // width: 150,
+            width: 150,
             valueGetter: (params) => params,
         },
     ];
@@ -218,6 +219,7 @@ const DisbursementPage = () => {
             headerName: 'รหัสวิชา',
             align: 'center',
             headerAlign: 'center',
+            width: 200,
             valueGetter: (params) => params,
         },
         {
@@ -225,7 +227,7 @@ const DisbursementPage = () => {
             headerName: 'รายวิชา',
             align: 'left',
             headerAlign: 'center',
-            flex: 1,
+            width: 200,
             valueGetter: (params) => params,
         },
         {
@@ -233,6 +235,7 @@ const DisbursementPage = () => {
             headerName: 'หน่วยกิต',
             align: 'center',
             headerAlign: 'center',
+            width: 200,
             valueGetter: (params) => params,
         },
         {
@@ -240,6 +243,7 @@ const DisbursementPage = () => {
             headerName: 'กลุ่ม',
             align: 'center',
             headerAlign: 'center',
+            width: 150,
             valueGetter: (params) => params,
         },
         {
@@ -247,6 +251,7 @@ const DisbursementPage = () => {
             headerName: 'ระดับ',
             align: 'center',
             headerAlign: 'center',
+            width: 150,
             valueGetter: (params) => params,
         },
         {
@@ -254,6 +259,7 @@ const DisbursementPage = () => {
             headerName: 'จำนวนนิสิตลงทะเบียน',
             align: 'center',
             headerAlign: 'center',
+            width: 250,
             valueGetter: (params) => params,
         },
         {
@@ -261,6 +267,8 @@ const DisbursementPage = () => {
             headerName: 'ผู้สอน',
             align: 'center',
             headerAlign: 'center',
+            minWidth: 250,
+            flex: 1,
             valueGetter: (params) => params,
         },
         {
@@ -268,6 +276,7 @@ const DisbursementPage = () => {
             headerName: 'ได้',
             align: 'center',
             headerAlign: 'center',
+            width: 150,
             valueGetter: (params) => params,
         },
         {
@@ -275,6 +284,7 @@ const DisbursementPage = () => {
             headerName: 'ไม่ได้',
             align: 'center',
             headerAlign: 'center',
+            width: 150,
             valueGetter: (params) => params,
         },
         {
@@ -282,6 +292,7 @@ const DisbursementPage = () => {
             headerName: 'เวลาเรียน',
             align: 'center',
             headerAlign: 'center',
+            width: 150,
             valueGetter: (params) => params,
         },
         {
@@ -289,6 +300,7 @@ const DisbursementPage = () => {
             headerName: 'หมายเหตุ',
             align: 'left',
             headerAlign: 'center',
+            width: 150,
             valueGetter: (params) => params,
         },
     ];
@@ -302,7 +314,7 @@ const DisbursementPage = () => {
     ];
 
     return (
-        <MenuDrawer>
+        <div>
             <Box sx={{ height: '100%' }}>
                 <Box>
                     <Typography textAlign="start" variant="h6" component="div">
@@ -317,6 +329,10 @@ const DisbursementPage = () => {
                             // borderRadius: '10px',
                             // height: '300px',
                             marginTop: 2,
+                            width:
+                                window?.innerWidth > 1024
+                                    ? `calc(100vw - 272px)`
+                                    : `calc(100vw - 32px)`,
                         }}
                     >
                         <DataGrid
@@ -405,7 +421,7 @@ const DisbursementPage = () => {
                     justifyContent="flex-end"
                     sx={{ paddingTop: 2, paddingBottom: 2 }}
                 >
-                    <Grid item xs={2}>
+                    <Grid item xs={4} md={2}>
                         <Button
                             variant="text"
                             fullWidth
@@ -414,7 +430,7 @@ const DisbursementPage = () => {
                             ดูตัวอย่าง
                         </Button>
                     </Grid>
-                    <Grid item xs={2}>
+                    <Grid item xs={4} md={2}>
                         <Button
                             variant="text"
                             fullWidth
@@ -430,6 +446,10 @@ const DisbursementPage = () => {
                         // borderRadius: '10px',
                         height: '300px',
                         // marginTop: 2,
+                        width:
+                            window?.innerWidth > 1024
+                                ? `calc(100vw - 272px)`
+                                : `calc(100vw - 32px)`,
                     }}
                 >
                     <DataGrid
@@ -451,7 +471,7 @@ const DisbursementPage = () => {
                     />
                 </Box>
             </Box>
-        </MenuDrawer>
+        </div>
     );
 };
 

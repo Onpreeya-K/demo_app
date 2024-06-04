@@ -33,34 +33,34 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     ...theme.mixins.toolbar,
 }));
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
-    open?: boolean;
-    isDesktop?: boolean;
-}>(({ theme, open, isDesktop }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(2),
-    transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: `-${drawerWidth}px`,
-    height: `calc(100vh - 56px)`,
-    ...(open && {
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-        // marginLeft: 0,
-    }),
-    ...(isDesktop && {
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-        marginLeft: 0,
-        height: '100vh',
-    }),
-}));
+// const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+//     open?: boolean;
+//     isDesktop?: boolean;
+// }>(({ theme, open, isDesktop }) => ({
+//     flexGrow: 1,
+//     padding: theme.spacing(2),
+//     transition: theme.transitions.create('margin', {
+//         easing: theme.transitions.easing.sharp,
+//         duration: theme.transitions.duration.leavingScreen,
+//     }),
+//     marginLeft: `-${drawerWidth}px`,
+//     height: `calc(100vh - 56px)`,
+//     ...(open && {
+//         transition: theme.transitions.create('margin', {
+//             easing: theme.transitions.easing.easeOut,
+//             duration: theme.transitions.duration.enteringScreen,
+//         }),
+//         // marginLeft: 0,
+//     }),
+//     ...(isDesktop && {
+//         transition: theme.transitions.create('margin', {
+//             easing: theme.transitions.easing.easeOut,
+//             duration: theme.transitions.duration.enteringScreen,
+//         }),
+//         marginLeft: 0,
+//         height: '100vh',
+//     }),
+// }));
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -87,7 +87,7 @@ const AppBar = styled(MuiAppBar, {
 interface MenuDrawerProps {
     children: ReactNode;
 }
-const MenuDrawer: React.FC<MenuDrawerProps> = ({ children }) => {
+const MenuDrawer = ({ children }: MenuDrawerProps) => {
     const [open, setOpen] = useState<boolean>(false);
     const navigate = useNavigate();
 
@@ -101,6 +101,9 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ children }) => {
 
     const onChangePage = (path: string) => {
         navigate(path);
+        if(!isDesktop){
+            setOpen(false)
+        }
     };
 
     const onClickLogout = () => {
@@ -108,14 +111,13 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ children }) => {
         sessionStorage.removeItem('ROLE');
     };
 
-    const [isDesktop, setIsDesktop] = useState<boolean>(true);
+    const [isDesktop, setIsDesktop] = useState<boolean>(false);
     const checkWindowSize = () => {
         let windowWidth: number = 0;
         if (typeof window !== 'undefined') {
             windowWidth = window.innerWidth;
         }
         if (windowWidth >= 1024) {
-            // setOpen(false);
             setIsDesktop(true);
         } else {
             setIsDesktop(false);
@@ -198,7 +200,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ children }) => {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <AppBar
-                    position="absolute"
+                    position="fixed"
                     open={open}
                     sx={{
                         ...(isDesktop && { display: 'none' }),
@@ -229,9 +231,6 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ children }) => {
                         >
                             ระบบเบิกเงินค่าตอบแทนการสอน
                         </Box>
-                        {/* <Typography variant="h6" noWrap component="div">
-                            ระบบเบิกเงินค่าตอบแทนการสอน
-                        </Typography> */}
                     </Toolbar>
                 </AppBar>
                 <Drawer
@@ -255,9 +254,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ children }) => {
                             justifyContent: 'end',
                         }}
                     >
-                        <IconButton
-                            onClick={toggleDrawer(false)}
-                        >
+                        <IconButton onClick={toggleDrawer(false)}>
                             <ChevronLeftIcon sx={{ color: '#FFFFFF' }} />
                         </IconButton>
                     </DrawerHeader>
@@ -317,9 +314,9 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ children }) => {
                 </Drawer>
                 <Drawer
                     sx={{
-                        width: drawerWidth,
+                        width: isDesktop ? drawerWidth : 'none',
                         '& .MuiDrawer-paper': {
-                            width: drawerWidth,
+                            width: isDesktop ? drawerWidth : 'none',
                             boxSizing: 'border-box',
                             backgroundColor:
                                 getRoleUser() === appConfig.role.ADMIN
@@ -346,12 +343,6 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ children }) => {
                         >
                             ระบบเบิกเงินค่าตอบแทนการสอน
                         </Box>
-                        {/* <IconButton
-                            onClick={handleDrawerClose}
-                            sx={{ ...(isDesktop && { display: 'none' }) }}
-                        >
-                            <ChevronLeftIcon sx={{ color: '#FFFFFF' }} />
-                        </IconButton> */}
                     </DrawerHeader>
                     <Divider sx={{ borderColor: '#FFFFFF' }} />
                     <Box
@@ -407,12 +398,18 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ children }) => {
                         </Button>
                     </div>
                 </Drawer>
-                <Main open={open} isDesktop={isDesktop}>
-                    <DrawerHeader
-                        sx={{ ...(isDesktop && { display: 'none' }) }}
-                    />
+                <Box
+                    component="main"
+                    id='childMenu'
+                    sx={{
+                        flexGrow: 1,
+                        p: 2,
+                        width: { sm: isDesktop ? `calc(100% - 240px)` : '100%'  },
+                        ...(!isDesktop && { marginTop: 7 })
+                    }}
+                >
                     {children}
-                </Main>
+                </Box>
             </Box>
         </ThemeProvider>
     );

@@ -1,3 +1,4 @@
+import EditIcon from '@mui/icons-material/Edit';
 import {
     Box,
     Button,
@@ -7,94 +8,111 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import MenuDrawer from '../../components/drawer/Drawer-menu';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import EditIcon from '@mui/icons-material/Edit';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getAllTeacher } from '../../services/Teacher-service';
+
+interface Teacher {
+    teacher_id:string;
+    prefix:string;
+    fullname:string;
+    position:string;
+    sub_positon:string;
+    is_active: number
+}
 
 const ProfessorInfoPage = () => {
-    const rows = [
-        {
-            id: '1',
-            professorId: '50078',
-            fullName: 'รศ.ดร.สุวัฒน์ จุลสุวรรณ์',
-            role: 'รองศาสตราจารย์',
-        },
-        {
-            id: '2',
-            professorId: '5117',
-            fullName: 'ผศ.ดร.วราพร เอราวรรณ์',
-            role: 'รองศาสตราจารย์',
-        },
-        {
-            id: '3',
-            professorId: '5999',
-            fullName: 'ผศ.ก่อเกียรติ ขวัญสกุล',
-            role: 'รองศาสตราจารย์',
-        },
-        {
-            id: '4',
-            professorId: '5805010',
-            fullName: 'อ.ดร.ชนยุตฏษ์ ช้างเพชร',
-            role: 'รองศาสตราจารย์',
-        },
-        {
-            id: '5',
-            professorId: '50014',
-            fullName: 'อ.มาณวิกา กิตติพร',
-            role: 'รองศาสตราจารย์',
-        },
-        {
-            id: '6',
-            professorId: '6105003',
-            fullName: 'รศ.ดร.พชรวิทย์ จันทร์ศิริสิร',
-            role: 'รองศาสตราจารย์',
-        },
-        {
-            id: '7',
-            professorId: '5999',
-            fullName: 'ผศ.ก่อเกียรติ ขวัญสกุล',
-            role: 'รองศาสตราจารย์',
-        },
-        {
-            id: '8',
-            professorId: '5805010',
-            fullName: 'อ.ดร.ชนยุตฏษ์ ช้างเพชร',
-            role: 'รองศาสตราจารย์',
-        },
-        {
-            id: '9',
-            professorId: '50014',
-            fullName: 'อ.มาณวิกา กิตติพร',
-            role: 'รองศาสตราจารย์',
-        },
-        {
-            id: '10',
-            professorId: '6105003',
-            fullName: 'รศ.ดร.พชรวิทย์ จันทร์ศิริสิร',
-            role: 'รองศาสตราจารย์',
-        },
-    ];
+    // const rows = [
+    //     {
+    //         id: '1',
+    //         professorId: '50078',
+    //         fullName: 'รศ.ดร.สุวัฒน์ จุลสุวรรณ์',
+    //         role: 'รองศาสตราจารย์',
+    //     },
+    //     {
+    //         id: '2',
+    //         professorId: '5117',
+    //         fullName: 'ผศ.ดร.วราพร เอราวรรณ์',
+    //         role: 'รองศาสตราจารย์',
+    //     },
+    //     {
+    //         id: '3',
+    //         professorId: '5999',
+    //         fullName: 'ผศ.ก่อเกียรติ ขวัญสกุล',
+    //         role: 'รองศาสตราจารย์',
+    //     },
+    //     {
+    //         id: '4',
+    //         professorId: '5805010',
+    //         fullName: 'อ.ดร.ชนยุตฏษ์ ช้างเพชร',
+    //         role: 'รองศาสตราจารย์',
+    //     },
+    //     {
+    //         id: '5',
+    //         professorId: '50014',
+    //         fullName: 'อ.มาณวิกา กิตติพร',
+    //         role: 'รองศาสตราจารย์',
+    //     },
+    //     {
+    //         id: '6',
+    //         professorId: '6105003',
+    //         fullName: 'รศ.ดร.พชรวิทย์ จันทร์ศิริสิร',
+    //         role: 'รองศาสตราจารย์',
+    //     },
+    //     {
+    //         id: '7',
+    //         professorId: '5999',
+    //         fullName: 'ผศ.ก่อเกียรติ ขวัญสกุล',
+    //         role: 'รองศาสตราจารย์',
+    //     },
+    //     {
+    //         id: '8',
+    //         professorId: '5805010',
+    //         fullName: 'อ.ดร.ชนยุตฏษ์ ช้างเพชร',
+    //         role: 'รองศาสตราจารย์',
+    //     },
+    //     {
+    //         id: '9',
+    //         professorId: '50014',
+    //         fullName: 'อ.มาณวิกา กิตติพร',
+    //         role: 'รองศาสตราจารย์',
+    //     },
+    //     {
+    //         id: '10',
+    //         professorId: '6105003',
+    //         fullName: 'รศ.ดร.พชรวิทย์ จันทร์ศิริสิร',
+    //         role: 'รองศาสตราจารย์',
+    //     },
+    // ];
 
     const columns: GridColDef[] = [
         {
-            field: 'professorId',
-            headerName: 'userId',
+            field: 'teacher_id',
+            headerName: 'รหัสอาจารย์',
             align: 'center',
             headerAlign: 'center',
             width: 150,
             // valueGetter: (params) => params,
         },
         {
-            field: 'fullName',
+            field: 'prefix',
+            headerName: 'คำนำหน้า',
+            align: 'left',
+            headerAlign: 'center',
+            minWidth: 150,
+            // valueGetter: (params) => params,
+        },
+        {
+            field: 'fullname',
             headerName: 'ชื่อ',
             align: 'left',
             headerAlign: 'center',
+            minWidth: 200,
             flex: 1,
             // valueGetter: (params) => params,
         },
         {
-            field: 'role',
+            field: 'position',
             headerName: 'ตำแหน่ง',
             align: 'left',
             headerAlign: 'center',
@@ -114,28 +132,23 @@ const ProfessorInfoPage = () => {
             ),
         },
     ];
-
-    // const [boxWidth, setBoxWidth] = useState(window.innerWidth);
-    // const boxRef = useRef<HTMLDivElement>(null);
-
-    // useEffect(() => {
-    //     function updateHeights() {
-    //         if (boxRef.current) {
-    //             const width = boxRef.current.clientWidth;
-    //             console.log('width :: ', width);
-
-    //             setBoxWidth(width);
-    //         }
-    //     }
-    //     updateHeights();
-    //     window.addEventListener('resize', updateHeights);
-    //     return () => {
-    //         window.removeEventListener('resize', updateHeights);
-    //     };
-    // }, []);
+    const [teacherAll, setTeacherAll] = useState<Teacher[]>([]);
+    const fetchData = async () => {
+        try {
+            const response = await getAllTeacher();
+            if (response && response.message === 'success') {
+                setTeacherAll(response.payload)
+            }
+        } catch (error: any) {
+            console.error('Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     return (
-        <MenuDrawer>
+        <div>
             <Box sx={{ height: '100%', width: '100%' }}>
                 <Box>
                     <Typography textAlign="start" variant="h6" component="div">
@@ -143,7 +156,15 @@ const ProfessorInfoPage = () => {
                     </Typography>
                     <Divider />
                 </Box>
-                <Box sx={{ marginTop: 2, width: '100%' }}>
+                <Box
+                    sx={{
+                        marginTop: 2,
+                        width:
+                            window?.innerWidth > 1024
+                                ? `calc(100vw - 272px)`
+                                : `calc(100vw - 32px)`
+                    }}
+                >
                     <Grid
                         container
                         marginBottom={2}
@@ -170,9 +191,9 @@ const ProfessorInfoPage = () => {
                         </Grid>
                     </Grid>
                     <DataGrid
-                        rows={rows}
+                        rows={teacherAll}
                         columns={columns}
-                        getRowId={(row: any) => row.id}
+                        getRowId={(row: any) => row.teacher_id}
                         autoHeight
                         initialState={{
                             pagination: {
@@ -182,30 +203,12 @@ const ProfessorInfoPage = () => {
                                 },
                             },
                         }}
-                        // style={{ width: `${boxWidth}px` }}
                         pageSizeOptions={[5, 10]}
                         disableRowSelectionOnClick
                     />
                 </Box>
-                {/* <Box sx={{ height: 400, width: `${boxWidth}px` }}>
-                    <DataGrid
-                        rows={rows}
-                        columns={columns}
-                        getRowId={(row: any) => row.id}
-                        initialState={{
-                            pagination: {
-                                paginationModel: {
-                                    page: 0,
-                                    pageSize: 10,
-                                },
-                            },
-                        }}
-                        pageSizeOptions={[5, 10]}
-                        disableRowSelectionOnClick
-                    />
-                </Box> */}
             </Box>
-        </MenuDrawer>
+        </div>
     );
 };
 

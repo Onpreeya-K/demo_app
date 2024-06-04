@@ -9,26 +9,33 @@ import {
 } from '@mui/material';
 import appConfig from '../../config/application-config.json';
 import { useNavigate } from 'react-router-dom';
+import { callLoginService } from '../../services/Authen-service';
+import { setAccessToken } from '../../util/Util';
 // import router from "next/router";
 
 const Login = () => {
     const navigate = useNavigate();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        // console.log('data :: ',data);
-        const userName = (data.get('username') as string).toUpperCase();
-        const password = (data.get('password') as string).toUpperCase();
-        if (userName === 'ADMIN' && password === 'ADMIN') {
-            // console.log('success');
-            navigate('/schedule');
-            sessionStorage.setItem('ROLE', 'ADMIN');
-        } else if (userName === 'USER' && password === 'USER') {
-            navigate('/schedule');
-            sessionStorage.setItem('ROLE', 'USER');
+        try {
+            const data = new FormData(event.currentTarget);
+            const userName = (data.get('username') as string)
+            const password = (data.get('password') as string)
+            let payloadData = {
+                username: userName,
+                password: password
+            }
+            const response = await callLoginService(payloadData);
+            if (response && response.message === 'success') {
+                console.log('response :: ', response);
+                setAccessToken(response.payload.token);
+                sessionStorage.setItem('ROLE', response.payload.role.toUpperCase());
+                navigate('/schedule');
+            }
+        } catch (error: any) {
+            console.error('Error:', error);
         }
-        // data.get('username') as string, data.get('password') as string
     };
 
     const theme = createTheme({
@@ -41,24 +48,6 @@ const Login = () => {
     return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
-                {/* <Box
-                sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
-                <Typography component="h2" variant="h5">
-                    ระบบเบิกเงินค่าตอบแทนการสอน
-                </Typography>
-                <Typography component="h2" variant="h5">
-                    คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม
-                </Typography>
-                <Typography component="h2" variant="h5">
-                    เข้าสู่ระบบ
-                </Typography>
-            </Box> */}
                 <Box
                     sx={{
                         height: '100vh',
@@ -68,12 +57,6 @@ const Login = () => {
                         justifyContent: 'center',
                     }}
                 >
-                    {/* <Typography component="h2" variant="h5">
-                    ระบบเบิกเงินค่าตอบแทนการสอน
-                </Typography>
-                <Typography component="h2" variant="h5">
-                    คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม
-                </Typography> */}
                     <Typography component="h2" variant="h5">
                         เข้าสู่ระบบ
                     </Typography>

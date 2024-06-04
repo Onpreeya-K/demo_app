@@ -5,3 +5,20 @@ export const getRoleUser = () => {
 
     return role;
 };
+
+export const setAccessToken = (accessToken: string) => {
+    sessionStorage.setItem(
+        'Access_Token',
+        accessToken
+    );
+};
+
+export const getAccessToken = (): string | null => {
+    const accessTokenStr = sessionStorage.getItem(
+        'Access_Token'
+    );
+    if (accessTokenStr) {
+        return accessTokenStr;
+    }
+    return null;
+};
