@@ -40,7 +40,7 @@ const post = async ({
 const get = async ({
     url,
     header,
-    params,
+    params
 }: {
     url: string;
     header: any;
@@ -62,16 +62,18 @@ const put = async ({
     url,
     header,
     params,
+    data
 }: {
     url: string;
     header: any;
     params: any;
+    data: any
 }) => {
     try {
-        const query = new URLSearchParams(params).toString();
-        const response = await fetch(`${url}?${query}`, {
+        const response = await fetch(`${url}/${params}`, {
             method: METHOD_TYPE.PUT,
             headers: header,
+            body: JSON.stringify(data),
         });
         return await handleResponse(url, response);
     } catch (error) {
@@ -89,8 +91,7 @@ const del = async ({
     params: any;
 }) => {
     try {
-        const query = new URLSearchParams(params).toString();
-        const response = await fetch(`${url}?${query}`, {
+        const response = await fetch(`${url}/${params}`, {
             method: METHOD_TYPE.DELETE,
             headers: header,
         });
@@ -115,7 +116,7 @@ const callApi = async (
         case 'POST':
             return await post({ url: urlEndpoint, header, data: requestBody });
         case 'PUT':
-            return await put({ url: urlEndpoint, header, params });
+            return await put({ url: urlEndpoint, header, params, data: requestBody });
         case 'DELETE':
             return await del({ url: urlEndpoint, header, params });
         default:

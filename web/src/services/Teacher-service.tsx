@@ -23,3 +23,37 @@ export async function getAllTeacher() {
         return null;
     }
 }
+export async function createTeacher(data: any) {
+    const urlEndpoint = `/teacher`;
+    const header = generateHeader();
+
+    try {
+        return ServiceUtil.callApi(urlEndpoint, header, {}, data, METHOD_TYPE.POST);
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+export async function updateTeacher(param:any,data: any) {
+    const urlEndpoint = `/teacher`;
+    const header = generateHeader();
+    console.log('param ::: ',param);
+    
+    try {
+        return ServiceUtil.callApi(urlEndpoint, header, param, data, METHOD_TYPE.PUT);
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+export async function deleteTeacher(param:any) {
+    const urlEndpoint = `/teacher`;
+    const header = generateHeader();
+
+    try {
+        return ServiceUtil.callApi(urlEndpoint, header, param, {}, METHOD_TYPE.DELETE);
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}

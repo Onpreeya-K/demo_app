@@ -11,7 +11,6 @@ import appConfig from '../../config/application-config.json';
 import { useNavigate } from 'react-router-dom';
 import { callLoginService } from '../../services/Authen-service';
 import { setAccessToken } from '../../util/Util';
-// import router from "next/router";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -28,7 +27,6 @@ const Login = () => {
             }
             const response = await callLoginService(payloadData);
             if (response && response.message === 'success') {
-                console.log('response :: ', response);
                 setAccessToken(response.payload.token);
                 sessionStorage.setItem('ROLE', response.payload.role.toUpperCase());
                 navigate('/schedule');
