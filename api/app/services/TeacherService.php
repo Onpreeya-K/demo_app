@@ -24,7 +24,7 @@ class TeacherService
     }
 
     public function createTeacher($data)
-    {
+    {   $data["is_active"] = 1;
         return $this->teacherRepository->createTeacher($data);
     }
 
