@@ -72,7 +72,7 @@ $app->get('/key', function (Request $request, Response $response, $args) use ($s
 
     return $response
              ->withHeader('Content-Type', 'application/json')
-             ->withStatus(401);
+             ->withStatus(200);
 });
 
 $app->get('/111', function (Request $request, Response $response, $args) {
