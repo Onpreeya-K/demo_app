@@ -47,7 +47,12 @@ class TeacherController
 
     public function delete(Request $request, Response $response, $args)
     {
-        $this->teacherService->deleteTeacher($args['id']);
-        return $response->withStatus(204);
+        // $dataResq = arra
+        $resp = $this->teacherService->deleteTeacher($args['id']);
+        // if ($resp > 0) 
+        $response->getBody()->write(json_encode(array("data" => $resp)));
+        return $response->withHeader('Content-Type', 'application/json')
+               ->withHeader('Content-Type', 'application/json')
+               ->withStatus(202);
     }
 }
