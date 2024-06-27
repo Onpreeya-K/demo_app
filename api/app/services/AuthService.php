@@ -3,16 +3,19 @@
 namespace App\Services;
 
 use App\Repositories\UserRepository;
+use App\Repositories\TeacherRepository;
 use Firebase\JWT\JWT;
 
 class AuthService
 {
     protected $userRepository;
+    protected $teacherRopository;
     private $secret;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, TeacherRepository $teacherRepository)
     {
         $this->userRepository = $userRepository;
+        $this->teacherRopository = $teacherRepository;
         $this->secret = $_ENV['SECRET_KEY'];
 
     }
@@ -38,9 +41,9 @@ class AuthService
                 "jti" => $jti,
                 "sub" => "abc",
             ];
-            
+            $teacher = $this->teacherRopository->getTeacherById($data["username"]);
             $token = JWT::encode($payload, $this->secret , $_ENV["ALGRO"]);
-            $resp = array('token' => $token, 'role' =>$user['role'] , 'data' => $user);
+            $resp = array('token' => $token, 'role' =>$user['role'] , 'data' => $teacher);
             return json_encode($resp);
             
         } else {
