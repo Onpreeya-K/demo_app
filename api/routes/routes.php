@@ -9,11 +9,25 @@ use App\Controllers\DepartmentController;
 use App\Controllers\MajorController;
 use App\Controllers\DegreeController;
 use App\Controllers\CourseOfStudyController;
+use App\Controllers\CriteriaOfTeachController;
+use App\Controllers\LevelController;
+use App\Controllers\ScheduleTeachController;
+use App\Controllers\SubjectController;
+use App\Controllers\TermOfYearController;
 
 // // Handle preflight requests
 // $app->options('/{routes:.+}', function ($request, $response, $args) {
 //     return $response;
 // });
+
+// Handle OPTIONS requests
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', '*')
+        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+});
+
 
 // Define routes for auth
 $app->group('/auth', function (Group $group) {
@@ -74,4 +88,49 @@ $app->group('/courseOfStudy', function (Group $group) {
     $group->post('', CourseOfStudyController::class . ':create');
     $group->put('/{id}', CourseOfStudyController::class . ':update');
     $group->delete('/{id}', CourseOfStudyController::class . ':delete');
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
+
+// Define routes for criteriaOfTeach
+$app->group('/criteriaOfTeach', function (Group $group) {
+    $group->get('', CriteriaOfTeachController::class . ':fetch');
+    $group->get('/{id}', CriteriaOfTeachController::class . ':fetchByID');
+    $group->post('', CriteriaOfTeachController::class . ':create');
+    $group->put('/{id}', CriteriaOfTeachController::class . ':update');
+    $group->delete('/{id}', CriteriaOfTeachController::class . ':delete');
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
+
+// Define routes for level
+$app->group('/level', function (Group $group) {
+    $group->get('', LevelController::class . ':fetch');
+    $group->get('/{id}', LevelController::class . ':fetchByID');
+    $group->post('', LevelController::class . ':create');
+    $group->put('/{id}', LevelController::class . ':update');
+    $group->delete('/{id}', LevelController::class . ':delete');
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
+
+// Define routes for scheduleTeach
+$app->group('/scheduleTeach', function (Group $group) {
+    $group->get('', ScheduleTeachController::class . ':fetch');
+    $group->get('/{id}', ScheduleTeachController::class . ':fetchByID');
+    $group->post('', ScheduleTeachController::class . ':create');
+    $group->put('/{id}', ScheduleTeachController::class . ':update');
+    $group->delete('/{id}', ScheduleTeachController::class . ':delete');
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
+
+// Define routes for subject
+$app->group('/subject', function (Group $group) {
+    $group->get('', SubjectController::class . ':fetch');
+    $group->get('/{id}', SubjectController::class . ':fetchByID');
+    $group->post('', SubjectController::class . ':create');
+    $group->put('/{id}', SubjectController::class . ':update');
+    $group->delete('/{id}', SubjectController::class . ':delete');
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
+
+// Define routes for termOfYear
+$app->group('/termOfYear', function (Group $group) {
+    $group->get('', TermOfYearController::class . ':fetch');
+    $group->get('/{id}', TermOfYearController::class . ':fetchByID');
+    $group->post('', TermOfYearController::class . ':create');
+    $group->put('/{id}', TermOfYearController::class . ':update');
+    $group->delete('/{id}', TermOfYearController::class . ':delete');
 })->add(new AuthMiddleware($_ENV['SECRET_KEY']));

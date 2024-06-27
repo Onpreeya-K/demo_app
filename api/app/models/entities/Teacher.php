@@ -8,7 +8,7 @@ class Teacher extends Model {
     protected $table = 'teacher'; // Table name
     protected $primaryKey = 'teacher_id'; // Primary key column
     protected $fillable = ['teacher_id', 'prefix', 'fullname', 'position', 'sub_position', 'is_active']; // Fillable columns
-    protected $hidden = ['created_at', 'updated_at'];
+    protected $hidden = ['created_at', 'updated_at', 'is_active'];
     public $timestamps = true;
     public $incrementing = false; // If primary key is not auto-incrementing
     protected $keyType = 'string'; // If primary key is not an integerq                             

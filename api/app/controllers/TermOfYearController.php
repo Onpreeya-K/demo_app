@@ -4,50 +4,51 @@ namespace App\Controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use App\Services\DegreeService;
+use App\Services\TermOfYearService;
 
-class DegreeController
+class TermOfYearController
 {
-    protected $degreeService;
+    protected $termOfYearService;
 
-    public function __construct(DegreeService $degreeService)
+    public function __construct(TermOfYearService $termOfYearService)
     {
-        $this->degreeService = $degreeService;
+        $this->termOfYearService = $termOfYearService;
     }
 
     public function fetch(Request $request, Response $response, $args)
     {
-        $degrees = $this->degreeService->getAllDegrees();
-        $response->getBody()->write(json_encode($degrees));
+        $termOfYears = $this->termOfYearService->getAllTermOfYears();
+        $response->getBody()->write(json_encode($termOfYears));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
     public function fetchByID(Request $request, Response $response, $args)
     {
-        $degree = $this->degreeService->getDegreeById($args['id']);
-        $response->getBody()->write(json_encode($degree));
+        $termOfYear = $this->termOfYearService->getTermOfYearById($args['id']);
+        $response->getBody()->write(json_encode($termOfYear));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
     public function create(Request $request, Response $response, $args)
     {
+        echo "dfdfdfd";
         $data = $request->getParsedBody();
-        $degree = $this->degreeService->createDegree($data);
-        $response->getBody()->write(json_encode($degree));
+        $termOfYear = $this->termOfYearService->createTermOfYear($data);
+        $response->getBody()->write(json_encode($termOfYear));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
     public function update(Request $request, Response $response, $args)
     {
         $data = $request->getParsedBody();
-        $degree = $this->degreeService->updateDegree($args['id'], $data);
-        $response->getBody()->write(json_encode($degree));
+        $termOfYear = $this->termOfYearService->updateTermOfYear($args['id'], $data);
+        $response->getBody()->write(json_encode($termOfYear));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
     public function delete(Request $request, Response $response, $args)
     {
-        $this->degreeService->deleteDegree($args['id']);
+        $this->termOfYearService->deleteTermOfYear($args['id']);
         return $response->withStatus(204);
     }
 }

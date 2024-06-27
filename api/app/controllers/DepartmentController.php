@@ -9,7 +9,6 @@ use App\Services\DepartmentService;
 class DepartmentController
 {
     protected $departmentService;
-    private $container;
 
     public function __construct(DepartmentService $departmentService)
     {

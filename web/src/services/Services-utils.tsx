@@ -114,7 +114,7 @@ const callApi = async (
         case 'GET':
             return await get({ url: urlEndpoint, header, params });
         case 'POST':
-            return await post({ url: urlEndpoint, header, data: requestBody });
+            return await post({ url: urlEndpoint, header, data: requestBody});
         case 'PUT':
             return await put({ url: urlEndpoint, header, params, data: requestBody });
         case 'DELETE':

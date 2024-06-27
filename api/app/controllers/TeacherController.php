@@ -9,7 +9,6 @@ use App\Services\TeacherService;
 class TeacherController
 {
     protected $teacherService;
-    private $container;
 
     public function __construct(TeacherService $teacherService)
     {

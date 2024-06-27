@@ -48,6 +48,9 @@ $capsule->setAsGlobal();
 $capsule->bootEloquent();
 $secret = $_ENV['SECRET_KEY'];
 
+$app->add(ResponseMiddleware::class);
+$app->add(CorsMiddleware::class);
+
 // Load routes file
 require __DIR__ . '/../routes/routes.php';
 
@@ -64,7 +67,7 @@ $app->get('/key', function (Request $request, Response $response, $args) use ($s
         "jti" => $jti,
         "sub" => "abc",
     ];
-    
+
     $token = JWT::encode($payload, $secret , $_ENV["ALGRO"]);
     $resp = array('token' => $token);
     $payload = json_encode($resp);
@@ -88,7 +91,6 @@ $app->get('/111', function (Request $request, Response $response, $args) {
     return $response->withHeader('Content-Type', 'application/json');
 })->add(new AuthMiddleware($secret));
 
-$app->add(ResponseMiddleware::class);
-$app->add(CorsMiddleware::class);
+
 
 $app->run();

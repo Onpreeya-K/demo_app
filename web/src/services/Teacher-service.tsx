@@ -5,7 +5,7 @@ const generateHeader = (): any => {
     let header: any = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'transactionDateTime': new Date().toISOString(),
+        // 'TransactionDateTime': new Date().toISOString(),
     };
     const accessToken = getAccessToken();
     header.Authorization = accessToken ? `Bearer ${accessToken}` : '';
