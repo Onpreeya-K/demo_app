@@ -52,7 +52,6 @@ class TeacherController
         // if ($resp > 0) 
         $response->getBody()->write(json_encode(array("data" => $resp)));
         return $response->withHeader('Content-Type', 'application/json')
-               ->withHeader('Content-Type', 'application/json')
                ->withStatus(202);
     }
 }
