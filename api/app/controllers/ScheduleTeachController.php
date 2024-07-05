@@ -30,6 +30,15 @@ class ScheduleTeachController {
     public function fetchScheduleTeachByID(Request $request, Response $response, $args) {
         $scheduleTeachId = $args['id'];
         $scheduleTeach = $this->scheduleTeachService->getScheduleTeachById($scheduleTeachId);
+        $response->getBody()->write(json_encode($scheduleTeach));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    // /scheduleTeach/teacherSchedule/{id}
+    public function fetchListTeacherBytermOfID(Request $request, Response $response, $args) {
+        $termOfYearId = $args['id'];
+        $scheduleTeach = $this->scheduleTeachService->getTeacherScheduleByTermOfYearId($termOfYearId);
+        $response->getBody()->write(json_encode($scheduleTeach));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
