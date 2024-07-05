@@ -93,6 +93,7 @@ $app->group('/courseOfStudy', function (Group $group) {
 // Define routes for criteriaOfTeach
 $app->group('/criteriaOfTeach', function (Group $group) {
     $group->get('', CriteriaOfTeachController::class . ':fetch');
+    $group->get('/level', CriteriaOfTeachController::class . ':fetchByLevelId');
     $group->get('/{id}', CriteriaOfTeachController::class . ':fetchByID');
     $group->post('', CriteriaOfTeachController::class . ':create');
     $group->put('/{id}', CriteriaOfTeachController::class . ':update');
@@ -112,6 +113,7 @@ $app->group('/level', function (Group $group) {
 $app->group('/scheduleTeach', function (Group $group) {
     $group->get('', ScheduleTeachController::class . ':fetch');
     $group->get('/{id}', ScheduleTeachController::class . ':fetchByID');
+    $group->get('/teacherSchedule/{id}', ScheduleTeachController::class . ':fetchListTeacherBytermOfID');
     $group->post('', ScheduleTeachController::class . ':create');
     $group->put('/{id}', ScheduleTeachController::class . ':update');
     $group->delete('/{id}', ScheduleTeachController::class . ':delete');
