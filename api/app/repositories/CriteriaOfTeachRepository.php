@@ -10,6 +10,10 @@ class CriteriaOfTeachRepository
     {
         return CriteriaOfTeach::get();
     }
+    public function getAllCriteriaOfTeachsByLevelId($level_id)
+    {
+        return CriteriaOfTeach::with(['courseOfStudy', 'level'])->whereIn('level_id', $level_id)->get();
+    }
 
     public function getCriteriaOfTeachById($id)
     {
@@ -24,11 +28,11 @@ class CriteriaOfTeachRepository
 
     public function updateCriteriaOfTeach($id, $data)
     {
-        return CriteriaOfTeach::where('subject_id', $id)->update($data);
+        return CriteriaOfTeach::where('criteria_of_teach_id', $id)->update($data);
     }
 
     public function deleteCriteriaOfTeach($id)
     {
-        return CriteriaOfTeach::where('subject_id', $id)->delete();
+        return CriteriaOfTeach::where('criteria_of_teach_id', $id)->delete();
     }
 }

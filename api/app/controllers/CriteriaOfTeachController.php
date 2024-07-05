@@ -27,6 +27,13 @@ class CriteriaOfTeachController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public function fetchByLevelId(Request $request, Response $response, $args)
+    {
+        $criteriaOfTeach = $this->criteriaOfTeachService->getCriteriaOfTeachByLevelId();
+        $response->getBody()->write(json_encode($criteriaOfTeach));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
     public function fetchCriteriaOfTeachByID(Request $request, Response $response, $args) {
         $criteriaOfTeachId = $args['id'];
         $criteriaOfTeach = $this->criteriaOfTeachService->getCriteriaOfTeachById($criteriaOfTeachId);
