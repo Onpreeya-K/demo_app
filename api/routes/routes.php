@@ -2,18 +2,18 @@
 
 use App\Middleware\AuthMiddleware;
 use Slim\Routing\RouteCollectorProxy as Group;
-use App\Controllers\AuthController;
-use App\Controllers\TeacherController;
-use App\Controllers\UserController;
-use App\Controllers\DepartmentController;
-use App\Controllers\MajorController;
-use App\Controllers\DegreeController;
-use App\Controllers\CourseOfStudyController;
-use App\Controllers\CriteriaOfTeachController;
-use App\Controllers\LevelController;
-use App\Controllers\ScheduleTeachController;
-use App\Controllers\SubjectController;
-use App\Controllers\TermOfYearController;
+use App\Modules\Auth\AuthController;
+use App\Modules\Teacher\TeacherController;
+use App\Modules\User\UserController;
+use App\Modules\Department\DepartmentController;
+use App\Modules\Major\MajorController;
+use App\Modules\Degree\DegreeController;
+use App\Modules\CourseOfStudy\CourseOfStudyController;
+use App\Modules\CriteriaOfTeach\CriteriaOfTeachController;
+use App\Modules\Level\LevelController;
+use App\Modules\ScheduleTeach\ScheduleTeachController;
+use App\Modules\Subject\SubjectController;
+use App\Modules\TermOfYear\TermOfYearController;
 
 // // Handle preflight requests
 // $app->options('/{routes:.+}', function ($request, $response, $args) {
@@ -61,15 +61,6 @@ $app->group('/department', function (Group $group) {
     $group->post('', DepartmentController::class . ':create');
     $group->put('/{id}', DepartmentController::class . ':update');
     $group->delete('/{id}', DepartmentController::class . ':delete');
-})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
-
-// Define routes for major
-$app->group('/major', function (Group $group) {
-    $group->get('', MajorController::class . ':fetch');
-    $group->get('/{id}', MajorController::class . ':fetchByID');
-    $group->post('', MajorController::class . ':create');
-    $group->put('/{id}', MajorController::class . ':update');
-    $group->delete('/{id}', MajorController::class . ':delete');
 })->add(new AuthMiddleware($_ENV['SECRET_KEY']));
 
 // Define routes for degree
