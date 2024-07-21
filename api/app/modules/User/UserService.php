@@ -22,7 +22,7 @@ class UserService
     }
 
     public function createUser($data)
-    {
+    {   
         return $this->userRepository->createUser($data);
     }
 

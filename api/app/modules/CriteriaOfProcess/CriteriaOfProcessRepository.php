@@ -10,10 +10,6 @@ class CriteriaOfProcessRepository
     {
         return CriteriaOfProcess::get();
     }
-    public function getAllCriteriaOfProcesssByLevelId($level_id)
-    {
-        return CriteriaOfProcess::with(['courseOfStudy', 'level'])->whereIn('level_id', $level_id)->get();
-    }
 
     public function getCriteriaOfProcessById($id)
     {

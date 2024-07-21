@@ -20,7 +20,7 @@ class ManagementPosition extends Model {
     }
 
     public function teacher() {
-        return $this->hasMany(Teacher::class, 'level_id');
+        return $this->hasMany(Teacher::class, 'm_id');
     }
 }
   

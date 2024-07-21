@@ -4,46 +4,36 @@ namespace App\Modules\ManagementPosition;
 
 class ManagementPositionService
 {
-    protected $criteriaOfTeachRepository;
+    protected $managementPositionRepository;
 
-    public function __construct(ManagementPositionRepository $criteriaOfTeachRepository)
+    public function __construct(ManagementPositionRepository $managementPositionRepository)
     {
-        $this->criteriaOfTeachRepository = $criteriaOfTeachRepository;
+        $this->managementPositionRepository = $managementPositionRepository;
     }
 
     public function getAllManagementPositions()
     {
-        return $this->criteriaOfTeachRepository->getAllManagementPositions();
+        return $this->managementPositionRepository->getAllManagementPositions();
     }
 
     public function getManagementPositionById($id)
     {
-        return $this->criteriaOfTeachRepository->getManagementPositionById($id);
-    }
-
-    public function getManagementPositionByLevelId()
-    {
-        $levelData = array("bachelor" => array(1,2) , "master" => array(5,8), "doctor" => array(6,9), "master_inter" => array(51,81), "doctor_inter" => array(61,91));
-        $result = array();
-        foreach ($levelData as $key => $value) {
-            $result[$key] = $this->criteriaOfTeachRepository->getAllManagementPositionsByLevelId($value);
-        }
-        return $result;
+        return $this->managementPositionRepository->getManagementPositionById($id);
     }
 
     public function createManagementPosition($data)
     {
-        return $this->criteriaOfTeachRepository->createManagementPosition($data);
+        return $this->managementPositionRepository->createManagementPosition($data);
     }
 
     public function updateManagementPosition($id, $data)
     {
         // $data->
-        return $this->criteriaOfTeachRepository->updateManagementPosition($id, $data);
+        return $this->managementPositionRepository->updateManagementPosition($id, $data);
     }
 
     public function deleteManagementPosition($id)
     {
-        return $this->criteriaOfTeachRepository->deleteManagementPosition($id);
+        return $this->managementPositionRepository->deleteManagementPosition($id);
     }
 }

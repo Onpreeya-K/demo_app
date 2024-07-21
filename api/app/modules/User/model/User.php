@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class User extends Model {
     protected $table = 'user';
     protected $primaryKey = 'username';
-    protected $fillable = ['username', 'role'];
+    protected $fillable = ['username', 'role', 'password'];
     protected $hidden = ['created_at', 'updated_at', 'password'];
     public $incrementing = false; // Assuming username is not auto-incrementing
     public $timestamps = false;

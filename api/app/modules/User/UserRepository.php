@@ -18,7 +18,6 @@ class UserRepository
 
     public function createUser($data)
     {
-        
         return User::create($data);
     }
 

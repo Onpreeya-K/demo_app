@@ -10,10 +10,6 @@ class ManagementPositionRepository
     {
         return ManagementPosition::get();
     }
-    public function getAllManagementPositionsByLevelId($level_id)
-    {
-        return ManagementPosition::with(['courseOfStudy', 'level'])->whereIn('level_id', $level_id)->get();
-    }
 
     public function getManagementPositionById($id)
     {
