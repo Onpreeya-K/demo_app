@@ -15,6 +15,7 @@ use App\Modules\Subject\SubjectController;
 use App\Modules\TermOfYear\TermOfYearController;
 use App\Modules\CriteriaOfProcess\CriteriaOfProcessController;
 use App\Modules\ManagementPosition\ManagementPositionController;
+use App\Modules\AcademicPosition\AcademicPositionController;
 
 // Handle OPTIONS requests
 $app->options('/{routes:.+}', function ($request, $response, $args) {
@@ -139,4 +140,12 @@ $app->group('/managementPosition', function (Group $group) {
     $group->post('', ManagementPositionController::class . ':create');
     $group->put('/{id}', ManagementPositionController::class . ':update');
     $group->delete('/{id}', ManagementPositionController::class . ':delete');
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
+
+$app->group('/academicPosition', function (Group $group) {
+    $group->get('', AcademicPositionController::class . ':fetch');
+    $group->get('/{id}', AcademicPositionController::class . ':fetchByID');
+    $group->post('', AcademicPositionController::class . ':create');
+    $group->put('/{id}', AcademicPositionController::class . ':update');
+    $group->delete('/{id}', AcademicPositionController::class . ':delete');
 })->add(new AuthMiddleware($_ENV['SECRET_KEY']));
