@@ -8,7 +8,7 @@ class TeacherRepository
 {
     public function getAllTeachers()
     {
-        return Teacher::with('managementPosition')->where('is_active', 1)->get();
+        return Teacher::with(['managementPosition', 'academicPosition'])->where('is_active', 1)->get();
     }
 
     public function getTeacherById($id)
