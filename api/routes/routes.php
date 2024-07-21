@@ -6,7 +6,6 @@ use App\Modules\Auth\AuthController;
 use App\Modules\Teacher\TeacherController;
 use App\Modules\User\UserController;
 use App\Modules\Department\DepartmentController;
-use App\Modules\Major\MajorController;
 use App\Modules\Degree\DegreeController;
 use App\Modules\CourseOfStudy\CourseOfStudyController;
 use App\Modules\CriteriaOfTeach\CriteriaOfTeachController;
@@ -14,11 +13,8 @@ use App\Modules\Level\LevelController;
 use App\Modules\ScheduleTeach\ScheduleTeachController;
 use App\Modules\Subject\SubjectController;
 use App\Modules\TermOfYear\TermOfYearController;
-
-// // Handle preflight requests
-// $app->options('/{routes:.+}', function ($request, $response, $args) {
-//     return $response;
-// });
+use App\Modules\CriteriaOfProcess\CriteriaOfProcessController;
+use App\Modules\ManagementPosition\ManagementPositionController;
 
 // Handle OPTIONS requests
 $app->options('/{routes:.+}', function ($request, $response, $args) {
@@ -126,4 +122,21 @@ $app->group('/termOfYear', function (Group $group) {
     $group->post('', TermOfYearController::class . ':create');
     $group->put('/{id}', TermOfYearController::class . ':update');
     $group->delete('/{id}', TermOfYearController::class . ':delete');
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
+
+// Define routes for criteriaOfProcess
+$app->group('/criteriaOfProcess', function (Group $group) {
+    $group->get('', CriteriaOfProcessController::class . ':fetch');
+    $group->get('/{id}', CriteriaOfProcessController::class . ':fetchByID');
+    $group->post('', CriteriaOfProcessController::class . ':create');
+    $group->put('/{id}', CriteriaOfProcessController::class . ':update');
+    $group->delete('/{id}', CriteriaOfProcessController::class . ':delete');
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
+
+$app->group('/managementPosition', function (Group $group) {
+    $group->get('', ManagementPositionController::class . ':fetch');
+    $group->get('/{id}', ManagementPositionController::class . ':fetchByID');
+    $group->post('', ManagementPositionController::class . ':create');
+    $group->put('/{id}', ManagementPositionController::class . ':update');
+    $group->delete('/{id}', ManagementPositionController::class . ':delete');
 })->add(new AuthMiddleware($_ENV['SECRET_KEY']));

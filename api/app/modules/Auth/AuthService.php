@@ -2,8 +2,8 @@
 
 namespace App\Modules\Auth;
 
-use App\Repositories\UserRepository;
-use App\Repositories\TeacherRepository;
+use App\Modules\User\UserRepository;
+use App\Modules\Teacher\TeacherRepository;
 use Firebase\JWT\JWT;
 
 class AuthService

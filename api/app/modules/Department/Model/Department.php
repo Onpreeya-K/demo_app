@@ -14,7 +14,7 @@ class Department extends Model {
     public $incrementing = true; // If primary key is not auto-incrementing
     protected $keyType = 'int'; // If primary key is not an integer
 
-    public function major() {
+    public function courseOfStudy() {
         return $this->hasMany(CourseOfStudy::class, 'department_id'); 
     }
 }

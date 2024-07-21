@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Modules\ManagementPosition;
+
+use App\Modules\ManagementPosition\Model\ManagementPosition;
+
+class ManagementPositionRepository
+{
+    public function getAllManagementPositions()
+    {
+        return ManagementPosition::get();
+    }
+    public function getAllManagementPositionsByLevelId($level_id)
+    {
+        return ManagementPosition::with(['courseOfStudy', 'level'])->whereIn('level_id', $level_id)->get();
+    }
+
+    public function getManagementPositionById($id)
+    {
+        return ManagementPosition::find($id);
+    }
+
+    public function createManagementPosition($data)
+    {
+        
+        return ManagementPosition::create($data);
+    }
+
+    public function updateManagementPosition($id, $data)
+    {
+        return ManagementPosition::where('criteria_of_teach_id', $id)->update($data);
+    }
+
+    public function deleteManagementPosition($id)
+    {
+        return ManagementPosition::where('criteria_of_teach_id', $id)->delete();
+    }
+}
