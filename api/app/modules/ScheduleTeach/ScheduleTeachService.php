@@ -21,9 +21,9 @@ class ScheduleTeachService
         return $this->scheduleTeachRepository->getAllScheduleTeachs();
     }
 
-    public function getScheduleTeachById($id)
+    public function getScheduleTeachByTermIdAndTeacherID($termID, $teacherID)
     {
-        return $this->scheduleTeachRepository->getScheduleTeachById($id);
+        return $this->scheduleTeachRepository->getScheduleTeachByTermIdAndTeacherID($termID, $teacherID);
     }
 
     public function getTeacherScheduleByTermOfYearId($termOfYearId){
@@ -41,7 +41,20 @@ class ScheduleTeachService
 
     public function createScheduleTeach($data)
     {
-        return $this->scheduleTeachRepository->createScheduleTeach($data);
+        $teacherID = $data['teacher_id'];
+        $termID = $data['term_of_year_id'];
+        $scheduleList = $data['data'];
+
+        foreach ($scheduleList as $value) {
+            $value['teacher_id'] = $teacherID;
+            $value['subject_id'] = explode("-",$value['course_code'])[0];
+            $value['term_of_year_id'] = $termID;
+
+            $this->scheduleTeachRepository->createScheduleTeach($value);
+        }
+
+        return null;
+        // $this->scheduleTeachRepository->createScheduleTeach($data);
     }
 
     public function updateScheduleTeach($id, $data)

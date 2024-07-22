@@ -11,9 +11,11 @@ class ScheduleTeachRepository
         return ScheduleTeach::get();
     }
 
-    public function getScheduleTeachById($id)
+    public function getScheduleTeachByTermIdAndTeacherID($termID, $teacherID)
     {
-        return ScheduleTeach::find($id);
+        return ScheduleTeach::where('teacher_id', $teacherID)
+                            ->where('term_of_year_id', $termID)
+                            ->get();
     }
     
     public function getTeacherSchedule($termOfYearId){
