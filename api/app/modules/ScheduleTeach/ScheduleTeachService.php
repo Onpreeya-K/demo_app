@@ -23,7 +23,14 @@ class ScheduleTeachService
 
     public function getScheduleTeachByTermIdAndTeacherID($termID, $teacherID)
     {
-        return $this->scheduleTeachRepository->getScheduleTeachByTermIdAndTeacherID($termID, $teacherID);
+        $data = $this->scheduleTeachRepository->getScheduleTeachByTermIdAndTeacherID($termID, $teacherID);
+        foreach ($data as $value) {
+            $value->course_name = $value->subject->name;
+            $value->course_unit = $value->subject->unit.' '.$value->subject->type;
+        }
+
+        data_forget($data, '*.subject');
+        return $data;
     }
 
     public function getTeacherScheduleByTermOfYearId($termOfYearId){
