@@ -1,65 +1,62 @@
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import {
+    Autocomplete,
     Box,
-    BoxProps,
     Button,
+    Dialog,
+    DialogContent,
+    DialogTitle,
     Divider,
     Grid,
     IconButton,
-    Modal,
     TextField,
+    Tooltip,
     Typography,
-    styled,
 } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridLocaleText } from '@mui/x-data-grid';
 import { useEffect, useRef, useState } from 'react';
+import PopupConfirm from '../../components/popupConfirm/Popup-Confirm';
+import SnackBarAlert from '../../components/snackbar/Snackbar-alert';
 import {
     createTeacher,
     deleteTeacher,
+    getAcademicPosition,
     getAllTeacher,
+    getManagementPosition,
     updateTeacher,
 } from '../../services/Teacher-service';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 interface Teacher {
     teacher_id: string;
     prefix: string;
     fullname: string;
-    position: string;
-    sub_position: string;
+    academic_position: AcademicPosition;
+    management_position: ManagementPosition;
 }
 interface FormState {
     teacher_id: string;
     prefix: string;
     fullname: string;
-    position: string;
-    sub_position: string;
+    academic_position: AcademicPosition | null;
+    management_position: ManagementPosition | null;
 }
-
+interface ManagementPosition {
+    m_id: number;
+    criteria_of_process_id: number;
+    name: string;
+}
+interface AcademicPosition {
+    a_id: number;
+    name: string;
+}
 interface ErrorState {
     teacher_id: boolean;
     prefix: boolean;
     fullname: boolean;
-    position: boolean;
-    sub_position: boolean;
+    academic_position: boolean;
+    management_position: boolean;
 }
-const StyledBox = styled(Box)<BoxProps>(({ theme }) => ({
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '40%',
-    height: '60%',
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: '24px',
-    borderRadius: '0.5em',
-    textAlign: 'center',
-    padding: '1.2em',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1em',
-    minHeight: '300px',
-}));
 
 const ProfessorInfoPage = () => {
     const startPage = useRef(false);
@@ -70,25 +67,39 @@ const ProfessorInfoPage = () => {
         teacher_id: '',
         prefix: '',
         fullname: '',
-        position: '',
-        sub_position: '',
+        academic_position: null,
+        management_position: null,
     });
 
     const [errors, setErrors] = useState<ErrorState>({
         teacher_id: false,
         prefix: false,
         fullname: false,
-        position: false,
-        sub_position: false,
+        academic_position: false,
+        management_position: false,
     });
     const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const [isOpenPopupConfirm, setIsOpenPopupConfirm] =
+        useState<boolean>(false);
+    const [isOpenSnackBar, setIsOpenSnackBar] = useState<boolean>(false);
+    const [messageSnackBar, setMessageSnackBar] = useState<string>('');
+    const [optionManagementPosition, setOptionManagementPosition] = useState<
+        ManagementPosition[]
+    >([]);
+    const [optionAcademicPosition, setOptionAcademicPosition] = useState<
+        AcademicPosition[]
+    >([]);
+
     const columns: GridColDef[] = [
         {
             field: 'teacher_id',
             headerName: 'รหัสอาจารย์',
             align: 'center',
             headerAlign: 'center',
-            width: 150,
+            width: 180,
+            sortable: false,
+            resizable: false,
+            disableColumnMenu: true,
         },
         {
             field: 'prefix',
@@ -96,6 +107,9 @@ const ProfessorInfoPage = () => {
             align: 'left',
             headerAlign: 'center',
             minWidth: 150,
+            sortable: false,
+            resizable: false,
+            disableColumnMenu: true,
         },
         {
             field: 'fullname',
@@ -104,20 +118,35 @@ const ProfessorInfoPage = () => {
             headerAlign: 'center',
             minWidth: 200,
             flex: 1,
+            sortable: false,
+            resizable: false,
+            disableColumnMenu: true,
         },
         {
             field: 'position',
-            headerName: 'ตำแหน่ง',
+            headerName: 'ตำแหน่งทางวิชาการ',
             align: 'left',
             headerAlign: 'center',
             width: 200,
+            sortable: false,
+            resizable: false,
+            disableColumnMenu: true,
+            renderCell: (params) => (
+                <div>{params.row.academic_position.name}</div>
+            ),
         },
         {
-            field: 'sub_position',
-            headerName: 'ตำแหน่ง',
+            field: 'management_position',
+            headerName: 'ตำแหน่งบริหาร',
             align: 'left',
             headerAlign: 'center',
             width: 200,
+            sortable: false,
+            resizable: false,
+            disableColumnMenu: true,
+            renderCell: (params) => (
+                <div>{params.row.management_position.name}</div>
+            ),
         },
         {
             field: 'edit',
@@ -125,20 +154,27 @@ const ProfessorInfoPage = () => {
             align: 'center',
             headerAlign: 'center',
             width: 150,
+            sortable: false,
+            resizable: false,
+            disableColumnMenu: true,
             renderCell: (params) => (
                 <div>
-                    <IconButton
-                        size="small"
-                        onClick={() => onClickEditData(params.row)}
-                    >
-                        <EditIcon fontSize="inherit" />
-                    </IconButton>
-                    <IconButton
-                        size="small"
-                        onClick={() => onClickDeleteData(params.row)}
-                    >
-                        <DeleteOutlineIcon fontSize="inherit" />
-                    </IconButton>
+                    <Tooltip title="แก้ไข" placement="top">
+                        <IconButton
+                            size="small"
+                            onClick={() => onClickEditData(params.row)}
+                        >
+                            <EditIcon fontSize="inherit" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="ลบ" placement="top">
+                        <IconButton
+                            size="small"
+                            onClick={() => onClickDeleteData(params.row)}
+                        >
+                            <DeleteOutlineIcon fontSize="inherit" />
+                        </IconButton>
+                    </Tooltip>
                 </div>
             ),
         },
@@ -148,12 +184,20 @@ const ProfessorInfoPage = () => {
         setOpenDialog(true);
         setForm(row);
     };
+
+    const onConfirmDelete = async () => {
+        const response = await deleteTeacher(form.teacher_id);
+        setIsOpenPopupConfirm(false);
+        if (response && response.message === 'success') {
+            await fetchData();
+            setIsOpenSnackBar(true);
+            setMessageSnackBar('ลบรายชื่ออาจารย์สำเร็จ');
+        }
+    };
+
     const onClickDeleteData = async (row: Teacher) => {
         setForm(row);
-        const response = await deleteTeacher(row.teacher_id);
-        if (response && response.message === 'success') {
-            fetchData();
-        }
+        setIsOpenPopupConfirm(true);
     };
 
     const fetchData = async () => {
@@ -163,12 +207,27 @@ const ProfessorInfoPage = () => {
                 setTeacherAll(response.payload);
                 setDataTable(response.payload);
             }
+            const responseManagementPosition = await getManagementPosition();
+            if (
+                responseManagementPosition &&
+                responseManagementPosition.message === 'success'
+            ) {
+                setOptionManagementPosition(responseManagementPosition.payload);
+            }
+            const responseAcademicPosition = await getAcademicPosition();
+            if (
+                responseAcademicPosition &&
+                responseAcademicPosition.message === 'success'
+            ) {
+                setOptionAcademicPosition(responseAcademicPosition.payload);
+            }
         } catch (error: any) {
             console.error('Error:', error);
         }
     };
 
     const onClickAddProfessor = () => {
+        clearForm();
         setModalAction('CREATE');
         setOpenDialog(true);
     };
@@ -185,20 +244,38 @@ const ProfessorInfoPage = () => {
         });
     };
 
+    const onChangeAutocompleteManagementPosition = (
+        option: ManagementPosition | null
+    ) => {
+        setForm({
+            ...form,
+            management_position: option,
+        });
+    };
+
+    const onChangeAutocompleteAcademicPosition = (
+        option: AcademicPosition | null
+    ) => {
+        setForm({
+            ...form,
+            academic_position: option,
+        });
+    };
+
     const clearForm = () => {
         setForm({
             teacher_id: '',
             prefix: '',
             fullname: '',
-            position: '',
-            sub_position: '',
+            academic_position: null,
+            management_position: null,
         });
         setErrors({
             teacher_id: false,
             prefix: false,
             fullname: false,
-            position: false,
-            sub_position: false,
+            academic_position: false,
+            management_position: false,
         });
     };
 
@@ -207,8 +284,8 @@ const ProfessorInfoPage = () => {
             teacher_id: form.teacher_id === '',
             prefix: form.prefix === '',
             fullname: form.fullname === '',
-            position: form.position === '',
-            sub_position: form.sub_position === '',
+            academic_position: !form.academic_position,
+            management_position: !form.management_position,
         };
         setErrors(tempErrors);
         return Object.values(tempErrors).every((x) => x === false);
@@ -216,15 +293,39 @@ const ProfessorInfoPage = () => {
 
     const onSubmitAddProfessor = async () => {
         if (validate()) {
-            const response =
-                modalAction === 'CREATE'
-                    ? await createTeacher(form)
-                    : await updateTeacher(form.teacher_id, form);
-            if (response && response.message === 'success') {
-                setModalAction('');
-                setOpenDialog(false);
-                clearForm();
-                fetchData();
+            setOpenDialog(false);
+            if (modalAction === 'CREATE') {
+                const payload = {
+                    teacher_id: form.teacher_id,
+                    prefix: form.prefix,
+                    fullname: form.fullname,
+                    a_id: form.academic_position?.a_id,
+                    m_id: form.management_position?.m_id,
+                };
+                const response = await createTeacher(payload);
+                if (response && response.message === 'success') {
+                    setModalAction('');
+                    setMessageSnackBar('เพิ่มรายชื่ออาจารย์สำเร็จ');
+                    clearForm();
+                    setIsOpenSnackBar(true);
+                    fetchData();
+                }
+            } else {
+                const payload = {
+                    teacher_id: form.teacher_id,
+                    prefix: form.prefix,
+                    fullname: form.fullname,
+                    a_id: form.academic_position?.a_id,
+                    m_id: form.management_position?.m_id,
+                };
+                const response = await updateTeacher(form.teacher_id, payload);
+                if (response && response.message === 'success') {
+                    setModalAction('');
+                    setMessageSnackBar('แก้ไขรายชื่ออาจารย์สำเร็จ');
+                    clearForm();
+                    setIsOpenSnackBar(true);
+                    fetchData();
+                }
             }
         } else {
             console.log('Form has errors.');
@@ -245,6 +346,11 @@ const ProfessorInfoPage = () => {
         }
     };
 
+    const onCloseSnackBar = () => {
+        setIsOpenSnackBar(false);
+        setMessageSnackBar('');
+    };
+
     useEffect(() => {
         if (startPage.current === false) {
             fetchData();
@@ -256,15 +362,24 @@ const ProfessorInfoPage = () => {
 
     const renderDialogAddProfessor = () => {
         return (
-            <Modal open={openDialog}>
-                <StyledBox>
-                    <div>
-                        <Typography variant="h6">
-                            เพิ่มรายชื่ออาจารย์
-                        </Typography>
-                        <Divider />
-                    </div>
-                    <Grid container spacing={2}>
+            <Dialog
+                open={openDialog}
+                onClose={() => {
+                    clearForm();
+                    setOpenDialog(false);
+                }}
+                fullWidth
+            >
+                <DialogTitle sx={{ padding: '16px 24px 8px 24px' }}>
+                    <Typography textAlign="center" variant="h6" component="div">
+                        {modalAction === 'CREATE'
+                            ? 'เพิ่มรายชื่ออาจารย์'
+                            : 'แก้ไขรายชื่ออาจารย์'}
+                    </Typography>
+                    <Divider />
+                </DialogTitle>
+                <DialogContent sx={{ padding: 3 }}>
+                    <Grid container spacing={2} paddingTop={1}>
                         <Grid item xs={12}>
                             <TextField
                                 required
@@ -276,8 +391,7 @@ const ProfessorInfoPage = () => {
                                 onChange={handleChange}
                                 error={errors.teacher_id}
                                 helperText={
-                                    errors.teacher_id &&
-                                    'This field is required'
+                                    errors.teacher_id && 'กรุณาระบุรหัสอาจารย์'
                                 }
                             />
                         </Grid>
@@ -292,7 +406,7 @@ const ProfessorInfoPage = () => {
                                 onChange={handleChange}
                                 error={errors.prefix}
                                 helperText={
-                                    errors.prefix && 'This field is required'
+                                    errors.prefix && 'กรุณาระบุคำนำหน้า'
                                 }
                             />
                         </Grid>
@@ -307,43 +421,76 @@ const ProfessorInfoPage = () => {
                                 onChange={handleChange}
                                 error={errors.fullname}
                                 helperText={
-                                    errors.fullname && 'This field is required'
+                                    errors.fullname && 'กรุณาระบุชื่อ - นามสกุล'
                                 }
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                required
-                                label="ตำแหน่ง"
-                                name="position"
+                            <Autocomplete
                                 size="small"
                                 fullWidth
-                                value={form.position}
-                                onChange={handleChange}
-                                error={errors.position}
-                                helperText={
-                                    errors.position && 'This field is required'
+                                options={optionAcademicPosition}
+                                getOptionLabel={(option) => option.name}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        required
+                                        label="ตำแหน่งทางวิชาการ"
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        error={errors.academic_position}
+                                        helperText={
+                                            errors.academic_position &&
+                                            'กรุณาเลือกตำแหน่งทางวิชาการ'
+                                        }
+                                    />
+                                )}
+                                isOptionEqualToValue={(option, value) =>
+                                    option.a_id === value.a_id
+                                }
+                                value={form.academic_position}
+                                onChange={(_e, option) =>
+                                    onChangeAutocompleteAcademicPosition(option)
                                 }
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                required
-                                label="ตำแหน่ง"
-                                name="sub_position"
+                            <Autocomplete
                                 size="small"
                                 fullWidth
-                                value={form.sub_position}
-                                onChange={handleChange}
-                                error={errors.sub_position}
-                                helperText={
-                                    errors.sub_position &&
-                                    'This field is required'
+                                options={optionManagementPosition || []}
+                                getOptionLabel={(option) => option.name}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        required
+                                        label="ตำแหน่งบริหาร"
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        error={errors.management_position}
+                                        helperText={
+                                            errors.management_position &&
+                                            'กรุณาเลือกตำแหน่งบริหาร'
+                                        }
+                                    />
+                                )}
+                                isOptionEqualToValue={(option, value) =>
+                                    option.m_id === value.m_id
+                                }
+                                value={form.management_position}
+                                onChange={(_e, option) =>
+                                    onChangeAutocompleteManagementPosition(
+                                        option
+                                    )
                                 }
                             />
                         </Grid>
                     </Grid>
-                    <Grid container component={'div'}>
+                    <Grid container component={'div'} marginTop={2}>
                         <Grid
                             item
                             xs={12}
@@ -358,87 +505,104 @@ const ProfessorInfoPage = () => {
                                     setOpenDialog(false);
                                 }}
                             >
-                                Cancel
+                                ยกเลิก
                             </Button>
                             <Button
                                 variant="contained"
                                 onClick={onSubmitAddProfessor}
                             >
-                                Create
+                                {modalAction === 'CREATE'
+                                    ? 'เพิ่ม'
+                                    : 'ยืนยันการแก้ไข'}
                             </Button>
                         </Grid>
                     </Grid>
-                </StyledBox>
-            </Modal>
+                </DialogContent>
+            </Dialog>
         );
+    };
+
+    const localeText: Partial<GridLocaleText> = {
+        MuiTablePagination: {
+            labelDisplayedRows: ({ from, to, count }) =>
+                `รายชื่ออาจารย์ตั้งแต่ ${from} ถึง ${to} จาก ${
+                    count !== -1 ? count : `${to}`
+                }`,
+            labelRowsPerPage: 'จำนวนอาจารย์ต่อหน้า',
+        },
     };
 
     return (
         <div>
-            <Box sx={{ height: '100%', width: '100%' }}>
-                <Box>
-                    <Typography textAlign="start" variant="h6" component="div">
-                        ข้อมูลอาจารย์
-                    </Typography>
-                    <Divider />
-                </Box>
-                <Box
-                    sx={{
-                        marginTop: 2,
-                        width:
-                            window?.innerWidth > 1024
-                                ? `calc(100vw - 272px)`
-                                : `calc(100vw - 32px)`,
-                    }}
+            <Box>
+                <Typography textAlign="start" variant="h6" component="div">
+                    ข้อมูลอาจารย์
+                </Typography>
+                <Divider />
+            </Box>
+            <Box
+                sx={{
+                    marginTop: 2,
+                    width:
+                        window?.innerWidth > 1024
+                            ? `calc(100vw - 272px)`
+                            : `calc(100vw - 32px)`,
+                }}
+            >
+                <Grid
+                    container
+                    marginBottom={2}
+                    spacing={2}
+                    alignItems="center"
                 >
-                    {renderDialogAddProfessor()}
-                    <Grid
-                        container
-                        marginBottom={2}
-                        spacing={2}
-                        alignItems="center"
-                    >
-                        <Grid item xs={8} md={10}>
-                            <TextField
-                                fullWidth
-                                size="small"
-                                label="ค้นหารายชื่อ"
-                                variant="outlined"
-                                onChange={onChangeSaleOwnerAndRefer}
-                            />
-                        </Grid>
-                        {/* <Grid item xs={4} md={2}>
-                            <Button fullWidth variant="contained">
-                                ค้นหา
-                            </Button>
-                        </Grid> */}
-                        <Grid item xs={12} md={2}>
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                onClick={onClickAddProfessor}
-                            >
-                                เพิ่มรายชื่ออาจารย์
-                            </Button>
-                        </Grid>
+                    <Grid item xs={12} md={10}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            label="ค้นหารายชื่อ"
+                            variant="outlined"
+                            onChange={onChangeSaleOwnerAndRefer}
+                        />
                     </Grid>
-                    <DataGrid
-                        rows={dataTable}
-                        columns={columns}
-                        getRowId={(row: any) => row.teacher_id}
-                        autoHeight
-                        initialState={{
-                            pagination: {
-                                paginationModel: {
-                                    page: 0,
-                                    pageSize: 10,
-                                },
+                    <Grid item xs={12} md={2}>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            onClick={onClickAddProfessor}
+                        >
+                            เพิ่มรายชื่ออาจารย์
+                        </Button>
+                    </Grid>
+                </Grid>
+                {renderDialogAddProfessor()}
+                <PopupConfirm
+                    isOpen={isOpenPopupConfirm}
+                    onClose={() => setIsOpenPopupConfirm(false)}
+                    onConfirm={onConfirmDelete}
+                    title={'คุณต้องการลบข้อมูลอาจารย์ ?'}
+                />
+                <SnackBarAlert
+                    open={isOpenSnackBar}
+                    onClose={onCloseSnackBar}
+                    message={messageSnackBar}
+                />
+                <DataGrid
+                    rows={dataTable}
+                    columns={columns}
+                    getRowId={(row: any) => row.teacher_id}
+                    autoHeight
+                    initialState={{
+                        pagination: {
+                            paginationModel: {
+                                page: 0,
+                                pageSize: 10,
                             },
-                        }}
-                        pageSizeOptions={[5, 10]}
-                        disableRowSelectionOnClick
-                    />
-                </Box>
+                        },
+                    }}
+                    pageSizeOptions={[5, 10, 15, 20]}
+                    disableRowSelectionOnClick
+                    localeText={localeText}
+                />
             </Box>
         </div>
     );

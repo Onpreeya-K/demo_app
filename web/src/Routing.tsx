@@ -1,10 +1,11 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-// import environment from "./config/environment.json";
 import Login from './pages/login/Login';
 import SchedulePage from './pages/schedule/Schedule';
 import DisbursementPage from './pages/disbursement/Disbursement';
 import ProfessorInfoPage from './pages/professor-info/Professor-info';
 import MenuDrawer from './components/drawer/Drawer-menu';
+import CriteriaPage from './pages/criteria/Criteria';
+import CriteriaProcessPage from './pages/criteria-process/Criteria-process';
 
 const Routing: React.FC = () => {
     return (
@@ -27,6 +28,14 @@ const Routing: React.FC = () => {
                                 <Route
                                     path="professor-info"
                                     element={<ProfessorInfoPage />}
+                                />
+                                <Route
+                                    path="criteria-of-teach"
+                                    element={<CriteriaPage />}
+                                />
+                                <Route
+                                    path="criteria-process"
+                                    element={<CriteriaProcessPage />}
                                 />
                             </Routes>
                         </MenuDrawer>

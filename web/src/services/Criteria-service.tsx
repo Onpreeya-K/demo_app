@@ -11,8 +11,8 @@ const generateHeader = (): any => {
     return header;
 };
 
-export async function getAllTeacher() {
-    const urlEndpoint = `/teacher`;
+export async function getCriteriaOfTeach() {
+    const urlEndpoint = `/criteriaOfTeach/level`;
     const header = generateHeader();
 
     try {
@@ -28,10 +28,64 @@ export async function getAllTeacher() {
         return null;
     }
 }
-export async function createTeacher(data: any) {
-    const urlEndpoint = `/teacher`;
+
+export async function getTermOfYear() {
+    const urlEndpoint = `/termOfYear`;
     const header = generateHeader();
 
+    try {
+        return ServiceUtil.callApi(
+            urlEndpoint,
+            header,
+            {},
+            {},
+            METHOD_TYPE.GET
+        );
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+export async function getTeacherSchedule(param: any) {
+    const urlEndpoint = `/scheduleTeach/teacherSchedule/${param}`;
+    const header = generateHeader();
+
+    try {
+        return ServiceUtil.callApi(
+            urlEndpoint,
+            header,
+            {},
+            {},
+            METHOD_TYPE.GET
+        );
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+export async function getCriteraiProcess() {
+    const urlEndpoint = `/criteriaOfProcess`;
+    const header = generateHeader();
+
+    try {
+        return ServiceUtil.callApi(
+            urlEndpoint,
+            header,
+            {},
+            {},
+            METHOD_TYPE.GET
+        );
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+export async function createCriteraiProcess(data: any) {
+    const urlEndpoint = `/criteriaOfProcess`;
+    const header = generateHeader();
     try {
         return ServiceUtil.callApi(
             urlEndpoint,
@@ -45,8 +99,9 @@ export async function createTeacher(data: any) {
         return null;
     }
 }
-export async function updateTeacher(param: any, data: any) {
-    const urlEndpoint = `/teacher`;
+
+export async function updateCriteraiProcess(param: any, data: any) {
+    const urlEndpoint = `/criteriaOfProcess`;
     const header = generateHeader();
 
     try {
@@ -62,8 +117,9 @@ export async function updateTeacher(param: any, data: any) {
         return null;
     }
 }
-export async function deleteTeacher(param: any) {
-    const urlEndpoint = `/teacher`;
+
+export async function deleteCriteraiProcess(param: any) {
+    const urlEndpoint = `/criteriaOfProcess`;
     const header = generateHeader();
 
     try {
@@ -73,42 +129,6 @@ export async function deleteTeacher(param: any) {
             param,
             {},
             METHOD_TYPE.DELETE
-        );
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-}
-
-export async function getManagementPosition() {
-    const urlEndpoint = `/managementPosition`;
-    const header = generateHeader();
-
-    try {
-        return ServiceUtil.callApi(
-            urlEndpoint,
-            header,
-            {},
-            {},
-            METHOD_TYPE.GET
-        );
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-}
-
-export async function getAcademicPosition() {
-    const urlEndpoint = `/academicPosition`;
-    const header = generateHeader();
-
-    try {
-        return ServiceUtil.callApi(
-            urlEndpoint,
-            header,
-            {},
-            {},
-            METHOD_TYPE.GET
         );
     } catch (error) {
         console.error(error);

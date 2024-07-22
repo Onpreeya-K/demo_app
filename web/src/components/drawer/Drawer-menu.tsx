@@ -22,7 +22,10 @@ import { PiUserListBold } from 'react-icons/pi';
 import { TbLogout } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import appConfig from '../../config/application-config.json';
-import { getRoleUser } from '../../util/Util';
+import { getDataProfessor, getRoleUser } from '../../util/Util';
+import { FaCalculator } from 'react-icons/fa';
+import { MdOutlineCalculate } from 'react-icons/md';
+import { IProfessor } from '../../interface/Professor-interface';
 
 const drawerWidth = 240;
 
@@ -32,35 +35,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     padding: theme.spacing(0, 1),
     ...theme.mixins.toolbar,
 }));
-
-// const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
-//     open?: boolean;
-//     isDesktop?: boolean;
-// }>(({ theme, open, isDesktop }) => ({
-//     flexGrow: 1,
-//     padding: theme.spacing(2),
-//     transition: theme.transitions.create('margin', {
-//         easing: theme.transitions.easing.sharp,
-//         duration: theme.transitions.duration.leavingScreen,
-//     }),
-//     marginLeft: `-${drawerWidth}px`,
-//     height: `calc(100vh - 56px)`,
-//     ...(open && {
-//         transition: theme.transitions.create('margin', {
-//             easing: theme.transitions.easing.easeOut,
-//             duration: theme.transitions.duration.enteringScreen,
-//         }),
-//         // marginLeft: 0,
-//     }),
-//     ...(isDesktop && {
-//         transition: theme.transitions.create('margin', {
-//             easing: theme.transitions.easing.easeOut,
-//             duration: theme.transitions.duration.enteringScreen,
-//         }),
-//         marginLeft: 0,
-//         height: '100vh',
-//     }),
-// }));
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -95,20 +69,16 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
         setOpen(true);
     };
 
-    // const handleDrawerClose = () => {
-    //     setOpen(false);
-    // };
-
     const onChangePage = (path: string) => {
         navigate(path);
-        if(!isDesktop){
-            setOpen(false)
+        if (!isDesktop) {
+            setOpen(false);
         }
     };
 
     const onClickLogout = () => {
         navigate('/login');
-        sessionStorage.removeItem('ROLE');
+        sessionStorage.clear();
     };
 
     const [isDesktop, setIsDesktop] = useState<boolean>(false);
@@ -135,7 +105,11 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
             if (getRoleUser() === appConfig.role.ADMIN) {
                 return true;
             } else {
-                return menu.key !== 'PROFESSOR-INFO';
+                return ![
+                    'PROFESSOR-INFO',
+                    'CRITERIA-OF-TEACH',
+                    'CRITERIA-PROCESS',
+                ].includes(menu.key);
             }
         });
         return (
@@ -157,6 +131,12 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                                 )}
                                 {item.key === 'DISBURSEMENT' && (
                                     <GiReceiveMoney color="#FFF" />
+                                )}
+                                {item.key === 'CRITERIA-OF-TEACH' && (
+                                    <MdOutlineCalculate color="#FFF" />
+                                )}
+                                {item.key === 'CRITERIA-PROCESS' && (
+                                    <FaCalculator color="#FFF" />
                                 )}
                             </ListItemIcon>
                             <Typography
@@ -180,19 +160,28 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
             fontSize: 16,
         },
         components: {
-            MuiDrawer: {
-                // styleOverrides: {
-                //     root: {
-                //         backgroundColor:
-                //             appConfig.component.appBar.backgroundColor,
-                //     },
-                // },
+            MuiTextField: {
+                defaultProps: {
+                    variant: 'outlined',
+                    InputLabelProps: {
+                        shrink: true,
+                    },
+                },
             },
         },
     });
 
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpen(newOpen);
+    };
+
+    const getNameFromSession = () => {
+        const data = getDataProfessor();
+        if (data) {
+            const teacherData: IProfessor = JSON.parse(data);
+            return teacherData.fullname;
+        }
+        return null;
     };
 
     return (
@@ -274,7 +263,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                             component="div"
                             color="#FFFFFF"
                         >
-                            Onpreeya Kitphuek
+                            {getNameFromSession()}
                         </Typography>
                         <AccountCircleIcon
                             sx={{
@@ -360,7 +349,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                             component="div"
                             color="#FFFFFF"
                         >
-                            Onpreeya Kitphuek
+                            {getNameFromSession()}
                         </Typography>
                         <AccountCircleIcon
                             sx={{
@@ -400,12 +389,12 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                 </Drawer>
                 <Box
                     component="main"
-                    id='childMenu'
+                    id="childMenu"
                     sx={{
                         flexGrow: 1,
                         p: 2,
-                        width: { sm: isDesktop ? `calc(100% - 240px)` : '100%'  },
-                        ...(!isDesktop && { marginTop: 7 })
+                        width: isDesktop ? `calc(100% - 240px)` : '100%',
+                        ...(!isDesktop && { marginTop: 7 }),
                     }}
                 >
                     {children}

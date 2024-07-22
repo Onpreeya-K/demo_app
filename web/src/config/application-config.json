@@ -20,6 +20,16 @@
             "key": "DISBURSEMENT",
             "name": "เบิกค่าสอน",
             "link": "/disbursement"
+        },
+        {
+            "key": "CRITERIA-OF-TEACH",
+            "name": "เกณฑ์ค่าสอน",
+            "link": "/criteria-of-teach"
+        },
+        {
+            "key": "CRITERIA-PROCESS",
+            "name": "เกณฑ์คำนวณ",
+            "link": "/criteria-process"
         }
     ],
     "role": {
