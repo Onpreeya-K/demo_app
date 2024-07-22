@@ -1,4 +1,4 @@
-import environment from "./../environment/environment.json"
+import environment from './../environment/environment.json';
 
 export const METHOD_TYPE = {
     GET: 'GET',
@@ -11,7 +11,12 @@ export const METHOD_TYPE = {
 const handleResponse = async (url: string, response: Response) => {
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(`Error: ${response.status} ${response.statusText}, URL: ${url}, Details: ${JSON.stringify(error)}`);
+        //    unAuth 401
+        throw new Error(
+            `Error: ${response.status} ${
+                response.statusText
+            }, URL: ${url}, Details: ${JSON.stringify(error)}`
+        );
     }
     return response.json();
 };
@@ -40,7 +45,7 @@ const post = async ({
 const get = async ({
     url,
     header,
-    params
+    params,
 }: {
     url: string;
     header: any;
@@ -62,12 +67,12 @@ const put = async ({
     url,
     header,
     params,
-    data
+    data,
 }: {
     url: string;
     header: any;
     params: any;
-    data: any
+    data: any;
 }) => {
     try {
         const response = await fetch(`${url}/${params}`, {
@@ -99,7 +104,7 @@ const del = async ({
     } catch (error) {
         console.error('Error:', error);
     }
-}
+};
 
 const callApi = async (
     url: string,
@@ -114,9 +119,14 @@ const callApi = async (
         case 'GET':
             return await get({ url: urlEndpoint, header, params });
         case 'POST':
-            return await post({ url: urlEndpoint, header, data: requestBody});
+            return await post({ url: urlEndpoint, header, data: requestBody });
         case 'PUT':
-            return await put({ url: urlEndpoint, header, params, data: requestBody });
+            return await put({
+                url: urlEndpoint,
+                header,
+                params,
+                data: requestBody,
+            });
         case 'DELETE':
             return await del({ url: urlEndpoint, header, params });
         default:

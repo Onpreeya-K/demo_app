@@ -1,6 +1,6 @@
 {
-  "name": "demo_test",
-  "homepage": "/login",
+  "name": "teachingfee",
+  "homepage": "http://localhost/teachingfee/login",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
