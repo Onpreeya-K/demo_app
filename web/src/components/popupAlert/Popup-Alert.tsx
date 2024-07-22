@@ -1,4 +1,5 @@
 import {
+    Button,
     Dialog,
     DialogActions,
     DialogContent,
@@ -8,7 +9,6 @@ import {
     Typography,
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
-import { CancelButton } from './Popup-Alert.styled';
 
 interface IProps {
     isOpen: boolean;
@@ -52,13 +52,13 @@ const PopupAlert = (props: IProps) => {
                     <Grid item xs={12}>
                         <Grid container justifyContent="center">
                             <Grid item xs={7} textAlign="center">
-                                <CancelButton
+                                <Button
                                     onClick={() => onClose()}
                                     fullWidth
                                     color="inherit"
                                 >
                                     OK
-                                </CancelButton>
+                                </Button>
                             </Grid>
                         </Grid>
                     </Grid>
