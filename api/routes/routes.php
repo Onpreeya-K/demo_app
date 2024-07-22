@@ -100,8 +100,9 @@ $app->group('/level', function (Group $group) {
 // Define routes for scheduleTeach
 $app->group('/scheduleTeach', function (Group $group) {
     $group->get('', ScheduleTeachController::class . ':fetch');
-    $group->get('/{termId}/{teacherID}', ScheduleTeachController::class . ':fetchScheduleTeachByID');
     $group->get('/teacherSchedule/{id}', ScheduleTeachController::class . ':fetchListTeacherBytermOfID');
+    $group->get('/{termId}/{teacherID}', ScheduleTeachController::class . ':fetchScheduleTeachByID');
+    
     $group->post('', ScheduleTeachController::class . ':create');
     $group->put('/{id}', ScheduleTeachController::class . ':update');
     $group->delete('/{id}', ScheduleTeachController::class . ':delete');
