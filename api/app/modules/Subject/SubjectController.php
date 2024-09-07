@@ -26,9 +26,10 @@ class SubjectController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function fetchSubjectByID(Request $request, Response $response, $args) {
+    public function fetchByID(Request $request, Response $response, $args) {
         $subjectId = $args['id'];
         $subject = $this->subjectService->getSubjectById($subjectId);
+        $response->getBody()->write(json_encode($subject));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
