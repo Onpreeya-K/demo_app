@@ -16,6 +16,7 @@ use App\Modules\TermOfYear\TermOfYearController;
 use App\Modules\CriteriaOfProcess\CriteriaOfProcessController;
 use App\Modules\ManagementPosition\ManagementPositionController;
 use App\Modules\AcademicPosition\AcademicPositionController;
+use App\Modules\Disbursement\DisbursementController;
 
 // Handle OPTIONS requests
 $app->options('/{routes:.+}', function ($request, $response, $args) {
@@ -100,8 +101,9 @@ $app->group('/level', function (Group $group) {
 // Define routes for scheduleTeach
 $app->group('/scheduleTeach', function (Group $group) {
     $group->get('', ScheduleTeachController::class . ':fetch');
-    $group->get('/teacherSchedule/{id}', ScheduleTeachController::class . ':fetchListTeacherBytermOfID');
-    $group->get('/{termId}/{teacherID}', ScheduleTeachController::class . ':fetchScheduleTeachByID');
+    $group->get('/teacherSchedule/{termId}/{teacherID}', ScheduleTeachController::class . ':fetchScheduleTeachByTermIdAndTeacherID');
+    $group->get('/term/{id}', ScheduleTeachController::class . ':fetchListTeacherBytermOfID');
+    
     
     $group->post('', ScheduleTeachController::class . ':create');
     $group->put('/{id}', ScheduleTeachController::class . ':update');
@@ -149,4 +151,14 @@ $app->group('/academicPosition', function (Group $group) {
     $group->post('', AcademicPositionController::class . ':create');
     $group->put('/{id}', AcademicPositionController::class . ':update');
     $group->delete('/{id}', AcademicPositionController::class . ':delete');
+})->add(new AuthMiddleware($_ENV['SECRET_KEY']));
+
+$app->group('/disbursement', function (Group $group) {
+    $group->get('', DisbursementController::class . ':fetch');
+    $group->get('/term/{termId}', DisbursementController::class . ':fetchDisbursementsByTermID');
+    $group->get('/teacher/{teacherId}', DisbursementController::class . ':fetchDisbursementsByTeacherID');
+    $group->get('/{id}', DisbursementController::class . ':fetchByID');
+    $group->post('', DisbursementController::class . ':create');
+    $group->put('/{id}', DisbursementController::class . ':update');
+    $group->delete('/{id}', DisbursementController::class . ':delete');
 })->add(new AuthMiddleware($_ENV['SECRET_KEY']));

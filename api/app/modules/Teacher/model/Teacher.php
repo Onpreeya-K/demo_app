@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Modules\User\Model\User;
 use App\Modules\ManagementPosition\Model\ManagementPosition;
 use App\Modules\AcademicPosition\Model\AcademicPosition;
+use App\Modules\Disbursement\Model\Disbursement;
 
 class Teacher extends Model {
     protected $table = 'teacher'; // Table name
@@ -26,5 +27,9 @@ class Teacher extends Model {
 
     public function academicPosition() {
         return $this->belongsTo(AcademicPosition::class, 'a_id');
+    }
+
+    public function disbursement() {
+        return $this->hasMany(Disbursement::class, 'teacher_id');
     }
 }

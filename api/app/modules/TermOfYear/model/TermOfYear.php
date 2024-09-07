@@ -3,7 +3,8 @@
 namespace App\Modules\TermOfYear\Model;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Modules\CourseOfStudy\Model\CourseOfStudy;
+use App\Modules\Disbursement\Model\Disbursement;
+use App\Modules\ScheduleTeach\Model\ScheduleTeach;
 
 class TermOfYear extends Model {
     protected $table = 'termOfYear'; // Table name
@@ -14,7 +15,11 @@ class TermOfYear extends Model {
     public $incrementing = true; // If primary key is not auto-incrementing
     protected $keyType = 'int'; // If primary key is not an integer
 
-    public function courseOfStudy() {
-        return $this->hasMany(CourseOfStudy::class, 'course_of_study_id'); 
+    public function disbursement() {
+        return $this->hasMany(Disbursement::class, 'term_of_year_id');
+    }
+
+    public function scheduleTeach() {
+        return $this->hasMany(ScheduleTeach::class, 'term_of_year_id');
     }
 }

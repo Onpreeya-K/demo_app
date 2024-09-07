@@ -2,6 +2,8 @@
 
 namespace App\Modules\ScheduleTeach\Model;
 
+use App\Modules\Disbursement\Model\Disbursement;
+use App\Modules\Disbursement\Model\DisbursementTeach;
 use Illuminate\Database\Eloquent\Model;
 use App\Modules\Level\Model\Level;
 use App\Modules\Teacher\Model\Teacher;
@@ -31,5 +33,11 @@ class ScheduleTeach extends Model {
 
     public function termOfYear() {
         return $this->belongsTo(TermOfYear::class, 'term_of_year_id');
+    }
+
+    public function disbursements() {
+        return $this->belongsToMany(Disbursement::class, 'disbursementTeach', 'schedule_teach_id', 'disbursement_id')
+                    ->using(DisbursementTeach::class)
+                    ->withPivot('count_of_teach', 'unit', 'unit_yes', 'unit_no', 'rate_of_unit', 'total', 'note');
     }
 }
