@@ -2,18 +2,23 @@
 
 namespace App\Modules\ScheduleTeach;
 
+use App\Modules\Subject\SubjectService;
 use App\Modules\Teacher\TeacherService;
 
+use function DI\get;
 
 class ScheduleTeachService
 {
     protected $scheduleTeachRepository;
     protected $teacherService;
+    protected $subjectService;
 
-    public function __construct(ScheduleTeachRepository $scheduleTeachRepository, TeacherService $teacherService)
+
+    public function __construct(ScheduleTeachRepository $scheduleTeachRepository, TeacherService $teacherService, SubjectService $subjectService)
     {
         $this->scheduleTeachRepository = $scheduleTeachRepository;
         $this->teacherService = $teacherService;
+        $this->subjectService = $subjectService;
     }
 
     public function getAllScheduleTeachs()
@@ -24,13 +29,33 @@ class ScheduleTeachService
     public function getScheduleTeachByTermIdAndTeacherID($termID, $teacherID)
     {
         $data = $this->scheduleTeachRepository->getScheduleTeachByTermIdAndTeacherID($termID, $teacherID);
-        foreach ($data as $value) {
-            $value->course_name = $value->subject->name;
-            $value->course_unit = $value->subject->unit.' '.$value->subject->type;
+        $newData = [];
+        foreach ($data->toArray() as $value) {
+            if ($value['subject'] && $value['subject']['course_of_study']) {
+                $level_id = $value['level_id'];
+
+                $criteria_of_teach = $value['subject']['course_of_study']['criteria_of_teach'];
+
+
+
+                $filtered_criteria_of_teach = array_filter($criteria_of_teach, function ($item) use ($level_id) {
+                    return $item['level_id'] == $level_id;
+                });
+
+                $value['criteria_of_teach'] = $filtered_criteria_of_teach[0];
+
+                unset($value['subject']['course_of_study']['criteria_of_teach']);
+
+                $course_of_study = $value['subject']['course_of_study'];
+                $value['course_of_study'] = $course_of_study;
+                unset($value['subject']['course_of_study']);
+
+                $newData[] = $value;
+            }
+            
         }
 
-        data_forget($data, '*.subject');
-        return $data;
+        return $newData;
     }
 
     public function getTeacherScheduleByTermOfYearId($termOfYearId){
@@ -53,15 +78,26 @@ class ScheduleTeachService
         $scheduleList = $data['data'];
 
         foreach ($scheduleList as $value) {
+            $checkSubject = $this->subjectService->getSubjectById($value['course_code']);//
+            if($checkSubject == null){
+                $spiltUnit = explode(" ", $value['course_unit']);
+                $subject = array(
+                    'subject_id' => $value['course_code'],
+                    'name' => $value['course_name'],
+                    'unit' => $spiltUnit[0],
+                    'type' => $spiltUnit[1],
+                    'is_internal' => 0
+                );
+                $this->subjectService->createSubject($subject);
+            }
             $value['teacher_id'] = $teacherID;
-            $value['subject_id'] = explode("-",$value['course_code'])[0];
+            $value['subject_id'] = $value['course_code'];
             $value['term_of_year_id'] = $termID;
 
             $this->scheduleTeachRepository->createScheduleTeach($value);
         }
 
         return null;
-        // $this->scheduleTeachRepository->createScheduleTeach($data);
     }
 
     public function updateScheduleTeach($id, $data)

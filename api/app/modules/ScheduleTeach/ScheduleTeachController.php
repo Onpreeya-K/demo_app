@@ -15,7 +15,7 @@ class ScheduleTeachController {
     public function create(Request $request, Response $response) {
         $data = $request->getParsedBody();
         $scheduleTeach = $this->scheduleTeachService->createScheduleTeach($data);
-        // $response->getBody()->write(json_encode($scheduleTeach));
+        $response->getBody()->write(json_encode($scheduleTeach));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
@@ -26,7 +26,7 @@ class ScheduleTeachController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function fetchScheduleTeachByID(Request $request, Response $response, $args) {
+    public function fetchScheduleTeachByTermIdAndTeacherID(Request $request, Response $response, $args) {
         $termID = $args['termId'];
         $teacherID = $args['teacherID'];
         $scheduleTeach = $this->scheduleTeachService->getScheduleTeachByTermIdAndTeacherID($termID, $teacherID);

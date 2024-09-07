@@ -13,7 +13,8 @@ class ScheduleTeachRepository
 
     public function getScheduleTeachByTermIdAndTeacherID($termID, $teacherID)
     {
-        return ScheduleTeach::where('teacher_id', $teacherID)
+        return ScheduleTeach::with(['teacher', 'subject.courseOfStudy.criteriaOfTeach', 'level', 'termOfYear'])
+                            ->where('teacher_id', $teacherID)
                             ->where('term_of_year_id', $termID)
                             ->get();
     }
