@@ -52,6 +52,9 @@ class ScheduleTeachService
 
                 $newData[] = $value;
             }
+            else {
+                $newData[] = $value;
+            }
             
         }
 
