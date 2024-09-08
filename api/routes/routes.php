@@ -37,6 +37,7 @@ $app->group('/auth', function (Group $group) {
 // Define routes for teacher
 $app->group('/teacher', function (Group $group) {
     $group->get('', TeacherController::class . ':fetch');
+    $group->get('/rate/{teacherId}', TeacherController::class . ':fetchCriteriaOfProcessByTeacherID');
     $group->get('/{id}', TeacherController::class . ':fetchByID');
     $group->post('', TeacherController::class . ':create');
     $group->put('/{id}', TeacherController::class . ':update');

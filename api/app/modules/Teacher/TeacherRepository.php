@@ -22,6 +22,11 @@ class TeacherRepository
         return Teacher::create($data);
     }
 
+    public function findCriteriaOfProcessByTeacherID($teacherId)
+    {
+        return Teacher::with('managementPosition.criteriaOfProcess')->where('teacher_id', $teacherId)->get();
+    }
+
     public function updateTeacher($id, $data)
     {
         return Teacher::where('teacher_id', $id)->update($data);

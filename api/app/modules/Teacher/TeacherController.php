@@ -28,6 +28,14 @@ class TeacherController
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public function fetchCriteriaOfProcessByTeacherID(Request $request, Response $response, $args)
+    {
+        $teacherId = $args['teacherId'];
+        $teacher = $this->teacherService->getCriteriaOfProcessByTeacherId($teacherId);
+        $response->getBody()->write(json_encode($teacher));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
     public function create(Request $request, Response $response, $args)
     {
         $data = $request->getParsedBody();
