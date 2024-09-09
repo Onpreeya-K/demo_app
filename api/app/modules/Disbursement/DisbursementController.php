@@ -40,6 +40,14 @@ class DisbursementController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public function fetchDisbursementsByTeacherIDAndTermID(Request $request, Response $response, $args) {
+        $teacherId = $args['teacherId'];
+        $termOfYearId = $args['termId'];
+        $disbursement = $this->disbursementService->getDisbursementsByTeacherIdAndTermOfYearId($teacherId, $termOfYearId);
+        $response->getBody()->write(json_encode($disbursement));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
     public function fetchDisbursementsByTeacherID(Request $request, Response $response, $args) {
         $teacherId = $args['teacherId'];
         $disbursement = $this->disbursementService->getDisbursementsByTeacherId($teacherId);

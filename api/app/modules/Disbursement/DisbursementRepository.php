@@ -25,6 +25,12 @@ class DisbursementRepository
         return Disbursement::where('teacher_id', $teacherId)->get();
     }
 
+    public function getDisbursementByTeacherIDAndTermID($teacherId, $termOfYearId){
+        return Disbursement::where('teacher_id', $teacherId)
+                           ->wheres('term_of_year_id', $termOfYearId)
+                           ->get();
+    }
+
     public function createDisbursement($data)
     {
         

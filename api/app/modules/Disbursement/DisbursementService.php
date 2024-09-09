@@ -31,6 +31,10 @@ class DisbursementService
         return $this->disbursementRepository->getDisbursementByTeacherID($teacherId);
     }
 
+    public function getDisbursementsByTeacherIdAndTermOfYearId($teacherId, $termOfYearId){
+        return $this->disbursementRepository->getDisbursementByTeacherIDAndTermID($teacherId, $termOfYearId);
+    }
+
     public function createDisbursementWithTech($data)
     {
         return DB::transaction(function () use ($data) {

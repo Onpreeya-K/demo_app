@@ -157,6 +157,7 @@ $app->group('/academicPosition', function (Group $group) {
 $app->group('/disbursement', function (Group $group) {
     $group->get('', DisbursementController::class . ':fetch');
     $group->get('/term/{termId}', DisbursementController::class . ':fetchDisbursementsByTermID');
+    $group->get('/teacher/{teacherId}/term/{termId}', DisbursementController::class . ':fetchDisbursementsByTeacherIDAndTermID');
     $group->get('/teacher/{teacherId}', DisbursementController::class . ':fetchDisbursementsByTeacherID');
     $group->get('/{id}', DisbursementController::class . ':fetchByID');
     $group->post('', DisbursementController::class . ':create');
