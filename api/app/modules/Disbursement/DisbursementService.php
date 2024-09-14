@@ -37,7 +37,11 @@ class DisbursementService
 
     public function createDisbursementWithTech($data)
     {
-        return DB::transaction(function () use ($data) {
+
+        //gen pdf path
+        $pdfPath = 'disbursement_' . time() . '.pdf';
+        
+        return DB::transaction(function () use ($data, $pdfPath) {
 
             $disbursementData = [
                 'teacher_id' => $data['teacher_id'],
@@ -46,7 +50,7 @@ class DisbursementService
                 'sum_no_unit' => $data['sum_no_unit'],
                 'total' => $data['total'],
                 'status' => $data['status'],
-                'pdf_path' => $data['pdf_path'] //gen on backend
+                'pdf_path' => $pdfPath//gen on backend
             ];
 
             $disbursement = $this->disbursementRepository->createDisbursement($disbursementData);
