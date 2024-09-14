@@ -11,8 +11,8 @@ const generateHeader = (): any => {
     return header;
 };
 
-export async function saveScheduleTeach(data: any) {
-    const urlEndpoint = `/scheduleTeach`;
+export async function addDisbursement(data: any) {
+    const urlEndpoint = `/disbursement`;
     const header = generateHeader();
 
     try {
@@ -23,20 +23,8 @@ export async function saveScheduleTeach(data: any) {
     }
 }
 
-export async function getScheduleByTeacherId(data: any) {
-    const urlEndpoint = `/scheduleTeach/${data.termId}/${data.teacherID}`;
-    const header = generateHeader();
-
-    try {
-        return ServiceUtil.callApi(urlEndpoint, header, {}, {}, METHOD_TYPE.GET);
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-}
-
-export async function getScheduleByTermIdAndTeacherId(data: any) {
-    const urlEndpoint = `/scheduleTeach/teacherSchedule/${data.termId}/${data.teacherID}`;
+export async function getDataDisbursementByTeacherIDAndTermID(params: any) {
+    const urlEndpoint = `/disbursement/teacher/${params.teacherID}/${params.termId}`;
     const header = generateHeader();
 
     try {

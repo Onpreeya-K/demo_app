@@ -1,38 +1,21 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import {
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Grid,
-    Typography
-} from '@mui/material';
-import {
-    CancelButton,
-    ConfirmButton,
-    TitleConfirmModal,
-} from './PopupConfirm.styled';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
+import { CancelButton, ConfirmButton, TitleConfirmModal } from './PopupConfirm.styled';
 
 interface IProps {
     isOpen: boolean;
     onClose: Function;
     onConfirm: Function;
-    title: any;
+    title: React.ReactNode;
 }
 
 const PopupConfirm = (props: IProps) => {
     const { isOpen, onClose, onConfirm, title } = props;
     return (
-        <Dialog
-            open={isOpen}
-            onClose={() => onClose}
-            fullWidth
-        >
+        <Dialog open={isOpen} onClose={() => onClose} fullWidth>
             <DialogTitle>
                 <TitleConfirmModal>
-                    <HelpOutlineIcon
-                        sx={{ fontSize: '400%', color: '#87adbd' }}
-                    />
+                    <HelpOutlineIcon sx={{ fontSize: '400%', color: '#87adbd' }} />
                 </TitleConfirmModal>
             </DialogTitle>
             <DialogContent>
@@ -45,10 +28,7 @@ const PopupConfirm = (props: IProps) => {
                     <Grid item xs={12}>
                         <Grid container justifyContent="center">
                             <Grid item xs={7} textAlign="center">
-                                <ConfirmButton
-                                    onClick={() => onConfirm()}
-                                    fullWidth
-                                >
+                                <ConfirmButton onClick={() => onConfirm()} fullWidth>
                                     ใช่
                                 </ConfirmButton>
                             </Grid>
@@ -57,11 +37,7 @@ const PopupConfirm = (props: IProps) => {
                     <Grid item xs={12}>
                         <Grid container justifyContent="center">
                             <Grid item xs={7} textAlign="center">
-                                <CancelButton
-                                    onClick={() => onClose()}
-                                    fullWidth
-                                    color="inherit"
-                                >
+                                <CancelButton onClick={() => onClose()} fullWidth color="inherit">
                                     ไม่ใช่
                                 </CancelButton>
                             </Grid>

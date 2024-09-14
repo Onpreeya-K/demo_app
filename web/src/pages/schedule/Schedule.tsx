@@ -10,27 +10,30 @@ import {
     Grid,
     TextField,
     Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    TablePagination,
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useEffect, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 import appConfig from '../../config/application-config.json';
-import {
-    getDataProfessor,
-    getRoleUser,
-    isNullOrUndefined,
-} from '../../util/Util';
-import {
-    getTeacherSchedule,
-    getTermOfYear,
-} from '../../services/Criteria-service';
+import { getDataProfessor, getRoleUser, isNullOrUndefined, sourceList } from '../../util/Util';
+import { getTeacherSchedule, getTermOfYear } from '../../services/Criteria-service';
 import { IProfessor } from '../../interface/Professor-interface';
 import PopupAlert from '../../components/popupAlert/Popup-Alert';
 import {
     getScheduleByTeacherId,
+    getScheduleByTermIdAndTeacherId,
     saveScheduleTeach,
 } from '../../services/Schedule-service';
-import SnackBarAlert from '../../components/snackbar/Snackbar-alert';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { ScheduleTeach } from '../disbursement/Disbursement';
 
 interface Professor {
     teacher_id: string;
@@ -85,18 +88,14 @@ const SchedulePage = () => {
     const boxAdminSectionTermRef = useRef<HTMLDivElement>(null);
     const boxUserSectionTermRef = useRef<HTMLDivElement>(null);
     const [boxHeaderHeight, setBoxHeaderHeight] = useState<number | null>(null);
-    const [boxAdminSectionTermHeight, setBoxAdminSectionTermHeight] = useState<
-        number | null
-    >(null);
-    const [boxUserSectionTermHeight, setBoxUserSectionTermHeight] = useState<
-        number | null
-    >(null);
+    const [boxAdminSectionTermHeight, setBoxAdminSectionTermHeight] = useState<number | null>(null);
+    const [boxUserSectionTermHeight, setBoxUserSectionTermHeight] = useState<number | null>(null);
 
     const [termOfYear, setTermOfYear] = useState<DropdownTerm[]>([]);
     const [department, setDepartment] = useState<string>('');
+    const [openPopupAlertError, setOpenPopupAlertError] = useState<boolean>(false);
     const [openPopupAlert, setOpenPopupAlert] = useState<boolean>(false);
-    const [isOpenSnackBar, setIsOpenSnackBar] = useState<boolean>(false);
-    const [messageSnackBar, setMessageSnackBar] = useState<string>('');
+    const [messagePopupAlert, setMessagePopupAlert] = useState<string>('');
 
     const initFormSearch: FormSearch = {
         term: null,
@@ -114,6 +113,18 @@ const SchedulePage = () => {
     const [formSearch, setFormSearch] = useState<FormSearch>(initFormSearch);
     const [openSectionUpload, setOpenSectionUpload] = useState<boolean>(false);
     const [openSectionNoti, setOpenSectionNoti] = useState<boolean>(false);
+
+    const [page, setPage] = useState<number>(0);
+    const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     const fetchTerm = async () => {
         try {
@@ -190,9 +201,7 @@ const SchedulePage = () => {
                 const sheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
                 if (!worksheet || !worksheet['!ref']) {
-                    console.error(
-                        'Worksheet or worksheet reference is undefined'
-                    );
+                    console.error('Worksheet or worksheet reference is undefined');
                     return;
                 }
                 const range = XLSX.utils.decode_range(worksheet['!ref']);
@@ -253,19 +262,16 @@ const SchedulePage = () => {
                     const teacherIdFromXlsx = worksheet[colID + rowID]?.v;
 
                     const colDepartment = foundValues[1].cellRef.charAt(0);
-                    const rowDepartment =
-                        parseInt(foundValues[1].cellRef.slice(1)) + 1;
-                    const departmentValue =
-                        worksheet[colDepartment + rowDepartment]?.v;
+                    const rowDepartment = parseInt(foundValues[1].cellRef.slice(1)) + 1;
+                    const departmentValue = worksheet[colDepartment + rowDepartment]?.v;
                     if (!isNullOrUndefined(departmentValue)) {
                         setDepartment(departmentValue);
                     }
                     if (
                         teacherIdFromXlsx &&
-                        teacherIdFromXlsx.toString() !==
-                            formSearch.professor.teacher_id
+                        teacherIdFromXlsx.toString() !== formSearch.professor.teacher_id
                     ) {
-                        setOpenPopupAlert(true);
+                        setOpenPopupAlertError(true);
                     } else {
                         const startValueIndex = foundValues.findIndex(
                             (item) => item.value === 'LEVELID'
@@ -273,8 +279,7 @@ const SchedulePage = () => {
                         if (startValueIndex !== -1) {
                             for (
                                 let i = startValueIndex;
-                                i < startValueIndex + 30 &&
-                                i < foundValues.length;
+                                i < startValueIndex + 30 && i < foundValues.length;
                                 i++
                             ) {
                                 const { value, cellRef } = foundValues[i];
@@ -289,14 +294,9 @@ const SchedulePage = () => {
                                 }
                             }
                         } else {
-                            console.error(
-                                'Start value LEVELID not found in the worksheet'
-                            );
+                            console.error('Start value LEVELID not found in the worksheet');
                         }
-                        const xlsxDataRows = extractRowsFromWorksheet(
-                            worksheet,
-                            xlsxData
-                        );
+                        const xlsxDataRows = extractRowsFromWorksheet(worksheet, xlsxData);
                         const filterData = xlsxDataRows.filter(
                             (item) => !isNullOrUndefined(item.course_code)
                         );
@@ -341,8 +341,7 @@ const SchedulePage = () => {
                 course_name: worksheet[xlsxData.courseNameEng[i]]?.v || '',
                 course_unit: worksheet[xlsxData.courseUnit[i]]?.v || '',
                 total_seat: worksheet[xlsxData.totalSeat[i]]?.v || '',
-                enroll_seat:
-                    worksheet[xlsxData.enrollSeat[i]]?.v?.toString() || '',
+                enroll_seat: worksheet[xlsxData.enrollSeat[i]]?.v?.toString() || '',
                 teach_date: worksheet[xlsxData.date[i]]?.v || '',
                 major_name: worksheet[xlsxData.major[i]]?.v || '',
             };
@@ -468,7 +467,11 @@ const SchedulePage = () => {
         try {
             const response = await getTeacherSchedule(param);
             if (response && response.message === 'success') {
-                setProfessorList(response.payload);
+                if (!isNullOrUndefined(response.payload)) {
+                    const professor = response.payload;
+                    const sourceProfessor = sourceList(professor);
+                    setProfessorList(sourceProfessor);
+                }
             }
         } catch (error: any) {
             console.error('Error:', error);
@@ -505,14 +508,29 @@ const SchedulePage = () => {
                 termId: formSearch.term?.term_of_year_id,
                 teacherID: formSearch.professor.teacher_id,
             };
-            const response = await getScheduleByTeacherId(payload);
+            // const response = await getScheduleByTeacherId(payload);
+            const response = await getScheduleByTermIdAndTeacherId(payload);
             if (response && response.message === 'success') {
                 if (!isNullOrUndefined(response.payload)) {
+                    const mapResponse = response.payload.map((item: ScheduleTeach) => {
+                        return {
+                            schedule_teach_id: item.schedule_teach_id,
+                            level_id: item.level_id,
+                            course_code: item.course_code,
+                            section: item.section,
+                            course_name: item.subject.name,
+                            course_unit: `${item.subject.unit}${item.subject.type}`,
+                            total_seat: item.total_seat,
+                            enroll_seat: item.enroll_seat,
+                            teach_date: item.teach_date,
+                            major_name: item.major_name,
+                        };
+                    });
                     setFormSearch((prev) => ({
                         ...prev,
                         professor: {
                             ...prev.professor,
-                            dataTable: response.payload,
+                            dataTable: mapResponse,
                         },
                     }));
                 } else {
@@ -553,8 +571,8 @@ const SchedulePage = () => {
             };
             const response = await saveScheduleTeach(payload);
             if (response && response.message === 'success') {
-                setIsOpenSnackBar(true);
-                setMessageSnackBar('บันทึกตารางสอนสำเร็จ');
+                setOpenPopupAlert(true);
+                setMessagePopupAlert('บันทึกตารางสอนสำเร็จ');
                 setFormSearch((prev) => ({
                     ...prev,
                     professor: {
@@ -570,11 +588,13 @@ const SchedulePage = () => {
 
     const fetchTeacherListAfterUploadSchedule = async () => {
         try {
-            const response = await getTeacherSchedule(
-                formSearch.term?.term_of_year_id
-            );
+            const response = await getTeacherSchedule(formSearch.term?.term_of_year_id);
             if (response && response.message === 'success') {
-                setProfessorList(response.payload);
+                if (!isNullOrUndefined(response.payload)) {
+                    const professor = response.payload;
+                    const sourceProfessor = sourceList(professor);
+                    setProfessorList(sourceProfessor);
+                }
             }
         } catch (error) {
             console.error('Error:', error);
@@ -590,26 +610,24 @@ const SchedulePage = () => {
                 prefix: (prev.professor && prev.professor.prefix) ?? '',
                 fullname: (prev.professor && prev.professor.fullname) ?? '',
                 position: (prev.professor && prev.professor.position) ?? '',
-                sub_position:
-                    (prev.professor && prev.professor.sub_position) ?? '',
-                has_schedule:
-                    (prev.professor && prev.professor.has_schedule) ?? false,
+                sub_position: (prev.professor && prev.professor.sub_position) ?? '',
+                has_schedule: (prev.professor && prev.professor.has_schedule) ?? false,
                 dataTable: [],
             },
         }));
     };
 
-    const onCloseSnackBar = () => {
-        setIsOpenSnackBar(false);
-        setMessageSnackBar('');
+    const onClosePopupAlert = () => {
+        setOpenPopupAlert(false);
+        setMessagePopupAlert('');
     };
 
     return (
         <div>
             <Box sx={{ height: '100%' }}>
                 <PopupAlert
-                    isOpen={openPopupAlert}
-                    onClose={() => setOpenPopupAlert(false)}
+                    isOpen={openPopupAlertError}
+                    onClose={() => setOpenPopupAlertError(false)}
                     title={
                         <div
                             style={{
@@ -622,11 +640,13 @@ const SchedulePage = () => {
                             <span>เนื่องจากข้อมูลอาจารย์ไม่ตรงกับระบบ</span>
                         </div>
                     }
+                    type={'ERROR'}
                 />
-                <SnackBarAlert
-                    open={isOpenSnackBar}
-                    onClose={onCloseSnackBar}
-                    message={messageSnackBar}
+                <PopupAlert
+                    isOpen={openPopupAlert}
+                    onClose={onClosePopupAlert}
+                    title={<div>{messagePopupAlert}</div>}
+                    type={'SUCCESS'}
                 />
                 <Box ref={boxHeaderRef}>
                     <Typography textAlign="start" variant="h6" component="div">
@@ -658,15 +678,11 @@ const SchedulePage = () => {
                                         />
                                     )}
                                     isOptionEqualToValue={(option, value) =>
-                                        option.term_of_year_id ===
-                                        value.term_of_year_id
+                                        option.term_of_year_id === value.term_of_year_id
                                     }
                                     value={formSearch.term}
                                     onChange={(_e, option) =>
-                                        handleChangeTerm(
-                                            option,
-                                            appConfig.role.ADMIN
-                                        )
+                                        handleChangeTerm(option, appConfig.role.ADMIN)
                                     }
                                 />
                             </Grid>
@@ -677,11 +693,7 @@ const SchedulePage = () => {
                                     options={professorList}
                                     getOptionLabel={(option) => option.fullname}
                                     renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="อาจารย์"
-                                            variant="outlined"
-                                        />
+                                        <TextField {...params} label="อาจารย์" variant="outlined" />
                                     )}
                                     isOptionEqualToValue={(option, value) =>
                                         option.teacher_id === value.teacher_id
@@ -693,9 +705,7 @@ const SchedulePage = () => {
                                                 formSearch.professor.teacher_id
                                         ) || null
                                     }
-                                    onChange={(_e, option) =>
-                                        handleAutocompleteChange(option)
-                                    }
+                                    onChange={(_e, option) => handleAutocompleteChange(option)}
                                     disabled={!formSearch.term}
                                     renderOption={(props, option) => {
                                         return (
@@ -704,17 +714,33 @@ const SchedulePage = () => {
                                                 key={option.teacher_id}
                                                 style={{
                                                     display: 'flex',
-                                                    justifyContent:
-                                                        'space-between',
+                                                    justifyContent: 'space-between',
                                                 }}
                                             >
                                                 {option.fullname}
                                                 {option.has_schedule && (
-                                                    <DoneIcon
-                                                        sx={{
-                                                            color: '#008000',
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                            flexDirection: 'row',
+                                                            alignItems: 'center',
                                                         }}
-                                                    />
+                                                    >
+                                                        <CheckCircleOutlineIcon
+                                                            fontSize="small"
+                                                            sx={{
+                                                                color: '#008000',
+                                                            }}
+                                                        />
+                                                        <label
+                                                            style={{
+                                                                fontSize: 14,
+                                                                color: '#008000',
+                                                            }}
+                                                        >
+                                                            บันทึกแล้ว
+                                                        </label>
+                                                    </div>
                                                 )}
                                             </li>
                                         );
@@ -728,9 +754,7 @@ const SchedulePage = () => {
                                     onClick={onClickSearch}
                                     disabled={
                                         !formSearch.term?.term ||
-                                        isNullOrUndefined(
-                                            formSearch.professor.teacher_id
-                                        )
+                                        isNullOrUndefined(formSearch.professor.teacher_id)
                                     }
                                 >
                                     ตกลง
@@ -761,14 +785,10 @@ const SchedulePage = () => {
                                         />
                                     )}
                                     isOptionEqualToValue={(option, value) =>
-                                        option.term_of_year_id ===
-                                        value.term_of_year_id
+                                        option.term_of_year_id === value.term_of_year_id
                                     }
                                     onChange={(_e, option) =>
-                                        handleChangeTerm(
-                                            option,
-                                            appConfig.role.USER
-                                        )
+                                        handleChangeTerm(option, appConfig.role.USER)
                                     }
                                 />
                             </Grid>
@@ -786,65 +806,125 @@ const SchedulePage = () => {
                     </Box>
                 )}
 
-                {formSearch.professor &&
-                    !isNullOrUndefined(formSearch.professor.dataTable) && (
-                        <Box
-                            style={{
-                                height:
-                                    boxHeaderHeight && boxUserSectionTermHeight
-                                        ? `calc(100vh - ${boxHeaderHeight}px - ${boxUserSectionTermHeight}px - 16px)`
-                                        : '100%',
-                                width:
-                                    window?.innerWidth > 1024
-                                        ? `calc(100vw - 272px)`
-                                        : `calc(100vw - 32px)`,
-                            }}
-                        >
-                            <DataGrid
-                                rows={formSearch.professor?.dataTable}
-                                columns={columnsOfSchedule}
-                                getRowId={(row: any) => row.schedule_teach_id}
-                                autoHeight
-                                initialState={{
-                                    pagination: {
-                                        paginationModel: {
-                                            page: 0,
-                                            pageSize: 10,
-                                        },
-                                    },
-                                }}
-                                pageSizeOptions={[5, 10]}
-                                disableRowSelectionOnClick
+                {formSearch.professor && !isNullOrUndefined(formSearch.professor.dataTable) && (
+                    <Box
+                        style={{
+                            height:
+                                boxHeaderHeight && boxUserSectionTermHeight
+                                    ? `calc(100vh - ${boxHeaderHeight}px - ${boxUserSectionTermHeight}px - 16px)`
+                                    : '100%',
+                            width:
+                                window?.innerWidth > 1024
+                                    ? `calc(100vw - 272px)`
+                                    : `calc(100vw - 32px)`,
+                        }}
+                    >
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell align="center">Level ID</TableCell>
+                                        <TableCell align="center">Course Code</TableCell>
+                                        <TableCell align="center">Section</TableCell>
+                                        <TableCell align="left">Course Name</TableCell>
+                                        <TableCell align="center">Course Unit</TableCell>
+                                        <TableCell align="center">Total Seat</TableCell>
+                                        <TableCell align="center">Enroll Seat</TableCell>
+                                        <TableCell align="center">Date</TableCell>
+                                        <TableCell align="center">Major</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {formSearch.professor?.dataTable
+                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                        .map((row) => (
+                                            <TableRow key={row.schedule_teach_id}>
+                                                <TableCell align="center">{row.level_id}</TableCell>
+                                                <TableCell align="center">
+                                                    {row.course_code}
+                                                </TableCell>
+                                                <TableCell align="center">{row.section}</TableCell>
+                                                <TableCell align="left">
+                                                    {row.course_name}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    {row.course_unit}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    {row.total_seat}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    {row.enroll_seat}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    {row.teach_date}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    {row.major_name}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </Table>
+                            <TablePagination
+                                rowsPerPageOptions={[5, 10]}
+                                component="div"
+                                count={formSearch.professor?.dataTable.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                labelDisplayedRows={({ from, to, count }) =>
+                                    `Showing ${from} to ${to} of ${count}`
+                                }
+                                labelRowsPerPage="Rows per page"
                             />
-                            {getRoleUser() === appConfig.role.ADMIN &&
-                                !formSearch.professor.has_schedule && (
-                                    <Grid container marginTop={2}>
-                                        <Grid
-                                            item
-                                            xs={12}
-                                            display={'flex'}
-                                            justifyContent={'center'}
-                                            gap={2}
+                        </TableContainer>
+                        {/* <DataGrid
+                            rows={formSearch.professor?.dataTable}
+                            columns={columnsOfSchedule}
+                            getRowId={(row: any) => row.schedule_teach_id}
+                            autoHeight
+                            initialState={{
+                                pagination: {
+                                    paginationModel: {
+                                        page: 0,
+                                        pageSize: 10,
+                                    },
+                                },
+                            }}
+                            pageSizeOptions={[5, 10]}
+                            disableRowSelectionOnClick
+                        /> */}
+                        {getRoleUser() === appConfig.role.ADMIN &&
+                            !formSearch.professor.has_schedule && (
+                                <Grid container marginTop={2}>
+                                    <Grid
+                                        item
+                                        xs={12}
+                                        display={'flex'}
+                                        justifyContent={'center'}
+                                        gap={2}
+                                    >
+                                        <Button
+                                            startIcon={<SaveIcon />}
+                                            variant="contained"
+                                            onClick={onClickSave}
                                         >
-                                            <Button
-                                                startIcon={<SaveIcon />}
-                                                variant="contained"
-                                                onClick={onClickSave}
-                                            >
-                                                บันทึกตารางสอน
-                                            </Button>
-                                            <Button
-                                                startIcon={<CloseIcon />}
-                                                variant="contained"
-                                                onClick={onCancelSaveSchedule}
-                                            >
-                                                ยกเลิก
-                                            </Button>
-                                        </Grid>
+                                            บันทึกตารางสอน
+                                        </Button>
+                                        <Button
+                                            startIcon={<CloseIcon />}
+                                            variant="contained"
+                                            onClick={onCancelSaveSchedule}
+                                        >
+                                            ยกเลิก
+                                        </Button>
                                     </Grid>
-                                )}
-                        </Box>
-                    )}
+                                </Grid>
+                            )}
+                    </Box>
+                )}
                 {openSectionUpload &&
                     formSearch.professor &&
                     isNullOrUndefined(formSearch.professor.dataTable) && (
@@ -856,9 +936,7 @@ const SchedulePage = () => {
                                     boxHeaderHeight && boxAdminSectionTermHeight
                                         ? `calc(100vh - ${boxHeaderHeight}px - ${boxAdminSectionTermHeight}px - 16px)`
                                         : '100%',
-                                display: !isNullOrUndefined(
-                                    formSearch.professor.dataTable
-                                )
+                                display: !isNullOrUndefined(formSearch.professor.dataTable)
                                     ? 'none'
                                     : 'flex',
                                 justifyContent: 'center',
@@ -893,18 +971,14 @@ const SchedulePage = () => {
                                 boxHeaderHeight && boxAdminSectionTermHeight
                                     ? `calc(100vh - ${boxHeaderHeight}px - ${boxAdminSectionTermHeight}px - 16px)`
                                     : '100%',
-                            display: !isNullOrUndefined(
-                                formSearch.professor.dataTable
-                            )
+                            display: !isNullOrUndefined(formSearch.professor.dataTable)
                                 ? 'none'
                                 : 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
                         }}
                     >
-                        <Typography variant="subtitle1">
-                            ไม่มีข้อมูลตารางสอนในระบบ
-                        </Typography>
+                        <Typography variant="subtitle1">ไม่มีข้อมูลตารางสอนในระบบ</Typography>
                     </Box>
                 )}
             </Box>

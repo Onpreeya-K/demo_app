@@ -12,24 +12,19 @@ const handleResponse = async (url: string, response: Response) => {
     if (!response.ok) {
         const error = await response.json();
         //    unAuth 401
-        throw new Error(
-            `Error: ${response.status} ${
-                response.statusText
-            }, URL: ${url}, Details: ${JSON.stringify(error)}`
-        );
+        if (response.status === 401 || response.statusText === 'Unauthorized') {
+            window.location.href = `${environment.baseUrl}:3000/login`;
+            throw new Error(
+                `Error: ${response.status} ${
+                    response.statusText
+                }, URL: ${url}, Details: ${JSON.stringify(error)}`
+            );
+        }
     }
     return response.json();
 };
 
-const post = async ({
-    url,
-    header,
-    data,
-}: {
-    url: string;
-    header: any;
-    data: any;
-}) => {
+const post = async ({ url, header, data }: { url: string; header: any; data: any }) => {
     try {
         const response = await fetch(url, {
             method: METHOD_TYPE.POST,
@@ -42,15 +37,7 @@ const post = async ({
     }
 };
 
-const get = async ({
-    url,
-    header,
-    params,
-}: {
-    url: string;
-    header: any;
-    params: any;
-}) => {
+const get = async ({ url, header, params }: { url: string; header: any; params: any }) => {
     try {
         const query = new URLSearchParams(params).toString();
         const response = await fetch(`${url}?${query}`, {
@@ -86,15 +73,7 @@ const put = async ({
     }
 };
 
-const del = async ({
-    url,
-    header,
-    params,
-}: {
-    url: string;
-    header: any;
-    params: any;
-}) => {
+const del = async ({ url, header, params }: { url: string; header: any; params: any }) => {
     try {
         const response = await fetch(`${url}/${params}`, {
             method: METHOD_TYPE.DELETE,

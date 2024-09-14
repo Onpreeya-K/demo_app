@@ -11,20 +11,8 @@ const generateHeader = (): any => {
     return header;
 };
 
-export async function saveScheduleTeach(data: any) {
-    const urlEndpoint = `/scheduleTeach`;
-    const header = generateHeader();
-
-    try {
-        return ServiceUtil.callApi(urlEndpoint, header, {}, data, METHOD_TYPE.POST);
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-}
-
-export async function getScheduleByTeacherId(data: any) {
-    const urlEndpoint = `/scheduleTeach/${data.termId}/${data.teacherID}`;
+export async function getAllLavel() {
+    const urlEndpoint = `/level`;
     const header = generateHeader();
 
     try {
@@ -35,8 +23,8 @@ export async function getScheduleByTeacherId(data: any) {
     }
 }
 
-export async function getScheduleByTermIdAndTeacherId(data: any) {
-    const urlEndpoint = `/scheduleTeach/teacherSchedule/${data.termId}/${data.teacherID}`;
+export async function getAllSubject() {
+    const urlEndpoint = `/subject`;
     const header = generateHeader();
 
     try {

@@ -1,3 +1,5 @@
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import InfoIcon from '@mui/icons-material/Info';
 import {
     Button,
     Dialog,
@@ -8,22 +10,16 @@ import {
     styled,
     Typography,
 } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info';
 
 interface IProps {
     isOpen: boolean;
     onClose: any;
     title: any;
+    type: 'ERROR' | 'SUCCESS';
 }
 
 const PopupAlert = (props: IProps) => {
-    const { isOpen, onClose, title } = props;
-
-    const StyledDialog = styled(Dialog)(({ theme }) => ({
-        '& .MuiDialog-paper': {
-            width: window.innerWidth >= 1024 ? '20%' : '80%',
-        },
-    }));
+    const { isOpen, onClose, title, type } = props;
 
     const TitleConfirmModal = styled('div')({
         display: 'flex',
@@ -32,10 +28,25 @@ const PopupAlert = (props: IProps) => {
     });
 
     return (
-        <StyledDialog open={isOpen} onClose={onClose}>
+        <Dialog
+            open={isOpen}
+            onClose={onClose}
+            sx={{
+                '& .MuiDialog-paper': {
+                    width: window.innerWidth >= 1024 ? '20%' : '80%',
+                },
+            }}
+        >
             <DialogTitle>
                 <TitleConfirmModal>
-                    <InfoIcon sx={{ fontSize: '200%', color: '#fe0000' }} />
+                    {type === 'ERROR' && (
+                        <InfoIcon sx={{ fontSize: '200%', color: '#FE0000' }} />
+                    )}
+                    {type === 'SUCCESS' && (
+                        <CheckCircleIcon
+                            sx={{ fontSize: '200%', color: '#52C41A' }}
+                        />
+                    )}
                 </TitleConfirmModal>
             </DialogTitle>
             <DialogContent>
@@ -64,7 +75,7 @@ const PopupAlert = (props: IProps) => {
                     </Grid>
                 </Grid>
             </DialogActions>
-        </StyledDialog>
+        </Dialog>
     );
 };
 

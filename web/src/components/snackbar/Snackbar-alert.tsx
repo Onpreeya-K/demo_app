@@ -41,7 +41,10 @@ const SnackBarAlert = (props: IProps) => {
                             gap: 8,
                         }}
                     >
-                        <AiFillCheckCircle fontSize={'18px'} color={'#52c41a'} />
+                        <AiFillCheckCircle
+                            fontSize={'18px'}
+                            color={'#52c41a'}
+                        />
                         <span>{message}</span>
                     </div>
                 }
