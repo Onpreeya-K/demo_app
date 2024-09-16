@@ -32,7 +32,14 @@ class DisbursementService
     }
 
     public function getDisbursementsByTeacherIdAndTermOfYearId($teacherId, $termOfYearId){
-        return $this->disbursementRepository->getDisbursementByTeacherIDAndTermID($teacherId, $termOfYearId);
+
+        $dataDisbursement = $this->disbursementRepository->getDisbursementByTeacherIDAndTermID($teacherId, $termOfYearId);
+
+        $listDisbursementTeach = $this->disbursementRepository->getListDisbursementTeachByDisbursementID($dataDisbursement->disbursement_id);
+        $dataDisbursement->data = $listDisbursementTeach;
+
+
+        return $dataDisbursement;
     }
 
     public function createDisbursementWithTech($data)
@@ -69,6 +76,11 @@ class DisbursementService
 
             return $disbursement;
         });
+    }
+
+    public function getListTeacherStatusByTermID($termOfYearId) {
+        return $this->disbursementRepository->getListTeacherStatusByTermID($termOfYearId);
+
     }
 
     public function updateDisbursement($id, $data)

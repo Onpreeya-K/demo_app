@@ -23,6 +23,7 @@ class ScheduleTeachRepository
         return ScheduleTeach::where('term_of_year_id', $termOfYearId)->get();
     }
 
+
     public function createScheduleTeach($data)
     {
         

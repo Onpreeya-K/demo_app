@@ -27,8 +27,27 @@ class DisbursementRepository
 
     public function getDisbursementByTeacherIDAndTermID($teacherId, $termOfYearId){
         return Disbursement::where('teacher_id', $teacherId)
-                           ->wheres('term_of_year_id', $termOfYearId)
-                           ->get();
+                           ->where('term_of_year_id', $termOfYearId)
+                           ->get()[0];
+    }
+
+    public function getListDisbursementTeachByDisbursementID($disbursementId){
+
+        $disbursmentData = Disbursement::find($disbursementId);
+        if (!$disbursmentData) {
+            return null;
+        }
+        $listDisburseteach = $disbursmentData->scheduleTeachs()->withPivot('count_of_teach', 'unit', 'unit_yes', 'unit_no', 'rate_of_unit', 'total', 'note')->with(['subject'])->get();
+
+        return $listDisburseteach;
+    }
+
+    public function getListTeacherStatusByTermID($termOfYearId){
+        return Disbursement::with(['teacher' => function($query) {
+            $query->select('teacher_id', 'prefix', 'fullname',); // Customize columns from the 'product' table
+        }])
+        ->where('term_of_year_id', $termOfYearId)
+        ->get();
     }
 
     public function createDisbursement($data)
