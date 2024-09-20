@@ -17,14 +17,23 @@ class ResponseMiddleware implements MiddlewareInterface
 
         // Get the response status code
         $statusCode = $response->getStatusCode();
+
+        $messageResponse = "";
         if ($statusCode >= 200 && $statusCode < 300) {
+            $messageResponse = "success";
+        } else if ($statusCode >= 400 && $statusCode < 500) {
+            $messageResponse = "not found";
+        } else if ($statusCode >= 500) {
+            $messageResponse = "server error";
+        }
+        
             // Get the response body
             $body = $response->getBody();
             $body->rewind();
             $data = $body->getContents();
 
             // Convert the response data to JSON format
-            $formattedData = json_encode(['message' => "success", 'payload' => json_decode($data)]);
+            $formattedData = json_encode(['message' => $messageResponse, 'payload' => json_decode($data)]);
             // Create a new response with the formatted data
             $response = $response->withHeader('Content-Type', 'application/json');
             
@@ -32,7 +41,6 @@ class ResponseMiddleware implements MiddlewareInterface
             $body = $response->getBody();
             $body->rewind();
             $body->write($formattedData);
-        }
 
         return $response;
     }

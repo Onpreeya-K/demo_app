@@ -44,6 +44,10 @@ class DisbursementController {
         $teacherId = $args['teacherId'];
         $termOfYearId = $args['termId'];
         $disbursement = $this->disbursementService->getDisbursementsByTeacherIdAndTermOfYearId($teacherId, $termOfYearId);
+
+        if (!$disbursement) {
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
         $response->getBody()->write(json_encode($disbursement));
         return $response->withHeader('Content-Type', 'application/json');
     }
