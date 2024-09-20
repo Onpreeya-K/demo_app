@@ -34,6 +34,9 @@ class DisbursementService
     public function getDisbursementsByTeacherIdAndTermOfYearId($teacherId, $termOfYearId){
 
         $dataDisbursement = $this->disbursementRepository->getDisbursementByTeacherIDAndTermID($teacherId, $termOfYearId);
+        if (!$dataDisbursement) {
+            return null;
+        }
 
         $listDisbursementTeach = $this->disbursementRepository->getListDisbursementTeachByDisbursementID($dataDisbursement->disbursement_id);
         $dataDisbursement->data = $listDisbursementTeach;
