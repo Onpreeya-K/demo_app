@@ -27,7 +27,14 @@ class UserService
     }
 
     public function updateUser($id, $data)
-    {
+    {   
+        $data["password"] = password_hash($data["password"], PASSWORD_BCRYPT);
+        return $this->userRepository->updateUser($id, $data);
+    }
+
+    public function resetUserPassword($id)
+    {   
+        $data["password"]= password_hash($id, PASSWORD_BCRYPT);
         return $this->userRepository->updateUser($id, $data);
     }
 

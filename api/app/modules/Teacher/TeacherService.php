@@ -45,8 +45,8 @@ class TeacherService
 
         if ($insertTeacher) {
             $user = [
-                "username" => $data["username"],
-                "password" => $data["username"],
+                "username" => $data["teacher_id"],
+                "password" => $data["teacher_id"],
                 "role" => "user"
             ];
             $insertUser = $this->userService->createUser($user);

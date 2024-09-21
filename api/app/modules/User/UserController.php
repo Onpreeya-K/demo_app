@@ -32,10 +32,17 @@ class UserController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function resetPassword(Request $request, Response $response, $args) {
+    public function updatePassword(Request $request, Response $response, $args) {
         $userId = $args['id'];
         $data = $request->getParsedBody();
         $user = $this->userService->updateUser($userId, $data);
+        $response->getBody()->write(json_encode($user));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    public function resetPassword(Request $request, Response $response, $args) {
+        $userId = $args['id'];
+        $user = $this->userService->resetUserPassword($userId);
         $response->getBody()->write(json_encode($user));
         return $response->withHeader('Content-Type', 'application/json');
     }
