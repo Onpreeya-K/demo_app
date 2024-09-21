@@ -2,6 +2,7 @@
 
 namespace App\Modules\User;
 
+use Exception;
 class UserService
 {
     protected $userRepository;
@@ -27,9 +28,15 @@ class UserService
     }
 
     public function updateUser($id, $data)
-    {   
-        $data["password"] = password_hash($data["password"], PASSWORD_BCRYPT);
-        return $this->userRepository->updateUser($id, $data);
+
+    {   $user = $this->userRepository->getUserById($id);
+        if ($user && password_verify($data["old_password"], $user->password)){
+            $newData["password"] = password_hash($data["new_password"], PASSWORD_BCRYPT);
+            return $this->userRepository->updateUser($id, $newData);
+        } else {
+            throw new Exception("Old password is incorrect");
+        }
+        
     }
 
     public function resetUserPassword($id)

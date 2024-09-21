@@ -166,13 +166,8 @@ class DisbursementService
         $fullPath = __DIR__. '/../../../storage/pdfs/' . $pdfPath;
 
         if (file_exists($fullPath)) {
-            // Read the file content into a variable
             $pdf_content = file_get_contents($fullPath);
-            
-            // Encode the file content into base64
             $base64_pdf = base64_encode($pdf_content);
-            
-            // Output the base64 string
             return ["base64" => $base64_pdf];
         } else {
             throw new Exception("File not found");
