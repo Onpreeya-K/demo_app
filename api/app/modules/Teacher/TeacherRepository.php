@@ -13,7 +13,7 @@ class TeacherRepository
 
     public function getTeacherById($id)
     {
-        return Teacher::find($id);
+        return Teacher::with(['managementPosition', 'academicPosition'])->find($id);
     }
 
     public function createTeacher($data)
