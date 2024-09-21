@@ -28,7 +28,6 @@ class UserService
 
     public function updateUser($id, $data)
     {
-        // $data->
         return $this->userRepository->updateUser($id, $data);
     }
 

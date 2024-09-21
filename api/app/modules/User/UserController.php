@@ -32,7 +32,7 @@ class UserController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function update(Request $request, Response $response, $args) {
+    public function resetPassword(Request $request, Response $response, $args) {
         $userId = $args['id'];
         $data = $request->getParsedBody();
         $user = $this->userService->updateUser($userId, $data);
@@ -43,6 +43,6 @@ class UserController {
     public function delete(Request $request, Response $response, $args) {
         $userId = $args['id'];
         $this->userService->deleteUser($userId);
-        return $response->withStatus(204);
+        return $response->withStatus(200);
     }
 }

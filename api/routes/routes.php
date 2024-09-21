@@ -49,7 +49,7 @@ $app->group('/user', function (Group $group) {
     $group->get('', UserController::class . ':fetch');
     $group->get('/{id}', UserController::class . ':fetchByID');
     $group->post('', UserController::class . ':create');
-    $group->put('/{id}', UserController::class . ':update');
+    $group->put('/{id}', UserController::class . ':resetPassword');
     $group->delete('/{id}', UserController::class . ':delete');
 })->add(new AuthMiddleware($_ENV['SECRET_KEY']));
 

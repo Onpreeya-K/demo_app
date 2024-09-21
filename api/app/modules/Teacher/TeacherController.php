@@ -46,8 +46,9 @@ class TeacherController
 
     public function update(Request $request, Response $response, $args)
     {
+        $teacherId = $args['id'];
         $data = $request->getParsedBody();
-        $teacher = $this->teacherService->updateTeacher($args['id'], $data);
+        $teacher = $this->teacherService->updateTeacher($teacherId, $data);
         $response->getBody()->write(json_encode($teacher));
         return $response->withHeader('Content-Type', 'application/json');
     }
