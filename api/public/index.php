@@ -20,6 +20,8 @@ use App\Middleware\AuthMiddleware;
 use App\Middleware\CorsMiddleware;
 use App\Middleware\ResponseMiddleware;
 use Slim\Middleware\BodyParsingMiddleware;
+
+use App\Utils\PDFGen;
 // Load environment variables
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
@@ -79,17 +81,12 @@ $app->get('/key', function (Request $request, Response $response, $args) use ($s
 });
 
 $app->get('/111', function (Request $request, Response $response, $args) {
-    $data = $request->getParsedBody();
+    $spdf = new PDFGen("test.pdf");
+    $spdf->createPDF();
 
-    // If the body is JSON, it will be an associative array
-    if (is_array($data)) {
-        $response->getBody()->write(json_encode($data));
-    } else {
-        $response->getBody()->write('Invalid JSON');
-    }
-
+    $response->getBody()->write(json_encode(['status' => 'success']));
     return $response->withHeader('Content-Type', 'application/json');
-})->add(new AuthMiddleware($secret));
+});
 
 
 

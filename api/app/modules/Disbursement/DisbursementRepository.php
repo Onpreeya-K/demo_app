@@ -14,7 +14,7 @@ class DisbursementRepository
     }
 
     public function getDisbursementByID($id){
-        return Disbursement::where('disbursement_id', $id)->get();
+        return Disbursement::find($id);
     }
     
     public function getDisbursementByTermID($termOfYearId){
@@ -60,9 +60,14 @@ class DisbursementRepository
         return Disbursement::create($data);
     }
 
-    public function updateDisbursement($id, $data)
-    {
-        return Disbursement::where('disbursement_id', $id)->update($data);
+    public function updateDisbursement($id, $data){
+    $disbursement = $this->getDisbursementByID($id);
+        if (!$disbursement) {
+            return null;
+        }
+
+        $disbursement->update($data);
+        return $disbursement;
     }
 
     public function deleteDisbursement($id)

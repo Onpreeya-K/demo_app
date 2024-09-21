@@ -74,6 +74,18 @@ class DisbursementController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public function updateStatus(Request $request, Response $response, $args) {
+        $disbursementId = $args['disbursementId'];
+        $data = $request->getParsedBody();
+        if ($data['status'] == "reject") {
+            $resp = $this->disbursementService->updateRejectDisbursement($disbursementId, $data);
+        } else {
+            $resp = $this->disbursementService->updateAcceptDisbursement($disbursementId, $data);
+        }
+        $response->getBody()->write(json_encode($resp));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
     public function delete(Request $request, Response $response, $args) {
         $disbursementId = $args['id'];
         $this->disbursementService->deleteDisbursement($disbursementId);

@@ -3,6 +3,8 @@
 namespace App\Modules\Disbursement;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use Exception;
+use App\Utils\PDFGen;
 
 class DisbursementService
 {
@@ -47,9 +49,10 @@ class DisbursementService
 
     public function createDisbursementWithTech($data)
     {
+        $pdfPath = 'disbursement_'. $data['term_of_year_id']. '_' . $data['teacher_id']. '_' . time() . '.pdf';
 
-        //gen pdf path
-        $pdfPath = 'disbursement_' . time() . '.pdf';
+        $spdf = new PDFGen(pathFile: $pdfPath);
+        $spdf->createPDF();
         
         return DB::transaction(function () use ($data, $pdfPath) {
 
@@ -60,7 +63,7 @@ class DisbursementService
                 'sum_no_unit' => $data['sum_no_unit'],
                 'total' => $data['total'],
                 'status' => $data['status'],
-                'pdf_path' => $pdfPath//gen on backend
+                'pdf_path' => $pdfPath
             ];
 
             $disbursement = $this->disbursementRepository->createDisbursement($disbursementData);
@@ -88,8 +91,74 @@ class DisbursementService
 
     public function updateDisbursement($id, $data)
     {
-        // $data->
-        return $this->disbursementRepository->updateDisbursement($id, $data);
+
+        return DB::transaction(function () use ($id, $data) {
+
+            $disbursementData = [
+                'sum_yes_unit' => $data['sum_yes_unit'],
+                'sum_no_unit' => $data['sum_no_unit'],
+                'total' => $data['total'],
+                'status' => $data['status'],
+            ];
+
+            $disbursement = $this->disbursementRepository->updateDisbursement($id,$disbursementData);
+
+            if (!$disbursement) {
+                throw new Exception('disbursement not found.');
+            }
+
+            // Sync the products with the pivot table
+            $pivotData = [];
+            foreach ($data['data'] as $subject) {
+                $pivotData[$subject['schedule_teach_id']] = [
+                    'count_of_teach' => $subject['count_of_teach'],
+                    'unit' => $subject['unit'],
+                    'unit_yes' => $subject['unit_yes'],
+                    'unit_no' => $subject['unit_no'],
+                    'rate_of_unit' => $subject['rate_of_unit'],
+                    'total' => $subject['total'],
+                    'note' => $subject['note']
+                ];
+            }
+
+            $disbursement->scheduleTeachs()->sync($pivotData);
+
+            return $disbursement;
+        });
+    }
+
+    public function updateAcceptDisbursement($id, $data)
+    {
+        $status = [
+            'status' => $data['status']
+        ];
+
+        $resp = $this->disbursementRepository->updateDisbursement($id, $status);
+        if (!$resp) {
+            throw new Exception('disbursement not found.');
+        }
+
+        $disbursement = $this->disbursementRepository->getDisbursementByID($id);
+
+        $listDisbursement = $this->getDisbursementsByTeacherIdAndTermOfYearId($disbursement->teacher_id, $disbursement->term_of_year_id);
+
+        //update pdf Data
+        $spdf = new PDFGen(pathFile: $disbursement->pdf_path);
+        $spdf->updatePDF();
+
+        return $resp;
+    }
+
+    public function updateRejectDisbursement($id, $data)
+    {
+        $status = [
+            'status' => $data['status']
+        ];
+        $resp = $this->disbursementRepository->updateDisbursement($id, $status);
+        if (!$resp) {
+            throw new Exception('disbursement not found.');
+        }
+        return $resp;
     }
 
     public function deleteDisbursement($id)
