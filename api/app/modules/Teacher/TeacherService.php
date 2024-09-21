@@ -2,13 +2,17 @@
 
 namespace App\Modules\Teacher;
 
+use App\Modules\User\UserService;
+
 class TeacherService
 {
     protected $teacherRepository;
+    protected $userService;
 
-    public function __construct(TeacherRepository $teacherRepository)
+    public function __construct(TeacherRepository $teacherRepository, UserService $userService)
     {
         $this->teacherRepository = $teacherRepository;
+        $this->userService = $userService;
     }
 
     public function getAllTeachers()
@@ -35,8 +39,25 @@ class TeacherService
     }
 
     public function createTeacher($data)
-    {   $data["is_active"] = 1;
-        return $this->teacherRepository->createTeacher($data);
+    {   
+        $data["is_active"] = 1;
+        $insertTeacher = $this->teacherRepository->createTeacher($data);
+
+        if ($insertTeacher) {
+            $user = [
+                "username" => $data["username"],
+                "password" => $data["username"],
+                "role" => "user"
+            ];
+            $insertUser = $this->userService->createUser($user);
+            if (!$insertUser) {
+                throw new \Exception("Failed to create user");
+            }
+            return $insertTeacher;
+        }
+        else {
+            throw new \Exception("Failed to create teacher");
+        }
     }
 
     public function updateTeacher($id, $data)
