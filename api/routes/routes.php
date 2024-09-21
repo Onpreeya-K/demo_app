@@ -162,8 +162,12 @@ $app->group('/disbursement', function (Group $group) {
     $group->get('/teacher/{teacherId}/term/{termId}', DisbursementController::class . ':fetchDisbursementsByTeacherIDAndTermID');
     $group->get('/teacher/{teacherId}', DisbursementController::class . ':fetchDisbursementsByTeacherID');
     $group->get('/{id}', DisbursementController::class . ':fetchByID');
+    $group->post('/pdf', DisbursementController::class . ':getPdfFile');
     $group->post('', DisbursementController::class . ':create');
     $group->put('/status/{disbursementId}', DisbursementController::class . ':updateStatus');
     $group->put('/{id}', DisbursementController::class . ':update');
     $group->delete('/{id}', DisbursementController::class . ':delete');
 })->add(new AuthMiddleware($_ENV['SECRET_KEY']));
+
+
+

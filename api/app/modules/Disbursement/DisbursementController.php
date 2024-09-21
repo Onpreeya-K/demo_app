@@ -86,6 +86,13 @@ class DisbursementController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public function getPdfFile(Request $request, Response $response, $args) {
+        $data = $request->getParsedBody();
+        $resp = $this->disbursementService->generatePdf($data);
+        $response->getBody()->write(json_encode($resp));
+        return $response->withHeader('Content-Type', 'application/pdf');
+    }
+
     public function delete(Request $request, Response $response, $args) {
         $disbursementId = $args['id'];
         $this->disbursementService->deleteDisbursement($disbursementId);
