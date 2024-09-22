@@ -470,7 +470,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                                 gap={2}
                             >
                                 <Button
-                                    variant="outlined"
+                                    variant="contained"
                                     size="small"
                                     onClick={onConfirmChangePassword}
                                 >
@@ -636,7 +636,6 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                     >
                         <Box
                             sx={{
-                                // ...(!isDesktop && { display: 'none' }),
                                 color: '#FFF',
                                 fontSize: 16,
                             }}

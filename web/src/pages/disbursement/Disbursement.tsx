@@ -566,10 +566,10 @@ const DisbursementPage = () => {
             };
             const response = await updateStatus(form.professor?.disbursement_id, payload);
             if (response && response.message === 'success') {
-                onClosePopupConfirm();
                 setTypePopupAlert('SUCCESS');
                 setIsOpenPopupAlert(true);
                 setMessagePopupAlert('ให้ผลรายการขอเบิกค่าสอนสำเร็จ');
+                onClosePopupConfirm();
                 fetchTeacherListByTerm(form.term?.term_of_year_id);
                 fetchScheduleDisburse();
             }
@@ -1322,10 +1322,16 @@ const DisbursementPage = () => {
                             >
                                 <Grid item xs={12} sm={12} xl={12}>
                                     {status === 'pending' && (
-                                        <Typography variant="h6">{`สถานะ : รออนุมัติ`}</Typography>
+                                        <Typography
+                                            variant="h6"
+                                            color={'#FF9800'}
+                                        >{`สถานะ : รออนุมัติ`}</Typography>
                                     )}
                                     {status === 'reject' && (
-                                        <Typography variant="h6">{`สถานะ : ปฏิเสธ`}</Typography>
+                                        <Typography
+                                            variant="h6"
+                                            color={'#FF0000'}
+                                        >{`สถานะ : ปฏิเสธ`}</Typography>
                                     )}
                                     {status === 'accept' && (
                                         <Grid
@@ -1341,6 +1347,7 @@ const DisbursementPage = () => {
                                                 <Typography
                                                     variant="h6"
                                                     align="center"
+                                                    color={'#008000'}
                                                 >{`สถานะ : อนุมัติ`}</Typography>
                                             </Grid>
                                             <Grid item xs={12} sm={2} xl={1}>
@@ -1407,10 +1414,6 @@ const DisbursementPage = () => {
                             status !== 'new' &&
                             status !== 'reject' &&
                             renderTableDisbursement()}
-                        {/* {!isNullOrUndefined(disburseScheduleData) &&
-                            status &&
-                            status === 'reject' &&
-                            renderTableSchedule()} */}
                     </div>
                 ) : (
                     <div>
@@ -1499,13 +1502,13 @@ const DisbursementPage = () => {
                                                                 <CloseIcon
                                                                     fontSize="small"
                                                                     sx={{
-                                                                        color: '#ff0000',
+                                                                        color: '#FF0000',
                                                                     }}
                                                                 />
                                                                 <label
                                                                     style={{
                                                                         fontSize: 14,
-                                                                        color: '#ff0000',
+                                                                        color: '#FF0000',
                                                                     }}
                                                                 >
                                                                     ปฏิเสธ
@@ -1551,6 +1554,68 @@ const DisbursementPage = () => {
                                 </Button>
                             </Grid>
                         </Grid>
+                        {disburseScheduleData && disburseScheduleData.status && (
+                            <Grid
+                                container
+                                spacing={2}
+                                justifyContent={'center'}
+                                sx={{ paddingTop: 2, paddingBottom: 2 }}
+                            >
+                                <Grid item xs={12} sm={12} xl={12}>
+                                    {disburseScheduleData.status === 'pending' && (
+                                        <Typography
+                                            variant="h6"
+                                            color={'#FF9800'}
+                                        >{`สถานะ : รออนุมัติ`}</Typography>
+                                    )}
+                                    {disburseScheduleData.status === 'reject' && (
+                                        <Typography
+                                            variant="h6"
+                                            color={'#FF0000'}
+                                        >{`สถานะ : ปฏิเสธ`}</Typography>
+                                    )}
+                                    {disburseScheduleData.status === 'accept' && (
+                                        <Grid
+                                            container
+                                            item
+                                            xs={12}
+                                            sm={12}
+                                            xl={12}
+                                            spacing={2}
+                                            alignItems="center"
+                                        >
+                                            <Grid item xs>
+                                                <Typography
+                                                    variant="h6"
+                                                    align="center"
+                                                    color={'#008000'}
+                                                >{`สถานะ : อนุมัติ`}</Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={2} xl={1}>
+                                                <Button
+                                                    fullWidth
+                                                    variant="outlined"
+                                                    startIcon={<RemoveRedEyeIcon />}
+                                                    onClick={onClickViewPdf}
+                                                >
+                                                    ดู
+                                                </Button>
+                                            </Grid>
+                                            <Grid item xs={12} sm={2} xl={1}>
+                                                <Button
+                                                    fullWidth
+                                                    variant="outlined"
+                                                    startIcon={<FaRegFilePdf />}
+                                                    onClick={onClickDownloadPdf}
+                                                >
+                                                    ดาวน์โหลด
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    )}
+                                </Grid>
+                            </Grid>
+                        )}
                         {disburseScheduleData &&
                             !isNullOrUndefined(disburseScheduleData.data) &&
                             renderTableDisbursement()}

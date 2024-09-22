@@ -18,10 +18,12 @@ import { callLoginService } from '../../services/Authen-service';
 import { setAccessToken } from '../../util/Util';
 import { useEffect, useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import PopupAlert from '../../components/popupAlert/Popup-Alert';
 
 const Login = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [isOpenPopupAlert, setIsOpenPopupAlert] = useState<boolean>(false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -41,7 +43,7 @@ const Login = () => {
                 navigate('/schedule');
             }
         } catch (error: any) {
-            console.error('Error:', error);
+            setIsOpenPopupAlert(true);
         }
     };
 
@@ -85,6 +87,14 @@ const Login = () => {
         <ThemeProvider theme={theme}>
             <Grid container component="main" sx={{ height: '100vh' }}>
                 <CssBaseline />
+                <PopupAlert
+                    isOpen={isOpenPopupAlert}
+                    onClose={() => setIsOpenPopupAlert(false)}
+                    title={
+                        <div style={{ alignItems: 'center' }}>ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
+                    }
+                    type={'ERROR'}
+                />
                 {isDesktop && (
                     <>
                         <Grid
@@ -110,27 +120,6 @@ const Login = () => {
                         </Grid>
                     </>
                 )}
-                {/* <Grid
-                    item
-                    xs={false}
-                    sm={5}
-                    md={8}
-                    sx={{
-                        backgroundRepeat: 'no-repeat',
-                        backgroundColor: '#FD7301',
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                    }}
-                    container
-                    justifyContent="center"
-                    alignItems={'center'}
-                >
-                    <img
-                        src={educationMSULogo}
-                        alt="Example"
-                        style={{ width: '40%', height: '30%' }}
-                    />
-                </Grid> */}
                 <Grid
                     item
                     xs={12}
@@ -181,7 +170,7 @@ const Login = () => {
                                     required
                                     fullWidth
                                     id="username"
-                                    label="Username"
+                                    label="ชื่อผู้ใช้"
                                     name="username"
                                     autoComplete="username"
                                     autoFocus
@@ -207,7 +196,7 @@ const Login = () => {
                                     required
                                     fullWidth
                                     name="password"
-                                    label="Password"
+                                    label="รหัสผ่าน"
                                     id="password"
                                     autoComplete="current-password"
                                     type={showPassword ? 'text' : 'password'}
@@ -264,107 +253,6 @@ const Login = () => {
                     </Grid>
                 </Grid>
             </Grid>
-            {/* <Box
-                sx={{
-                    height: `${window.innerHeight}px`,
-                    width: `${window.innerWidth}px`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#f5f5f5',
-                }}
-            >
-                <Box
-                    sx={{
-                        width: '50%',
-                        padding: '2rem',
-                        backgroundColor: '#FD7301',
-                        borderRadius: '10px',
-                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                    }}
-                >
-                    <img
-                        src={educationMSULogo}
-                        alt="Example"
-                        style={{ width: '40%', height: '30%' }}
-                    />
-                    <br />
-                    <Typography
-                        component="h2"
-                        variant="h5"
-                        align="center"
-                        color="#fff"
-                    >
-                        ระบบเบิกเงินค่าตอนแทนการสอน คณะศึกษาศาสตร์
-                        <br />
-                        มหาวิทยาลัยมหาสารคาม
-                    </Typography>
-                    <Typography
-                        component="h2"
-                        variant="h5"
-                        align="center"
-                        color="#fff"
-                        // mt={2}
-                    >
-                        เข้าสู่ระบบ
-                    </Typography>
-                    <div
-                        style={{
-                            width: '100%',
-                            display: 'flex',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <Box
-                            component="form"
-                            onSubmit={handleSubmit}
-                            noValidate
-                            sx={{ width: '50%' }}
-                        >
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="username"
-                                label="รหัสผู้ใช้"
-                                name="username"
-                                autoComplete="username"
-                                autoFocus
-                                InputProps={{
-                                    style: { backgroundColor: '#fff' },
-                                }}
-                            />
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="password"
-                                label="รหัสผ่าน"
-                                type="password"
-                                id="password"
-                                autoComplete="current-password"
-                                InputProps={{
-                                    style: { backgroundColor: '#fff' },
-                                }}
-                            />
-                            <Button
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                sx={{
-                                    mt: 3,
-                                    mb: 2,
-                                    backgroundColor: '#333',
-                                    color: '#fff',
-                                }}
-                            >
-                                เข้าสู่ระบบ
-                            </Button>
-                        </Box>
-                    </div>
-                </Box>
-            </Box> */}
         </ThemeProvider>
     );
 };

@@ -13,9 +13,6 @@ const handleResponse = async (url: string, response: Response) => {
         const error = await response.json();
         //    unAuth 401
         if (response.status === 401 || response.statusText === 'Unauthorized') {
-            window.alert(
-                'Session expired or unauthorized.'
-            );
             window.location.href = `${environment.baseUrl}:3000/login`;
             throw new Error(
                 `Error: ${response.status} ${
