@@ -1,38 +1,35 @@
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
-import SaveIcon from '@mui/icons-material/Save';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import DoneIcon from '@mui/icons-material/Done';
+import SaveIcon from '@mui/icons-material/Save';
 import {
     Autocomplete,
     Box,
     Button,
     Divider,
     Grid,
-    TextField,
-    Typography,
+    Paper,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
-    TableRow,
-    Paper,
     TablePagination,
+    TableRow,
+    TextField,
+    Typography,
 } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useEffect, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
-import appConfig from '../../config/application-config.json';
-import { getDataProfessor, getRoleUser, isNullOrUndefined, sourceList } from '../../util/Util';
-import { getTeacherSchedule, getTermOfYear } from '../../services/Criteria-service';
-import { IProfessor } from '../../interface/Professor-interface';
 import PopupAlert from '../../components/popupAlert/Popup-Alert';
+import appConfig from '../../config/application-config.json';
+import { IProfessor } from '../../interface/Professor-interface';
+import { getTeacherSchedule, getTermOfYear } from '../../services/Criteria-service';
 import {
-    getScheduleByTeacherId,
     getScheduleByTermIdAndTeacherId,
     saveScheduleTeach,
 } from '../../services/Schedule-service';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { getDataProfessor, getRoleUser, isNullOrUndefined, sourceList } from '../../util/Util';
 import { ScheduleTeach } from '../disbursement/Disbursement';
 
 interface Professor {
@@ -89,7 +86,7 @@ const SchedulePage = () => {
     const boxUserSectionTermRef = useRef<HTMLDivElement>(null);
     const [boxHeaderHeight, setBoxHeaderHeight] = useState<number | null>(null);
     const [boxAdminSectionTermHeight, setBoxAdminSectionTermHeight] = useState<number | null>(null);
-    const [boxUserSectionTermHeight, setBoxUserSectionTermHeight] = useState<number | null>(null);
+    // const [boxUserSectionTermHeight, setBoxUserSectionTermHeight] = useState<number | null>(null);
 
     const [termOfYear, setTermOfYear] = useState<DropdownTerm[]>([]);
     const [department, setDepartment] = useState<string>('');
@@ -172,10 +169,10 @@ const SchedulePage = () => {
                 const height = boxAdminSectionTermRef.current.clientHeight;
                 setBoxAdminSectionTermHeight(height);
             }
-            if (boxUserSectionTermRef.current) {
-                const height = boxUserSectionTermRef.current.clientHeight;
-                setBoxUserSectionTermHeight(height);
-            }
+            // if (boxUserSectionTermRef.current) {
+            //     const height = boxUserSectionTermRef.current.clientHeight;
+            //     setBoxUserSectionTermHeight(height);
+            // }
         }
         updateHeights();
         window.addEventListener('resize', updateHeights);
@@ -349,100 +346,6 @@ const SchedulePage = () => {
         }
         return result;
     };
-
-    const columnsOfSchedule: GridColDef[] = [
-        {
-            field: 'level_id',
-            headerName: 'Level ID',
-            align: 'center',
-            headerAlign: 'center',
-            width: 100,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-        },
-        {
-            field: 'course_code',
-            headerName: 'Course Code',
-            align: 'center',
-            headerAlign: 'center',
-            width: 150,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-        },
-        {
-            field: 'section',
-            headerName: 'Section',
-            align: 'center',
-            headerAlign: 'center',
-            width: 100,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-        },
-        {
-            field: 'course_name',
-            headerName: 'Course Name',
-            align: 'left',
-            headerAlign: 'center',
-            minWidth: 200,
-            flex: 1,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-        },
-        {
-            field: 'course_unit',
-            headerName: 'Course Unit',
-            align: 'center',
-            headerAlign: 'center',
-            width: 200,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-        },
-        {
-            field: 'total_seat',
-            headerName: 'Total Seat',
-            align: 'center',
-            headerAlign: 'center',
-            width: 200,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-        },
-        {
-            field: 'enroll_seat',
-            headerName: 'Enroll Seat',
-            align: 'center',
-            headerAlign: 'center',
-            width: 200,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-        },
-        {
-            field: 'teach_date',
-            headerName: 'Date',
-            align: 'center',
-            headerAlign: 'center',
-            width: 150,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-        },
-        {
-            field: 'major_name',
-            headerName: 'Major',
-            align: 'center',
-            headerAlign: 'center',
-            width: 150,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-        },
-    ];
 
     const handleAutocompleteChange = (opt: Professor | null) => {
         setOpenSectionUpload(false);
@@ -805,18 +708,19 @@ const SchedulePage = () => {
                         </Grid>
                     </Box>
                 )}
-
                 {formSearch.professor && !isNullOrUndefined(formSearch.professor.dataTable) && (
                     <Box
                         style={{
-                            height:
-                                boxHeaderHeight && boxUserSectionTermHeight
-                                    ? `calc(100vh - ${boxHeaderHeight}px - ${boxUserSectionTermHeight}px - 16px)`
-                                    : '100%',
-                            width:
-                                window?.innerWidth > 1024
-                                    ? `calc(100vw - 272px)`
-                                    : `calc(100vw - 32px)`,
+                            height: '100%',
+                            width: '100%',
+                            // height:
+                            //     boxHeaderHeight && boxUserSectionTermHeight
+                            //         ? `calc(100vh - ${boxHeaderHeight}px - ${boxUserSectionTermHeight}px - 16px)`
+                            //         : '100%',
+                            // width:
+                            //     window?.innerWidth > 1024
+                            //         ? `calc(100vw - 272px)`
+                            //         : `calc(100vw - 32px)`,
                         }}
                     >
                         <TableContainer component={Paper}>
@@ -826,7 +730,7 @@ const SchedulePage = () => {
                                         <TableCell align="center">Level ID</TableCell>
                                         <TableCell align="center">Course Code</TableCell>
                                         <TableCell align="center">Section</TableCell>
-                                        <TableCell align="left">Course Name</TableCell>
+                                        <TableCell align="center">Course Name</TableCell>
                                         <TableCell align="center">Course Unit</TableCell>
                                         <TableCell align="center">Total Seat</TableCell>
                                         <TableCell align="center">Enroll Seat</TableCell>
@@ -839,27 +743,58 @@ const SchedulePage = () => {
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row) => (
                                             <TableRow key={row.schedule_teach_id}>
-                                                <TableCell align="center">{row.level_id}</TableCell>
-                                                <TableCell align="center">
+                                                <TableCell
+                                                    align="center"
+                                                    sx={{ minWidth: '100px' }}
+                                                >
+                                                    {row.level_id}
+                                                </TableCell>
+                                                <TableCell
+                                                    align="center"
+                                                    sx={{ minWidth: '120px' }}
+                                                >
                                                     {row.course_code}
                                                 </TableCell>
-                                                <TableCell align="center">{row.section}</TableCell>
-                                                <TableCell align="left">
+                                                <TableCell
+                                                    align="center"
+                                                    sx={{ minWidth: '100px' }}
+                                                >
+                                                    {row.section}
+                                                </TableCell>
+                                                <TableCell
+                                                    align="left"
+                                                    sx={{ minWidth: '200px', flex: 1 }}
+                                                >
                                                     {row.course_name}
                                                 </TableCell>
-                                                <TableCell align="center">
+                                                <TableCell
+                                                    align="center"
+                                                    sx={{ minWidth: '100px' }}
+                                                >
                                                     {row.course_unit}
                                                 </TableCell>
-                                                <TableCell align="center">
+                                                <TableCell
+                                                    align="center"
+                                                    sx={{ minWidth: '100px' }}
+                                                >
                                                     {row.total_seat}
                                                 </TableCell>
-                                                <TableCell align="center">
+                                                <TableCell
+                                                    align="center"
+                                                    sx={{ minWidth: '100px' }}
+                                                >
                                                     {row.enroll_seat}
                                                 </TableCell>
-                                                <TableCell align="center">
+                                                <TableCell
+                                                    align="center"
+                                                    sx={{ minWidth: '100px' }}
+                                                >
                                                     {row.teach_date}
                                                 </TableCell>
-                                                <TableCell align="center">
+                                                <TableCell
+                                                    align="center"
+                                                    sx={{ minWidth: '100px' }}
+                                                >
                                                     {row.major_name}
                                                 </TableCell>
                                             </TableRow>
@@ -880,22 +815,6 @@ const SchedulePage = () => {
                                 labelRowsPerPage="Rows per page"
                             />
                         </TableContainer>
-                        {/* <DataGrid
-                            rows={formSearch.professor?.dataTable}
-                            columns={columnsOfSchedule}
-                            getRowId={(row: any) => row.schedule_teach_id}
-                            autoHeight
-                            initialState={{
-                                pagination: {
-                                    paginationModel: {
-                                        page: 0,
-                                        pageSize: 10,
-                                    },
-                                },
-                            }}
-                            pageSizeOptions={[5, 10]}
-                            disableRowSelectionOnClick
-                        /> */}
                         {getRoleUser() === appConfig.role.ADMIN &&
                             !formSearch.professor.has_schedule && (
                                 <Grid container marginTop={2}>

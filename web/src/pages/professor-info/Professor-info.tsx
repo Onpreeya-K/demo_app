@@ -1,5 +1,7 @@
+import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import {
     Autocomplete,
     Box,
@@ -22,8 +24,8 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { DataGrid, GridColDef, GridLocaleText } from '@mui/x-data-grid';
 import { useEffect, useRef, useState } from 'react';
+import PopupAlert from '../../components/popupAlert/Popup-Alert';
 import PopupConfirm from '../../components/popupConfirm/Popup-Confirm';
 import {
     createTeacher,
@@ -31,9 +33,9 @@ import {
     getAcademicPosition,
     getAllTeacher,
     getManagementPosition,
+    resetPasswordById,
     updateTeacher,
 } from '../../services/Teacher-service';
-import PopupAlert from '../../components/popupAlert/Popup-Alert';
 
 interface Teacher {
     teacher_id: string;
@@ -87,7 +89,9 @@ const ProfessorInfoPage = () => {
         management_position: false,
     });
     const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const [typeOfPopupConfirm, setTypeOfPopupConfirm] = useState<string>('');
     const [isOpenPopupConfirm, setIsOpenPopupConfirm] = useState<boolean>(false);
+    const [messagePopupConfirm, setMessagePopupConfirm] = useState<React.ReactNode>('');
     const [isOpenPopupAlert, setIsOpenPopupAlert] = useState<boolean>(false);
     const [messagePopupAlert, setMessagePopupAlert] = useState<string>('');
     const [optionManagementPosition, setOptionManagementPosition] = useState<ManagementPosition[]>(
@@ -111,103 +115,42 @@ const ProfessorInfoPage = () => {
         setPage(0);
     };
 
-    // const columns: GridColDef[] = [
-    //     {
-    //         field: 'teacher_id',
-    //         headerName: 'รหัสอาจารย์',
-    //         align: 'center',
-    //         headerAlign: 'center',
-    //         width: 180,
-    //         sortable: false,
-    //         resizable: false,
-    //         disableColumnMenu: true,
-    //     },
-    //     {
-    //         field: 'prefix',
-    //         headerName: 'คำนำหน้า',
-    //         align: 'left',
-    //         headerAlign: 'center',
-    //         minWidth: 150,
-    //         sortable: false,
-    //         resizable: false,
-    //         disableColumnMenu: true,
-    //     },
-    //     {
-    //         field: 'fullname',
-    //         headerName: 'ชื่อ',
-    //         align: 'left',
-    //         headerAlign: 'center',
-    //         minWidth: 200,
-    //         flex: 1,
-    //         sortable: false,
-    //         resizable: false,
-    //         disableColumnMenu: true,
-    //     },
-    //     {
-    //         field: 'position',
-    //         headerName: 'ตำแหน่งทางวิชาการ',
-    //         align: 'left',
-    //         headerAlign: 'center',
-    //         width: 200,
-    //         sortable: false,
-    //         resizable: false,
-    //         disableColumnMenu: true,
-    //         renderCell: (params) => <div>{params.row.academic_position.name}</div>,
-    //     },
-    //     {
-    //         field: 'management_position',
-    //         headerName: 'ตำแหน่งบริหาร',
-    //         align: 'left',
-    //         headerAlign: 'center',
-    //         width: 200,
-    //         sortable: false,
-    //         resizable: false,
-    //         disableColumnMenu: true,
-    //         renderCell: (params) => <div>{params.row.management_position.name}</div>,
-    //     },
-    //     {
-    //         field: 'edit',
-    //         headerName: 'แก้ไข',
-    //         align: 'center',
-    //         headerAlign: 'center',
-    //         width: 150,
-    //         sortable: false,
-    //         resizable: false,
-    //         disableColumnMenu: true,
-    //         renderCell: (params) => (
-    //             <div>
-    //                 <Tooltip title="แก้ไข" placement="top">
-    //                     <IconButton size="small" onClick={() => onClickEditData(params.row)}>
-    //                         <EditIcon fontSize="inherit" />
-    //                     </IconButton>
-    //                 </Tooltip>
-    //                 <Tooltip title="ลบ" placement="top">
-    //                     <IconButton size="small" onClick={() => onClickDeleteData(params.row)}>
-    //                         <DeleteOutlineIcon fontSize="inherit" />
-    //                     </IconButton>
-    //                 </Tooltip>
-    //             </div>
-    //         ),
-    //     },
-    // ];
     const onClickEditData = (row: Teacher) => {
         setModalAction('UPDATE');
         setOpenDialog(true);
         setForm(row);
     };
 
-    const onConfirmDelete = async () => {
-        const response = await deleteTeacher(form.teacher_id);
-        setIsOpenPopupConfirm(false);
-        if (response && response.message === 'success') {
-            await fetchData();
-            setIsOpenPopupAlert(true);
-            setMessagePopupAlert('ลบรายชื่ออาจารย์สำเร็จ');
+    const onConfirm = async () => {
+        if (typeOfPopupConfirm === 'DELETE') {
+            const response = await deleteTeacher(form.teacher_id);
+            setIsOpenPopupConfirm(false);
+            if (response && response.message === 'success') {
+                await fetchData();
+                setIsOpenPopupAlert(true);
+                setMessagePopupAlert('ลบรายชื่ออาจารย์สำเร็จ');
+            }
+        } else {
+            const response = await resetPasswordById(form.teacher_id);
+            setIsOpenPopupConfirm(false);
+            if (response && response.message === 'success') {
+                setIsOpenPopupAlert(true);
+                setMessagePopupAlert('รีเซ็ตรหัสผ่านสำเร็จ');
+            }
         }
     };
 
     const onClickDeleteData = async (row: Teacher) => {
         setForm(row);
+        setTypeOfPopupConfirm('DELETE');
+        setMessagePopupConfirm('คุณต้องการลบข้อมูลอาจารย์ ?');
+        setIsOpenPopupConfirm(true);
+    };
+
+    const onClickResetPassword = async (row: Teacher) => {
+        setForm(row);
+        setTypeOfPopupConfirm('RESET');
+        setMessagePopupConfirm(`คุณต้องการรีเซ็ตรหัสผ่านของ ${row.fullname}?`);
         setIsOpenPopupConfirm(true);
     };
 
@@ -362,19 +305,25 @@ const ProfessorInfoPage = () => {
 
     const renderDialogAddProfessor = () => {
         return (
-            <Dialog
-                open={openDialog}
-                onClose={() => {
-                    clearForm();
-                    setOpenDialog(false);
-                }}
-                fullWidth
-            >
-                <DialogTitle sx={{ padding: '16px 24px 8px 24px' }}>
+            <Dialog open={openDialog} disableEnforceFocus fullWidth>
+                <DialogTitle sx={{ padding: '16px 24px 8px 24px', position: 'relative' }}>
                     <Typography textAlign="center" variant="h6" component="div">
                         {modalAction === 'CREATE' ? 'เพิ่มรายชื่ออาจารย์' : 'แก้ไขรายชื่ออาจารย์'}
                     </Typography>
-                    <Divider />
+                    <IconButton
+                        autoFocus={false}
+                        sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                        }}
+                        onClick={() => {
+                            clearForm();
+                            setOpenDialog(false);
+                        }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
                 </DialogTitle>
                 <DialogContent sx={{ padding: 3 }}>
                     <Grid container spacing={2} paddingTop={1}>
@@ -385,7 +334,7 @@ const ProfessorInfoPage = () => {
                                 name="teacher_id"
                                 size="small"
                                 fullWidth
-                                value={form.teacher_id}
+                                value={form.teacher_id || ''}
                                 onChange={handleChange}
                                 error={errors.teacher_id}
                                 helperText={errors.teacher_id && 'กรุณาระบุรหัสอาจารย์'}
@@ -399,7 +348,7 @@ const ProfessorInfoPage = () => {
                                 name="prefix"
                                 size="small"
                                 fullWidth
-                                value={form.prefix}
+                                value={form.prefix || ''}
                                 onChange={handleChange}
                                 error={errors.prefix}
                                 helperText={errors.prefix && 'กรุณาระบุคำนำหน้า'}
@@ -412,7 +361,7 @@ const ProfessorInfoPage = () => {
                                 name="fullname"
                                 size="small"
                                 fullWidth
-                                value={form.fullname}
+                                value={form.fullname || ''}
                                 onChange={handleChange}
                                 error={errors.fullname}
                                 helperText={errors.fullname && 'กรุณาระบุชื่อ - นามสกุล'}
@@ -478,17 +427,10 @@ const ProfessorInfoPage = () => {
                     </Grid>
                     <Grid container component={'div'} marginTop={2}>
                         <Grid item xs={12} display={'flex'} justifyContent={'center'} gap={2}>
-                            <Button
-                                variant="outlined"
-                                onClick={() => {
-                                    clearForm();
-                                    setOpenDialog(false);
-                                }}
-                            >
-                                ยกเลิก
-                            </Button>
                             <Button variant="contained" onClick={onSubmitAddProfessor}>
-                                {modalAction === 'CREATE' ? 'เพิ่ม' : 'ยืนยันการแก้ไข'}
+                                {modalAction === 'CREATE'
+                                    ? 'ยืนยันการเพิ่มอาจารย์'
+                                    : 'ยืนยันการแก้ไข'}
                             </Button>
                         </Grid>
                     </Grid>
@@ -496,14 +438,6 @@ const ProfessorInfoPage = () => {
             </Dialog>
         );
     };
-
-    // const localeText: Partial<GridLocaleText> = {
-    //     MuiTablePagination: {
-    //         labelDisplayedRows: ({ from, to, count }) =>
-    //             `รายชื่ออาจารย์ตั้งแต่ ${from} ถึง ${to} จาก ${count !== -1 ? count : `${to}`}`,
-    //         labelRowsPerPage: 'จำนวนอาจารย์ต่อหน้า',
-    //     },
-    // };
 
     return (
         <div>
@@ -520,12 +454,12 @@ const ProfessorInfoPage = () => {
                 <Divider />
             </Box>
             <Box
-                sx={{
-                    marginTop: 2,
-                    width: window?.innerWidth > 1024 ? `calc(100vw - 272px)` : `calc(100vw - 32px)`,
+                style={{
+                    height: '100%',
+                    width: '100%',
                 }}
             >
-                <Grid container marginBottom={2} spacing={2} alignItems="center">
+                <Grid container marginBottom={2} marginTop={1} spacing={1} alignItems="center">
                     <Grid item xs={12} md={10}>
                         <TextField
                             fullWidth
@@ -536,7 +470,7 @@ const ProfessorInfoPage = () => {
                         />
                     </Grid>
                     <Grid item xs={12} md={2}>
-                        <Button fullWidth variant="outlined" onClick={onClickAddProfessor}>
+                        <Button fullWidth variant="contained" onClick={onClickAddProfessor}>
                             เพิ่มรายชื่ออาจารย์
                         </Button>
                     </Grid>
@@ -544,19 +478,23 @@ const ProfessorInfoPage = () => {
                 {renderDialogAddProfessor()}
                 <PopupConfirm
                     isOpen={isOpenPopupConfirm}
-                    onClose={() => setIsOpenPopupConfirm(false)}
-                    onConfirm={onConfirmDelete}
-                    title={'คุณต้องการลบข้อมูลอาจารย์ ?'}
+                    onClose={() => {
+                        setTypeOfPopupConfirm('');
+                        setMessagePopupConfirm('');
+                        setIsOpenPopupConfirm(false);
+                    }}
+                    onConfirm={onConfirm}
+                    title={messagePopupConfirm}
                 />
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">รหัสอาจารย์</TableCell>
-                                <TableCell align="left">คำนำหน้า</TableCell>
-                                <TableCell align="left">ชื่อ</TableCell>
-                                <TableCell align="left">ตำแหน่งทางวิชาการ</TableCell>
-                                <TableCell align="left">ตำแหน่งบริหาร</TableCell>
+                                <TableCell align="center">คำนำหน้า</TableCell>
+                                <TableCell align="center">ชื่อ</TableCell>
+                                <TableCell align="center">ตำแหน่งทางวิชาการ</TableCell>
+                                <TableCell align="center">ตำแหน่งบริหาร</TableCell>
                                 <TableCell align="center">แก้ไข</TableCell>
                             </TableRow>
                         </TableHead>
@@ -565,22 +503,39 @@ const ProfessorInfoPage = () => {
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row) => (
                                     <TableRow key={row.teacher_id}>
-                                        <TableCell align="center">{row.teacher_id}</TableCell>
-                                        <TableCell align="left">{row.prefix}</TableCell>
-                                        <TableCell align="left">{row.fullname}</TableCell>
-                                        <TableCell align="left">
+                                        <TableCell align="center" sx={{ minWidth: '120px' }}>
+                                            {row.teacher_id}
+                                        </TableCell>
+                                        <TableCell align="left" sx={{ minWidth: '120px' }}>
+                                            {row.prefix}
+                                        </TableCell>
+                                        <TableCell align="left" sx={{ minWidth: '120px', flex: 1 }}>
+                                            {row.fullname}
+                                        </TableCell>
+                                        <TableCell align="left" sx={{ minWidth: '120px' }}>
                                             {row.academic_position.name}
                                         </TableCell>
-                                        <TableCell align="left">
+                                        <TableCell align="left" sx={{ minWidth: '120px' }}>
                                             {row.management_position.name}
                                         </TableCell>
-                                        <TableCell align="center">
+                                        <TableCell
+                                            align="center"
+                                            sx={{ minWidth: '100px', padding: 0 }}
+                                        >
                                             <Tooltip title="แก้ไข" placement="top">
                                                 <IconButton
                                                     size="small"
                                                     onClick={() => onClickEditData(row)}
                                                 >
                                                     <EditIcon fontSize="inherit" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="แก้ไข" placement="top">
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => onClickResetPassword(row)}
+                                                >
+                                                    <RestartAltIcon fontSize="inherit" />
                                                 </IconButton>
                                             </Tooltip>
                                             <Tooltip title="ลบ" placement="top">
@@ -612,23 +567,6 @@ const ProfessorInfoPage = () => {
                         labelRowsPerPage="จำนวนอาจารย์ต่อหน้า"
                     />
                 </TableContainer>
-                {/* <DataGrid
-                    rows={dataTable}
-                    columns={columns}
-                    getRowId={(row: any) => row.teacher_id}
-                    autoHeight
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                page: 0,
-                                pageSize: 10,
-                            },
-                        },
-                    }}
-                    pageSizeOptions={[5, 10, 15, 20]}
-                    disableRowSelectionOnClick
-                    localeText={localeText}
-                /> */}
             </Box>
         </div>
     );

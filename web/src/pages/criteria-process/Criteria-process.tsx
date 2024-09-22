@@ -1,3 +1,4 @@
+import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import {
@@ -21,7 +22,6 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useEffect, useRef, useState } from 'react';
 import PopupAlert from '../../components/popupAlert/Popup-Alert';
 import PopupConfirm from '../../components/popupConfirm/Popup-Confirm';
@@ -74,64 +74,6 @@ const CriteriaProcessPage = () => {
     const [isOpenPopupAlert, setIsOpenPopupAlert] = useState<boolean>(false);
     const [messagePopupAlert, setMessagePopupAlert] = useState<string>('');
     const [isOpenPopupConfirm, setIsOpenPopupConfirm] = useState<boolean>(false);
-
-    // const columns: GridColDef[] = [
-    //     {
-    //         field: 'name',
-    //         headerName: 'ตำแหน่ง',
-    //         align: 'left',
-    //         headerAlign: 'center',
-    //         minWidth: 300,
-    //         flex: 1,
-    //         sortable: false,
-    //         resizable: false,
-    //         disableColumnMenu: true,
-    //     },
-    //     {
-    //         field: 'min_unit',
-    //         headerName: 'หน่วยกิตต่ำสุด',
-    //         align: 'center',
-    //         headerAlign: 'center',
-    //         width: 300,
-    //         sortable: false,
-    //         resizable: false,
-    //         disableColumnMenu: true,
-    //     },
-    //     {
-    //         field: 'max_unit',
-    //         headerName: 'หน่วยกิตสูงสุด',
-    //         align: 'center',
-    //         headerAlign: 'center',
-    //         width: 300,
-    //         sortable: false,
-    //         resizable: false,
-    //         disableColumnMenu: true,
-    //     },
-    //     {
-    //         field: 'edit',
-    //         headerName: 'แก้ไข',
-    //         align: 'center',
-    //         headerAlign: 'center',
-    //         width: 150,
-    //         sortable: false,
-    //         resizable: false,
-    //         disableColumnMenu: true,
-    //         renderCell: (params) => (
-    //             <div>
-    //                 <Tooltip title="แก้ไข" placement="top">
-    //                     <IconButton size="small" onClick={() => onClickEdit(params.row)}>
-    //                         <EditIcon fontSize="inherit" />
-    //                     </IconButton>
-    //                 </Tooltip>
-    //                 <Tooltip title="ลบ" placement="top">
-    //                     <IconButton size="small" onClick={() => onClickDeleteData(params.row)}>
-    //                         <DeleteOutlineIcon fontSize="inherit" />
-    //                     </IconButton>
-    //                 </Tooltip>
-    //             </div>
-    //         ),
-    //     },
-    // ];
 
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -254,11 +196,20 @@ const CriteriaProcessPage = () => {
     const renderDialogEditCriteria = () => {
         return (
             <Dialog open={openDialog} onClose={onCloseDialog} fullWidth>
-                <DialogTitle sx={{ padding: '16px 24px 8px 24px' }}>
+                <DialogTitle sx={{ padding: '16px 24px 8px 24px', position: 'relative' }}>
                     <Typography textAlign="center" variant="h6" component="div">
                         {dialogMode === 'ADD' ? 'เพิ่มเกณฑ์คำนวณ' : 'แก้ไขเกณฑ์คำนวณ'}
                     </Typography>
-                    <Divider />
+                    <IconButton
+                        sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                        }}
+                        onClick={onCloseDialog}
+                    >
+                        <CloseIcon />
+                    </IconButton>
                 </DialogTitle>
                 <DialogContent sx={{ padding: 3 }}>
                     <Grid container spacing={2} paddingTop={1}>
@@ -304,9 +255,6 @@ const CriteriaProcessPage = () => {
                     </Grid>
                     <Grid container marginTop={2}>
                         <Grid item xs={12} display={'flex'} justifyContent={'center'} gap={2}>
-                            <Button variant="outlined" onClick={onCloseDialog}>
-                                ยกเลิก
-                            </Button>
                             <Button variant="contained" onClick={onSubmitCriteria}>
                                 {dialogMode === 'ADD' ? 'เพิ่ม' : 'ยืนยันการแก้ไข'}
                             </Button>
@@ -339,7 +287,7 @@ const CriteriaProcessPage = () => {
                     </Typography>
                     <Divider />
                     <Box component={'div'} display={'flex'} justifyContent={'flex-end'} p={1}>
-                        <Button onClick={onClickAdd} variant="outlined">
+                        <Button onClick={onClickAdd} variant="contained">
                             เพิ่มเกณฑ์คำนวณ
                         </Button>
                     </Box>
@@ -347,7 +295,7 @@ const CriteriaProcessPage = () => {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell align="left">ตำแหน่ง</TableCell>
+                                    <TableCell align="center">ตำแหน่ง</TableCell>
                                     <TableCell align="center">หน่วยกิตต่ำสุด</TableCell>
                                     <TableCell align="center">หน่วยกิตสูงสุด</TableCell>
                                     <TableCell align="center">แก้ไข</TableCell>
@@ -358,10 +306,15 @@ const CriteriaProcessPage = () => {
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row) => (
                                         <TableRow key={row.criteria_of_process_id}>
-                                            <TableCell align="left">{row.name}</TableCell>
+                                            <TableCell align="left" sx={{ minWidth: '120px' }}>
+                                                {row.name}
+                                            </TableCell>
                                             <TableCell align="center">{row.min_unit}</TableCell>
                                             <TableCell align="center">{row.max_unit}</TableCell>
-                                            <TableCell align="center">
+                                            <TableCell
+                                                align="center"
+                                                sx={{ minWidth: '80px', padding: 0 }}
+                                            >
                                                 <Tooltip title="แก้ไข" placement="top">
                                                     <IconButton
                                                         size="small"
@@ -397,23 +350,6 @@ const CriteriaProcessPage = () => {
                             labelRowsPerPage="จำนวนแถวต่อหน้า"
                         />
                     </TableContainer>
-                    {/* <DataGrid
-                        rows={criteriaData}
-                        columns={columns}
-                        getRowId={(row) => row.criteria_of_process_id}
-                        autoHeight
-                        // initialState={{
-                        //     pagination: {
-                        //         paginationModel: {
-                        //             page: 0,
-                        //             pageSize: 10,
-                        //         },
-                        //     },
-                        // }}
-                        // pageSizeOptions={[5, 10]}
-                        disableRowSelectionOnClick
-                        hideFooterPagination
-                    /> */}
                 </Box>
             </Box>
         </div>

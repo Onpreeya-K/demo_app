@@ -16,13 +16,7 @@ export async function getAllTeacher() {
     const header = generateHeader();
 
     try {
-        return ServiceUtil.callApi(
-            urlEndpoint,
-            header,
-            {},
-            {},
-            METHOD_TYPE.GET
-        );
+        return ServiceUtil.callApi(urlEndpoint, header, {}, {}, METHOD_TYPE.GET);
     } catch (error) {
         console.error(error);
         return null;
@@ -33,13 +27,7 @@ export async function createTeacher(data: any) {
     const header = generateHeader();
 
     try {
-        return ServiceUtil.callApi(
-            urlEndpoint,
-            header,
-            {},
-            data,
-            METHOD_TYPE.POST
-        );
+        return ServiceUtil.callApi(urlEndpoint, header, {}, data, METHOD_TYPE.POST);
     } catch (error) {
         console.error(error);
         return null;
@@ -50,13 +38,7 @@ export async function updateTeacher(param: any, data: any) {
     const header = generateHeader();
 
     try {
-        return ServiceUtil.callApi(
-            urlEndpoint,
-            header,
-            param,
-            data,
-            METHOD_TYPE.PUT
-        );
+        return ServiceUtil.callApi(urlEndpoint, header, param, data, METHOD_TYPE.PUT);
     } catch (error) {
         console.error(error);
         return null;
@@ -67,13 +49,7 @@ export async function deleteTeacher(param: any) {
     const header = generateHeader();
 
     try {
-        return ServiceUtil.callApi(
-            urlEndpoint,
-            header,
-            param,
-            {},
-            METHOD_TYPE.DELETE
-        );
+        return ServiceUtil.callApi(urlEndpoint, header, param, {}, METHOD_TYPE.DELETE);
     } catch (error) {
         console.error(error);
         return null;
@@ -85,13 +61,7 @@ export async function getManagementPosition() {
     const header = generateHeader();
 
     try {
-        return ServiceUtil.callApi(
-            urlEndpoint,
-            header,
-            {},
-            {},
-            METHOD_TYPE.GET
-        );
+        return ServiceUtil.callApi(urlEndpoint, header, {}, {}, METHOD_TYPE.GET);
     } catch (error) {
         console.error(error);
         return null;
@@ -103,13 +73,30 @@ export async function getAcademicPosition() {
     const header = generateHeader();
 
     try {
-        return ServiceUtil.callApi(
-            urlEndpoint,
-            header,
-            {},
-            {},
-            METHOD_TYPE.GET
-        );
+        return ServiceUtil.callApi(urlEndpoint, header, {}, {}, METHOD_TYPE.GET);
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+export async function getRateByTeacherId(teacherID: string) {
+    const urlEndpoint = `/teacher/rate/${teacherID}`;
+    const header = generateHeader();
+
+    try {
+        return ServiceUtil.callApi(urlEndpoint, header, {}, {}, METHOD_TYPE.GET);
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+export async function resetPasswordById(userID: any) {
+    const urlEndpoint = `/user/forgot`;
+    const header = generateHeader();
+
+    try {
+        return ServiceUtil.callApi(urlEndpoint, header, userID, {}, METHOD_TYPE.PUT);
     } catch (error) {
         console.error(error);
         return null;

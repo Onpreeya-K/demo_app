@@ -6,6 +6,7 @@ import DisbursementPage from './pages/disbursement/Disbursement';
 import Login from './pages/login/Login';
 import ProfessorInfoPage from './pages/professor-info/Professor-info';
 import SchedulePage from './pages/schedule/Schedule';
+import PreviewPdfPage from './pages/preview/Preview-Pdf';
 
 const Routing: React.FC = () => {
     return (
@@ -23,11 +24,15 @@ const Routing: React.FC = () => {
                                 <Route path="professor-info" element={<ProfessorInfoPage />} />
                                 <Route path="criteria-of-teach" element={<CriteriaPage />} />
                                 <Route path="criteria-process" element={<CriteriaProcessPage />} />
+                                <Route path="criteria-process" element={<PreviewPdfPage />} />
                                 <Route path="*" element={<Navigate to="/login" replace />} />
                             </Routes>
                         </MenuDrawer>
                     }
                 />
+                <Route path="viewpdf/:pdf_path">
+                    <Route index element={<PreviewPdfPage />} />
+                </Route>
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </BrowserRouter>

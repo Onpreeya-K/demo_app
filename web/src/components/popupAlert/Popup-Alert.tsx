@@ -15,7 +15,7 @@ interface IProps {
     isOpen: boolean;
     onClose: any;
     title: any;
-    type: 'ERROR' | 'SUCCESS';
+    type: 'ERROR' | 'SUCCESS' | 'WARNING';
 }
 
 const PopupAlert = (props: IProps) => {
@@ -39,13 +39,12 @@ const PopupAlert = (props: IProps) => {
         >
             <DialogTitle>
                 <TitleConfirmModal>
-                    {type === 'ERROR' && (
-                        <InfoIcon sx={{ fontSize: '200%', color: '#FE0000' }} />
-                    )}
+                    {type === 'ERROR' && <InfoIcon sx={{ fontSize: '200%', color: '#FE0000' }} />}
                     {type === 'SUCCESS' && (
-                        <CheckCircleIcon
-                            sx={{ fontSize: '200%', color: '#52C41A' }}
-                        />
+                        <CheckCircleIcon sx={{ fontSize: '200%', color: '#52C41A' }} />
+                    )}
+                    {type === 'WARNING' && (
+                        <InfoIcon sx={{ fontSize: '200%', color: '#ff9800' }} />
                     )}
                 </TitleConfirmModal>
             </DialogTitle>
@@ -63,11 +62,7 @@ const PopupAlert = (props: IProps) => {
                     <Grid item xs={12}>
                         <Grid container justifyContent="center">
                             <Grid item xs={7} textAlign="center">
-                                <Button
-                                    onClick={() => onClose()}
-                                    fullWidth
-                                    color="inherit"
-                                >
+                                <Button onClick={() => onClose()} fullWidth color="inherit">
                                     OK
                                 </Button>
                             </Grid>

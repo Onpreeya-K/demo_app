@@ -1,4 +1,3 @@
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import {
     Box,
@@ -23,10 +22,10 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useEffect, useRef, useState } from 'react';
-import { getCriteriaOfTeach } from '../../services/Criteria-service';
-import { getAllLavel, getAllSubject } from '../../services/LavelAndSubject-service';
+import PopupAlert from '../../components/popupAlert/Popup-Alert';
+import { getCriteriaOfTeach, updateCriteriaOfTeach } from '../../services/Criteria-service';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface Course {
     criteria_of_teach_id: number;
@@ -46,6 +45,8 @@ interface Course {
     };
 }
 
+type CourseType = 'bachelor' | 'master' | 'doctor' | 'master_inter' | 'doctor_inter';
+
 interface EducationData {
     bachelor: Course[];
     master: Course[];
@@ -60,28 +61,37 @@ interface TabPanelProps {
     value: number;
 }
 
-interface DropdownLavel {
-    level_id: number;
-    name: string;
-}
-
 const CriteriaPage = () => {
     const startPage = useRef(false);
 
     const [data, setData] = useState<EducationData>();
-    // const [openDialog, setOpenDialog] = useState<boolean>(false);
-    const [popupAction, setPopupAction] = useState<string>('');
-    // const [optionLavel, setOptionLavel] = useState<DropdownLavel[]>([]);
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const initDataCriteria = {
+        criteria_of_teach_id: 0,
+        course_of_study_id: 0,
+        course_name: '',
+        level_name: '',
+        teaching_rates: 0,
+        rate_unit: 0,
+    };
+    const [dataCriteria, setDataCriteria] = useState<{
+        criteria_of_teach_id: number;
+        course_of_study_id: number;
+        course_name: string;
+        level_name: string;
+        teaching_rates: number;
+        rate_unit: number;
+    }>(initDataCriteria);
 
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+    const [isOpenPopupAlert, setIsOpenPopupAlert] = useState<boolean>(false);
+    const [messagePopupAlert, setMessagePopupAlert] = useState<string>('');
 
-    // Event handler to change page
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
 
-    // Event handler to change rows per page
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
@@ -98,35 +108,9 @@ const CriteriaPage = () => {
         }
     };
 
-    // const fetchAllLavel = async () => {
-    //     try {
-    //         const response = await getAllLavel();
-    //         if (response && response.message === 'success') {
-    //             setOptionLavel(response.payload);
-    //         }
-    //     } catch (error: any) {
-    //         console.error('Error:', error);
-    //     }
-    // };
-
-    const fetchAllSubject = async () => {
-        try {
-            const response = await getAllSubject();
-            if (response && response.message === 'success') {
-                console.log('response.payload :: ', response.payload);
-
-                // setOptionLavel(response.payload);
-            }
-        } catch (error: any) {
-            console.error('Error:', error);
-        }
-    };
-
     useEffect(() => {
         if (startPage.current === false) {
             fetchCriteriaOfTeach();
-            // fetchAllLavel();
-            fetchAllSubject();
             startPage.current = true;
         }
     });
@@ -159,216 +143,47 @@ const CriteriaPage = () => {
         };
     }
 
-    const columns: GridColDef[] = [
-        {
-            field: 'course_name',
-            headerName: 'หลักสูตร',
-            flex: 1,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-            headerAlign: 'center',
-            align: 'left',
-        },
-        {
-            field: 'level_name',
-            headerName: 'ระดับ',
-            flex: 1,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-            headerAlign: 'center',
-            align: 'center',
-        },
-        {
-            field: 'teaching_rates',
-            headerName: 'ค่าบริหารการศึกษา',
-            flex: 1,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-            headerAlign: 'center',
-            align: 'center',
-        },
-        {
-            field: 'rate_unit',
-            headerName: 'อัตราค่าสอน/หัว/หน่วยกิต',
-            flex: 1,
-            sortable: false,
-            resizable: false,
-            disableColumnMenu: true,
-            headerAlign: 'center',
-            align: 'center',
-        },
-        // {
-        //     field: 'edit',
-        //     headerName: 'แก้ไข',
-        //     align: 'center',
-        //     headerAlign: 'center',
-        //     width: 150,
-        //     sortable: false,
-        //     resizable: false,
-        //     disableColumnMenu: true,
-        //     renderCell: (params) => (
-        //         <div>
-        //             <Tooltip title="แก้ไข" placement="top">
-        //                 <IconButton
-        //                     size="small"
-        //                     onClick={() => setOpenDialog(true)}
-        //                     // onClick={() => onClickEditData(params.row)}
-        //                 >
-        //                     <EditIcon fontSize="inherit" />
-        //                 </IconButton>
-        //             </Tooltip>
-        //             <Tooltip title="ลบ" placement="top">
-        //                 <IconButton
-        //                     size="small"
-        //                     // onClick={() => onClickDeleteData(params.row)}
-        //                 >
-        //                     <DeleteOutlineIcon fontSize="inherit" />
-        //                 </IconButton>
-        //             </Tooltip>
-        //         </div>
-        //     ),
-        // },
-    ];
+    const onChangeTextField = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value, name } = event.target;
+        setDataCriteria((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
 
-    // const renderDialogAddProfessor = () => {
-    //     return (
-    //         <Dialog
-    //             open={openDialog}
-    //             onClose={() => {
-    //                 // clearForm();
-    //                 setOpenDialog(false);
-    //             }}
-    //             fullWidth
-    //         >
-    //             <DialogTitle sx={{ padding: '16px 24px 8px 24px' }}>
-    //                 <Typography textAlign="center" variant="h6" component="div">
-    //                     {popupAction === 'CREATE' ? 'เพิ่มเกณฑ์ค่าสอน' : 'แก้ไขเกณฑ์ค่าสอน'}
-    //                 </Typography>
-    //                 <Divider />
-    //             </DialogTitle>
-    //             <DialogContent sx={{ padding: 3 }}>
-    //                 <Grid container spacing={2} paddingTop={1}>
-    //                     {/* <Grid item xs={12}>
-    //                         <Autocomplete
-    //                             size="small"
-    //                             fullWidth
-    //                             options={optionLavel}
-    //                             getOptionLabel={(option) => option.name}
-    //                             renderInput={(params) => (
-    //                                 <TextField
-    //                                     {...params}
-    //                                     required
-    //                                     label="หลักสูตร"
-    //                                     variant="outlined"
-    //                                     InputLabelProps={{
-    //                                         shrink: true,
-    //                                     }}
-    //                                 />
-    //                             )}
-    //                             isOptionEqualToValue={(option, value) =>
-    //                                 option.level_id === value.level_id
-    //                             }
-    //                         />
-    //                     </Grid> */}
-    //                     <Grid item xs={12}>
-    //                         <TextField
-    //                             required
-    //                             label="หลักสูตร"
-    //                             name="teacher_id"
-    //                             size="small"
-    //                             fullWidth
-    //                             // value={form.teacher_id}
-    //                             // onChange={handleChange}
-    //                             // error={errors.teacher_id}
-    //                             // helperText={errors.teacher_id && 'กรุณาระบุรหัสอาจารย์'}
-    //                             // disabled={modalAction !== 'CREATE'}
-    //                         />
-    //                     </Grid>
-    //                     {/* <Grid item xs={12}>
-    //                         <TextField
-    //                             required
-    //                             label="คำนำหน้า"
-    //                             name="prefix"
-    //                             size="small"
-    //                             fullWidth
-    //                             // value={form.prefix}
-    //                             // onChange={handleChange}
-    //                             // error={errors.prefix}
-    //                             // helperText={errors.prefix && 'กรุณาระบุคำนำหน้า'}
-    //                         />
-    //                     </Grid>
-    //                     <Grid item xs={12}>
-    //                         <TextField
-    //                             required
-    //                             label="ชื่อ - นามสกุล"
-    //                             name="fullname"
-    //                             size="small"
-    //                             fullWidth
-    //                             // value={form.fullname}
-    //                             // onChange={handleChange}
-    //                             // error={errors.fullname}
-    //                             // helperText={errors.fullname && 'กรุณาระบุชื่อ - นามสกุล'}
-    //                         />
-    //                     </Grid>
-    //                     <Grid item xs={12}>
-    //                         <Autocomplete
-    //                             size="small"
-    //                             fullWidth
-    //                             options={[]}
-    //                             // getOptionLabel={(option) => option.name}
-    //                             renderInput={(params) => (
-    //                                 <TextField
-    //                                     {...params}
-    //                                     required
-    //                                     label="ตำแหน่งทางวิชาการ"
-    //                                     variant="outlined"
-    //                                     InputLabelProps={{
-    //                                         shrink: true,
-    //                                     }}
-    //                                     // error={errors.academic_position}
-    //                                     // helperText={
-    //                                     //     errors.academic_position &&
-    //                                     //     'กรุณาเลือกตำแหน่งทางวิชาการ'
-    //                                     // }
-    //                                 />
-    //                             )}
-    //                             // isOptionEqualToValue={(option, value) => option.a_id === value.a_id}
-    //                             // value={form.academic_position}
-    //                             // onChange={(_e, option) =>
-    //                             //     onChangeAutocompleteAcademicPosition(option)
-    //                             // }
-    //                         />
-    //                     </Grid> */}
-    //                 </Grid>
-    //                 <Grid container component={'div'} marginTop={2}>
-    //                     <Grid item xs={12} display={'flex'} justifyContent={'center'} gap={2}>
-    //                         <Button
-    //                             variant="outlined"
-    //                             onClick={() => {
-    //                                 // clearForm();
-    //                                 setOpenDialog(false);
-    //                             }}
-    //                         >
-    //                             ยกเลิก
-    //                         </Button>
-    //                         <Button
-    //                             variant="contained"
-    //                             //  onClick={onSubmitAddProfessor}
-    //                         >
-    //                             {popupAction === 'CREATE' ? 'เพิ่ม' : 'ยืนยันการแก้ไข'}
-    //                         </Button>
-    //                     </Grid>
-    //                 </Grid>
-    //             </DialogContent>
-    //         </Dialog>
-    //     );
-    // };
+    const onConfirmUpdateCriteriaOfTeach = async () => {
+        let payload = {
+            teaching_rates: dataCriteria.teaching_rates,
+            rate_unit: dataCriteria.rate_unit,
+        };
+        const response = await updateCriteriaOfTeach(dataCriteria.criteria_of_teach_id, payload);
+        if (response) {
+            onCloseDialog();
+            setIsOpenPopupAlert(true);
+            setMessagePopupAlert('แก้ไขเกณฑ์ค่าสอนสำเร็จ');
+        }
+    };
+
+    const onClickEditCriteria = (row: {
+        criteria_of_teach_id: number;
+        course_of_study_id: number;
+        course_name: string;
+        level_name: string;
+        teaching_rates: number;
+        rate_unit: number;
+    }) => {
+        setDataCriteria(row);
+        setOpenDialog(true);
+    };
+
+    const onCloseDialog = () => {
+        setOpenDialog(false);
+        setDataCriteria(initDataCriteria);
+    };
 
     const formatCourses = (courses: Course[]) => {
         return courses.map((course) => ({
+            criteria_of_teach_id: course.criteria_of_teach_id,
             course_of_study_id: course.criteria_of_teach_id,
             course_name: course.course_of_study.name,
             level_name: course.level.name,
@@ -376,6 +191,107 @@ const CriteriaPage = () => {
             rate_unit: course.rate_unit,
         }));
     };
+
+    const onClosePopup = () => {
+        setIsOpenPopupAlert(false);
+        setMessagePopupAlert('');
+        fetchCriteriaOfTeach();
+    };
+
+    const renderDialogEditCriteria = () => {
+        return (
+            <Dialog open={openDialog} onClose={onCloseDialog} fullWidth>
+                <DialogTitle sx={{ padding: '16px 24px 8px 24px', position: 'relative' }}>
+                    <Typography textAlign="center" variant="h6" component="div">
+                        แก้ไขเกณฑ์ค่าสอน
+                    </Typography>
+                    <IconButton
+                        sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                        }}
+                        onClick={onCloseDialog}
+                    >
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ padding: 3 }}>
+                    <Grid container spacing={2} paddingTop={1}>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="หลักสูตร"
+                                size="medium"
+                                value={dataCriteria?.course_name}
+                                InputProps={{ readOnly: true }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="ระดับ"
+                                size="medium"
+                                value={dataCriteria?.level_name}
+                                InputProps={{ readOnly: true }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="ค่าบริหารการศึกษา"
+                                size="medium"
+                                name="teaching_rates"
+                                value={dataCriteria?.teaching_rates}
+                                onChange={onChangeTextField}
+                                inputProps={{
+                                    onInput: (event: any) => {
+                                        event.target.value = event.target.value.replace(
+                                            /[^0-9]/g,
+                                            ''
+                                        );
+                                    },
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="อัตราค่าสอน/หัว/หน่วยกิต"
+                                size="medium"
+                                name="rate_unit"
+                                value={dataCriteria?.rate_unit}
+                                onChange={onChangeTextField}
+                                inputProps={{
+                                    onInput: (event: any) => {
+                                        event.target.value = event.target.value.replace(
+                                            /[^0-9]/g,
+                                            ''
+                                        );
+                                    },
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                    <Grid container component={'div'} marginTop={2}>
+                        <Grid item xs={12} display={'flex'} justifyContent={'center'} gap={2}>
+                            <Button variant="contained" onClick={onConfirmUpdateCriteriaOfTeach}>
+                                ยืนยันการแก้ไข
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+            </Dialog>
+        );
+    };
+
+    const courseTypes: CourseType[] = [
+        'bachelor',
+        'master',
+        'doctor',
+        'master_inter',
+        'doctor_inter',
+    ];
 
     return (
         <div>
@@ -386,351 +302,116 @@ const CriteriaPage = () => {
                     </Typography>
                     <Divider />
                 </div>
-                {/* {renderDialogAddProfessor()} */}
+                {renderDialogEditCriteria()}
+                <PopupAlert
+                    isOpen={isOpenPopupAlert}
+                    onClose={onClosePopup}
+                    title={<div>{messagePopupAlert}</div>}
+                    type="SUCCESS"
+                />
                 {data && (
                     <div>
-                        <Tabs value={value} onChange={handleChange}>
-                            <Tab label="ระดับปริญญาตรี" {...a11yProps(0)} />
-                            <Tab label="ระดับมหาบัณฑิต" {...a11yProps(1)} />
-                            <Tab label="ระดับปริญญาดุษฎีบัณฑิต" {...a11yProps(2)} />
-                            <Tab label="ระดับมหาบัณฑิต (นิสิตต่างชาติ)" {...a11yProps(3)} />
-                            <Tab label="ระดับปริญญาดุษฎีบัณฑิต (นิสิตต่างชาติ)" {...a11yProps(4)} />
+                        <Tabs
+                            value={value}
+                            onChange={handleChange}
+                            variant="scrollable"
+                            scrollButtons="auto"
+                            allowScrollButtonsMobile
+                        >
+                            {[
+                                'ระดับปริญญาตรี',
+                                'ระดับมหาบัณฑิต',
+                                'ระดับปริญญาดุษฎีบัณฑิต',
+                                'ระดับมหาบัณฑิต (นิสิตต่างชาติ)',
+                                'ระดับปริญญาดุษฎีบัณฑิต (นิสิตต่างชาติ)',
+                            ].map((label, index) => (
+                                <Tab key={index} label={label} {...a11yProps(index)} />
+                            ))}
                         </Tabs>
-                        <TabPanel value={value} index={0}>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell align="left">หลักสูตร</TableCell>
-                                            <TableCell align="center">ระดับ</TableCell>
-                                            <TableCell align="center">ค่าบริหารการศึกษา</TableCell>
-                                            <TableCell align="center">
-                                                อัตราค่าสอน/หัว/หน่วยกิต
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {formatCourses(data.bachelor)
-                                            .slice(
-                                                page * rowsPerPage,
-                                                page * rowsPerPage + rowsPerPage
-                                            )
-                                            .map((row) => (
-                                                <TableRow key={row.course_of_study_id}>
-                                                    <TableCell align="left">
-                                                        {row.course_name}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.level_name}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.teaching_rates}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.rate_unit}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                    </TableBody>
-                                </Table>
-                                <TablePagination
-                                    rowsPerPageOptions={[5, 10]}
-                                    component="div"
-                                    count={formatCourses(data.bachelor).length}
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    labelDisplayedRows={({ from, to, count }) =>
-                                        `แสดง ${from} ถึง ${to} จาก ${count}`
-                                    }
-                                    labelRowsPerPage="จำนวนหลักสูตรต่อหน้า"
-                                />
-                            </TableContainer>
-                            {/* <DataGrid
-                                rows={formatCourses(data.bachelor)}
-                                columns={columns}
-                                getRowId={(row) => row.course_of_study_id}
-                                autoHeight
-                                initialState={{
-                                    pagination: {
-                                        paginationModel: {
-                                            page: 0,
-                                            pageSize: 10,
-                                        },
-                                    },
-                                }}
-                                pageSizeOptions={[5, 10]}
-                            /> */}
-                        </TabPanel>
-                        <TabPanel value={value} index={1}>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell align="left">หลักสูตร</TableCell>
-                                            <TableCell align="center">ระดับ</TableCell>
-                                            <TableCell align="center">ค่าบริหารการศึกษา</TableCell>
-                                            <TableCell align="center">
-                                                อัตราค่าสอน/หัว/หน่วยกิต
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {formatCourses(data.master)
-                                            .slice(
-                                                page * rowsPerPage,
-                                                page * rowsPerPage + rowsPerPage
-                                            )
-                                            .map((row) => (
-                                                <TableRow key={row.course_of_study_id}>
-                                                    <TableCell align="left">
-                                                        {row.course_name}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.level_name}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.teaching_rates}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.rate_unit}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                    </TableBody>
-                                </Table>
-                                <TablePagination
-                                    rowsPerPageOptions={[5, 10]}
-                                    component="div"
-                                    count={formatCourses(data.master).length}
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    labelDisplayedRows={({ from, to, count }) =>
-                                        `แสดง ${from} ถึง ${to} จาก ${count}`
-                                    }
-                                    labelRowsPerPage="จำนวนหลักสูตรต่อหน้า"
-                                />
-                            </TableContainer>
-                            {/* <DataGrid
-                                rows={formatCourses(data.master)}
-                                columns={columns}
-                                getRowId={(row) => row.course_of_study_id}
-                                autoHeight
-                                initialState={{
-                                    pagination: {
-                                        paginationModel: {
-                                            page: 0,
-                                            pageSize: 10,
-                                        },
-                                    },
-                                }}
-                                pageSizeOptions={[5, 10]}
-                            /> */}
-                        </TabPanel>
-                        <TabPanel value={value} index={2}>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell align="left">หลักสูตร</TableCell>
-                                            <TableCell align="center">ระดับ</TableCell>
-                                            <TableCell align="center">ค่าบริหารการศึกษา</TableCell>
-                                            <TableCell align="center">
-                                                อัตราค่าสอน/หัว/หน่วยกิต
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {formatCourses(data.doctor)
-                                            .slice(
-                                                page * rowsPerPage,
-                                                page * rowsPerPage + rowsPerPage
-                                            )
-                                            .map((row) => (
-                                                <TableRow key={row.course_of_study_id}>
-                                                    <TableCell align="left">
-                                                        {row.course_name}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.level_name}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.teaching_rates}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.rate_unit}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                    </TableBody>
-                                </Table>
-                                <TablePagination
-                                    rowsPerPageOptions={[5, 10]}
-                                    component="div"
-                                    count={formatCourses(data.doctor).length}
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    labelDisplayedRows={({ from, to, count }) =>
-                                        `แสดง ${from} ถึง ${to} จาก ${count}`
-                                    }
-                                    labelRowsPerPage="จำนวนหลักสูตรต่อหน้า"
-                                />
-                            </TableContainer>
-                            {/* <DataGrid
-                                rows={formatCourses(data.doctor)}
-                                columns={columns}
-                                getRowId={(row) => row.course_of_study_id}
-                                autoHeight
-                                initialState={{
-                                    pagination: {
-                                        paginationModel: {
-                                            page: 0,
-                                            pageSize: 10,
-                                        },
-                                    },
-                                }}
-                                pageSizeOptions={[5, 10]}
-                            /> */}
-                        </TabPanel>
-                        <TabPanel value={value} index={3}>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell align="left">หลักสูตร</TableCell>
-                                            <TableCell align="center">ระดับ</TableCell>
-                                            <TableCell align="center">ค่าบริหารการศึกษา</TableCell>
-                                            <TableCell align="center">
-                                                อัตราค่าสอน/หัว/หน่วยกิต
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {formatCourses(data.master_inter)
-                                            .slice(
-                                                page * rowsPerPage,
-                                                page * rowsPerPage + rowsPerPage
-                                            )
-                                            .map((row) => (
-                                                <TableRow key={row.course_of_study_id}>
-                                                    <TableCell align="left">
-                                                        {row.course_name}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.level_name}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.teaching_rates}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.rate_unit}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                    </TableBody>
-                                </Table>
-                                <TablePagination
-                                    rowsPerPageOptions={[5, 10]}
-                                    component="div"
-                                    count={formatCourses(data.master_inter).length}
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    labelDisplayedRows={({ from, to, count }) =>
-                                        `แสดง ${from} ถึง ${to} จาก ${count}`
-                                    }
-                                    labelRowsPerPage="จำนวนหลักสูตรต่อหน้า"
-                                />
-                            </TableContainer>
-                            {/* <DataGrid
-                                rows={formatCourses(data.master_inter)}
-                                columns={columns}
-                                getRowId={(row) => row.course_of_study_id}
-                                autoHeight
-                                initialState={{
-                                    pagination: {
-                                        paginationModel: {
-                                            page: 0,
-                                            pageSize: 10,
-                                        },
-                                    },
-                                }}
-                                pageSizeOptions={[5, 10]}
-                            /> */}
-                        </TabPanel>
-                        <TabPanel value={value} index={4}>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell align="left">หลักสูตร</TableCell>
-                                            <TableCell align="center">ระดับ</TableCell>
-                                            <TableCell align="center">ค่าบริหารการศึกษา</TableCell>
-                                            <TableCell align="center">
-                                                อัตราค่าสอน/หัว/หน่วยกิต
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {formatCourses(data.doctor_inter)
-                                            .slice(
-                                                page * rowsPerPage,
-                                                page * rowsPerPage + rowsPerPage
-                                            )
-                                            .map((row) => (
-                                                <TableRow key={row.course_of_study_id}>
-                                                    <TableCell align="left">
-                                                        {row.course_name}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.level_name}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.teaching_rates}
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        {row.rate_unit}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                    </TableBody>
-                                </Table>
-                                <TablePagination
-                                    rowsPerPageOptions={[5, 10]}
-                                    component="div"
-                                    count={formatCourses(data.doctor_inter).length}
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    labelDisplayedRows={({ from, to, count }) =>
-                                        `แสดง ${from} ถึง ${to} จาก ${count}`
-                                    }
-                                    labelRowsPerPage="จำนวนหลักสูตรต่อหน้า"
-                                />
-                            </TableContainer>
-                            {/* <DataGrid
-                                rows={formatCourses(data.doctor_inter)}
-                                columns={columns}
-                                getRowId={(row) => row.course_of_study_id}
-                                autoHeight
-                                initialState={{
-                                    pagination: {
-                                        paginationModel: {
-                                            page: 0,
-                                            pageSize: 10,
-                                        },
-                                    },
-                                }}
-                                pageSizeOptions={[5, 10]}
-                            /> */}
-                        </TabPanel>
+                        {courseTypes.map((courseType, index) => (
+                            <TabPanel key={index} value={value} index={index}>
+                                <TableContainer component={Paper}>
+                                    <Table>
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell align="center">หลักสูตร</TableCell>
+                                                <TableCell align="center">ระดับ</TableCell>
+                                                <TableCell align="center">
+                                                    ค่าบริหารการศึกษา
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    อัตราค่าสอน/หัว/หน่วยกิต
+                                                </TableCell>
+                                                <TableCell align="center">แก้ไข</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {formatCourses(data[courseType])
+                                                .slice(
+                                                    page * rowsPerPage,
+                                                    page * rowsPerPage + rowsPerPage
+                                                )
+                                                .map((row) => (
+                                                    <TableRow key={row.course_of_study_id}>
+                                                        <TableCell
+                                                            align="left"
+                                                            sx={{ minWidth: '200px', flex: 1 }}
+                                                        >
+                                                            {row.course_name}
+                                                        </TableCell>
+                                                        <TableCell
+                                                            align="center"
+                                                            sx={{ minWidth: '130px' }}
+                                                        >
+                                                            {row.level_name}
+                                                        </TableCell>
+                                                        <TableCell
+                                                            align="center"
+                                                            sx={{ minWidth: '150px' }}
+                                                        >
+                                                            {row.teaching_rates}
+                                                        </TableCell>
+                                                        <TableCell
+                                                            align="center"
+                                                            sx={{ minWidth: '150px' }}
+                                                        >
+                                                            {row.rate_unit}
+                                                        </TableCell>
+                                                        <TableCell
+                                                            align="center"
+                                                            sx={{ minWidth: '80px', padding: 0 }}
+                                                        >
+                                                            <Tooltip title="แก้ไข" placement="top">
+                                                                <IconButton
+                                                                    size="small"
+                                                                    onClick={() =>
+                                                                        onClickEditCriteria(row)
+                                                                    }
+                                                                >
+                                                                    <EditIcon fontSize="inherit" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                        </TableBody>
+                                    </Table>
+                                    <TablePagination
+                                        rowsPerPageOptions={[5, 10]}
+                                        component="div"
+                                        count={formatCourses(data[courseType]).length}
+                                        rowsPerPage={rowsPerPage}
+                                        page={page}
+                                        onPageChange={handleChangePage}
+                                        onRowsPerPageChange={handleChangeRowsPerPage}
+                                        labelDisplayedRows={({ from, to, count }) =>
+                                            `แสดง ${from} ถึง ${to} จาก ${count}`
+                                        }
+                                        labelRowsPerPage="จำนวนหลักสูตรต่อหน้า"
+                                    />
+                                </TableContainer>
+                            </TabPanel>
+                        ))}
                     </div>
                 )}
             </Box>

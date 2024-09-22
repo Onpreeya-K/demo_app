@@ -94,3 +94,17 @@ export async function deleteCriteraiProcess(param: any) {
         return null;
     }
 }
+
+export async function updateCriteriaOfTeach(criteriaOfTeachID: number, data: any) {
+    console.log('criteriaOfTeachID :: ', criteriaOfTeachID);
+
+    const urlEndpoint = `/criteriaOfTeach`;
+    const header = generateHeader();
+
+    try {
+        return ServiceUtil.callApi(urlEndpoint, header, criteriaOfTeachID, data, METHOD_TYPE.PUT);
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
