@@ -11,15 +11,12 @@ export const METHOD_TYPE = {
 const handleResponse = async (url: string, response: Response) => {
     if (!response.ok) {
         const error = await response.json();
-        //    unAuth 401
         if (response.status === 401 || response.statusText === 'Unauthorized') {
-            window.location.href = `${environment.baseUrl}:3000/login`;
-            throw new Error(
-                `Error: ${response.status} ${
-                    response.statusText
-                }, URL: ${url}, Details: ${JSON.stringify(error)}`
-            );
+            if (window.location.pathname !== '/login') {
+                window.location.href = `${environment.baseUrl}:3000/login`;
+            }
         }
+        throw new Error(error.payload?.message);
     }
     return response.json();
 };
@@ -33,7 +30,8 @@ const post = async ({ url, header, data }: { url: string; header: any; data: any
         });
         return await handleResponse(url, response);
     } catch (error) {
-        console.error('Error:', error);
+        // console.error('Error:', error);
+        throw error;
     }
 };
 
@@ -46,7 +44,8 @@ const get = async ({ url, header, params }: { url: string; header: any; params: 
         });
         return await handleResponse(url, response);
     } catch (error) {
-        console.error('Error:', error);
+        // console.error('Error:', error);
+        throw error;
     }
 };
 
@@ -69,7 +68,8 @@ const put = async ({
         });
         return await handleResponse(url, response);
     } catch (error) {
-        console.error('Error:', error);
+        // console.error('Error:', error);
+        throw error;
     }
 };
 
@@ -81,7 +81,8 @@ const del = async ({ url, header, params }: { url: string; header: any; params: 
         });
         return await handleResponse(url, response);
     } catch (error) {
-        console.error('Error:', error);
+        // console.error('Error:', error);
+        throw error;
     }
 };
 

@@ -233,7 +233,7 @@ const DisbursementPage = () => {
     const fetchTeacherListByTerm = async (param: any) => {
         try {
             const response = await getTeacherListByTermID(param);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 if (!isNullOrUndefined(response.payload)) {
                     setProfessorList(response.payload);
                 }
@@ -273,7 +273,7 @@ const DisbursementPage = () => {
     const fetchTerm = async () => {
         try {
             const response = await getTermOfYear();
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setTermOfYear(response.payload);
             }
         } catch (error: any) {
@@ -284,7 +284,7 @@ const DisbursementPage = () => {
     const fetchRate = async (teacher_id: string) => {
         try {
             const response = await getRateByTeacherId(teacher_id);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setTeacherRate(response.payload);
             }
         } catch (error: any) {
@@ -332,7 +332,7 @@ const DisbursementPage = () => {
             teacherID: form.professor?.teacher_id,
         };
         const response = await getScheduleByTermIdAndTeacherId(payload);
-        if (response && response.message === 'success') {
+        if (response && response.message === 'Success') {
             if (!isNullOrUndefined(response.payload)) {
                 const mapData = response.payload.map((item: any) => {
                     return {
@@ -565,7 +565,7 @@ const DisbursementPage = () => {
                 status: adminStatusBtn === 'REJECT' ? 'reject' : 'accept',
             };
             const response = await updateStatus(form.professor?.disbursement_id, payload);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setTypePopupAlert('SUCCESS');
                 setIsOpenPopupAlert(true);
                 setMessagePopupAlert('ให้ผลรายการขอเบิกค่าสอนสำเร็จ');
@@ -606,7 +606,7 @@ const DisbursementPage = () => {
                     ? await updateDisbursement(form.professor?.disbursement_id, mapPayload)
                     : await addDisbursement(mapPayload);
             // const response = await updateDisbursement(mapPayload);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setDataSchedule([]);
                 setTypePopupAlert('SUCCESS');
                 setIsOpenPopupAlert(true);
@@ -622,7 +622,7 @@ const DisbursementPage = () => {
             teacherID: form.professor?.teacher_id,
         };
         const response = await getDataDisbursementByTeacherIDAndTermID(payload);
-        if (response && response.message === 'success' && response.payload) {
+        if (response && response.message === 'Success' && response.payload) {
             setDisburseScheduleData(response.payload);
             return response.payload;
         }
@@ -707,7 +707,7 @@ const DisbursementPage = () => {
                 pdf_path: fileName,
             };
             const response = await getPdf(payload);
-            if (response && response.message === 'success' && response.payload?.base64) {
+            if (response && response.message === 'Success' && response.payload?.base64) {
                 const base64 = response.payload.base64;
                 const byteCharacters = atob(base64);
                 const byteNumbers = new Array(byteCharacters.length);

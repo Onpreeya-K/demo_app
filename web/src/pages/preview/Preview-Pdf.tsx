@@ -14,7 +14,7 @@ const PreviewPdfPage = () => {
                 pdf_path: pdf_path || '',
             };
             const response = await getPdf(payload);
-            if (response && response.message === 'success' && response.payload) {
+            if (response && response.message === 'Success' && response.payload) {
                 setFileData(response.payload.base64);
             }
         } catch (error) {

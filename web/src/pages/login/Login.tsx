@@ -24,6 +24,7 @@ const Login = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [isOpenPopupAlert, setIsOpenPopupAlert] = useState<boolean>(false);
+    const [messagePopupAlert, setMessagePopupAlert] = useState<string>('');
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -36,7 +37,7 @@ const Login = () => {
                 password: password,
             };
             const response = await callLoginService(payloadData);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setAccessToken(response.payload.token);
                 sessionStorage.setItem('ROLE', response.payload.role.toUpperCase());
                 sessionStorage.setItem('DATA', JSON.stringify(response.payload.data));
@@ -44,6 +45,7 @@ const Login = () => {
             }
         } catch (error: any) {
             setIsOpenPopupAlert(true);
+            setMessagePopupAlert(error.message);
         }
     };
 
@@ -89,10 +91,11 @@ const Login = () => {
                 <CssBaseline />
                 <PopupAlert
                     isOpen={isOpenPopupAlert}
-                    onClose={() => setIsOpenPopupAlert(false)}
-                    title={
-                        <div style={{ alignItems: 'center' }}>ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
-                    }
+                    onClose={() => {
+                        setIsOpenPopupAlert(false);
+                        setMessagePopupAlert('');
+                    }}
+                    title={<div style={{ alignItems: 'center' }}>{messagePopupAlert}</div>}
                     type={'ERROR'}
                 />
                 {isDesktop && (

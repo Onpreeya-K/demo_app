@@ -125,7 +125,7 @@ const ProfessorInfoPage = () => {
         if (typeOfPopupConfirm === 'DELETE') {
             const response = await deleteTeacher(form.teacher_id);
             setIsOpenPopupConfirm(false);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 await fetchData();
                 setIsOpenPopupAlert(true);
                 setMessagePopupAlert('ลบรายชื่ออาจารย์สำเร็จ');
@@ -133,7 +133,7 @@ const ProfessorInfoPage = () => {
         } else {
             const response = await resetPasswordById(form.teacher_id);
             setIsOpenPopupConfirm(false);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setIsOpenPopupAlert(true);
                 setMessagePopupAlert('รีเซ็ตรหัสผ่านสำเร็จ');
             }
@@ -157,16 +157,16 @@ const ProfessorInfoPage = () => {
     const fetchData = async () => {
         try {
             const response = await getAllTeacher();
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setTeacherAll(response.payload);
                 setDataTable(response.payload);
             }
             const responseManagementPosition = await getManagementPosition();
-            if (responseManagementPosition && responseManagementPosition.message === 'success') {
+            if (responseManagementPosition && responseManagementPosition.message === 'Success') {
                 setOptionManagementPosition(responseManagementPosition.payload);
             }
             const responseAcademicPosition = await getAcademicPosition();
-            if (responseAcademicPosition && responseAcademicPosition.message === 'success') {
+            if (responseAcademicPosition && responseAcademicPosition.message === 'Success') {
                 setOptionAcademicPosition(responseAcademicPosition.payload);
             }
         } catch (error: any) {
@@ -247,7 +247,7 @@ const ProfessorInfoPage = () => {
                     m_id: form.management_position?.m_id,
                 };
                 const response = await createTeacher(payload);
-                if (response && response.message === 'success') {
+                if (response && response.message === 'Success') {
                     setIsOpenPopupAlert(true);
                     setModalAction('');
                     setMessagePopupAlert('เพิ่มรายชื่ออาจารย์สำเร็จ');
@@ -264,7 +264,7 @@ const ProfessorInfoPage = () => {
                     m_id: form.management_position?.m_id,
                 };
                 const response = await updateTeacher(form.teacher_id, payload);
-                if (response && response.message === 'success') {
+                if (response && response.message === 'Success') {
                     setIsOpenPopupAlert(true);
                     setModalAction('');
                     setMessagePopupAlert('แก้ไขรายชื่ออาจารย์สำเร็จ');

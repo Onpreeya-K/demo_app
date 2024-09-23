@@ -126,7 +126,7 @@ const SchedulePage = () => {
     const fetchTerm = async () => {
         try {
             const response = await getTermOfYear();
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setTermOfYear(response.payload);
             }
         } catch (error: any) {
@@ -369,7 +369,7 @@ const SchedulePage = () => {
     const fetchTeacherListByTerm = async (param: any) => {
         try {
             const response = await getTeacherSchedule(param);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 if (!isNullOrUndefined(response.payload)) {
                     const professor = response.payload;
                     const sourceProfessor = sourceList(professor);
@@ -413,7 +413,7 @@ const SchedulePage = () => {
             };
             // const response = await getScheduleByTeacherId(payload);
             const response = await getScheduleByTermIdAndTeacherId(payload);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 if (!isNullOrUndefined(response.payload)) {
                     const mapResponse = response.payload.map((item: ScheduleTeach) => {
                         return {
@@ -473,7 +473,7 @@ const SchedulePage = () => {
                 data: mapData,
             };
             const response = await saveScheduleTeach(payload);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setOpenPopupAlert(true);
                 setMessagePopupAlert('บันทึกตารางสอนสำเร็จ');
                 setFormSearch((prev) => ({
@@ -492,7 +492,7 @@ const SchedulePage = () => {
     const fetchTeacherListAfterUploadSchedule = async () => {
         try {
             const response = await getTeacherSchedule(formSearch.term?.term_of_year_id);
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 if (!isNullOrUndefined(response.payload)) {
                     const professor = response.payload;
                     const sourceProfessor = sourceList(professor);

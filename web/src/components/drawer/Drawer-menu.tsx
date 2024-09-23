@@ -226,7 +226,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                     new_password: newPassword,
                 };
                 const response = await updatePassword(professorData?.teacher_id, payload);
-                if (response && response.message === 'success') {
+                if (response && response.message === 'Success') {
                     setMessagePopupAlert('เปลี่ยนรหัสผ่านสำเร็จ');
                     setTypePopupAlert('SUCCESS');
                     setIsOpenPopupAlert(true);

@@ -100,7 +100,7 @@ const CriteriaPage = () => {
     const fetchCriteriaOfTeach = async () => {
         try {
             const response = await getCriteriaOfTeach();
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setData(response.payload);
             }
         } catch (error: any) {

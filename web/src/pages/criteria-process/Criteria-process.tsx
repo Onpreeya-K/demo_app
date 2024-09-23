@@ -95,7 +95,7 @@ const CriteriaProcessPage = () => {
     const onConfirmDelete = async () => {
         const response = await deleteCriteraiProcess(form.criteria_of_process_id);
         setIsOpenPopupConfirm(false);
-        if (response && response.message === 'success') {
+        if (response && response.message === 'Success') {
             fetchCriteriaProcess();
             setIsOpenPopupAlert(true);
             setMessagePopupAlert('ลบเกณฑ์คำนวณสำเร็จ');
@@ -116,7 +116,7 @@ const CriteriaProcessPage = () => {
     const fetchCriteriaProcess = async () => {
         try {
             const response = await getCriteraiProcess();
-            if (response && response.message === 'success') {
+            if (response && response.message === 'Success') {
                 setCriteriaData(response.payload);
             }
         } catch (error: any) {
@@ -170,7 +170,7 @@ const CriteriaProcessPage = () => {
         if (validate()) {
             if (dialogMode === 'ADD') {
                 const response = await createCriteraiProcess(form);
-                if (response && response.message === 'success') {
+                if (response && response.message === 'Success') {
                     setMessagePopupAlert('เพิ่มเกณฑ์คำนวณสำเร็จ');
                     onCloseDialog();
                     fetchCriteriaProcess();
@@ -178,7 +178,7 @@ const CriteriaProcessPage = () => {
                 }
             } else {
                 const response = await updateCriteraiProcess(form.criteria_of_process_id, form);
-                if (response && response.message === 'success') {
+                if (response && response.message === 'Success') {
                     setMessagePopupAlert('แก้ไขเกณฑ์คำนวณสำเร็จ');
                     onCloseDialog();
                     fetchCriteriaProcess();
