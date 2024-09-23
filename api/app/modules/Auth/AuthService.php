@@ -6,6 +6,8 @@ use App\Modules\User\UserRepository;
 use App\Modules\Teacher\TeacherRepository;
 use Firebase\JWT\JWT;
 
+use Exception;
+
 class AuthService
 {
     protected $userRepository;
@@ -44,10 +46,10 @@ class AuthService
             $teacher = $this->teacherRopository->getTeacherById($data["username"]);
             $token = JWT::encode($payload, $this->secret , $_ENV["ALGRO"]);
             $resp = array('token' => $token, 'role' =>$user['role'] , 'data' => $teacher);
-            return json_encode($resp);
+            return $resp;
             
         } else {
-            return "error";
+            throw new Exception("Invalid username or password", 401);
         }
     }
 

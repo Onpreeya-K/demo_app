@@ -5,14 +5,17 @@ namespace App\Modules\Auth;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-class AuthController {
+class AuthController
+{
     private $authService;
 
-    public function __construct(AuthService $authService) {
+    public function __construct(AuthService $authService)
+    {
         $this->authService = $authService;
     }
 
-    public function signUp(Request $request, Response $response) {
+    public function signUp(Request $request, Response $response)
+    {
         $data = $request->getParsedBody();
         $auth = $this->authService->signUp($data);
         $response->getBody()->write($auth);
@@ -23,24 +26,28 @@ class AuthController {
     public function login(Request $request, Response $response, $args)
     {
         $data = $request->getParsedBody();
-        $auth = $this->authService->login($data);
-        $response->getBody()->write($auth);
-        return $response
+
+        try {
+            $auth = $this->authService->login($data);
+            $response->getBody()->write(json_encode($auth));
+            return $response
+            ->withHeader('Content-Type', 'application/json')
             ->withStatus(200);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 401) {
+                $response->getBody()->write(json_encode(['message' => 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง']));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+            }
+
+            $response->getBody()->write(json_encode(['message' => Login_Invalid]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
     }
 
-    public function logout(Request $request, Response $response, $args) {
+    public function logout(Request $request, Response $response, $args)
+    {
         $data = $request->getParsedBody();
         $auth = $this->authService->logout($data);
         return $response->withHeader('Content-Type', 'application/json');
     }
-
-    // public function forgetPassword(Request $request, Response $response, $args) {
-    //     $authId = $args['id'];
-    //     $data = $request->getParsedBody();
-    //     $auth = $this->authService->updateAuth($authId, $data);
-    //     $response->getBody()->write(json_encode($auth));
-    //     return $response->withHeader('Content-Type', 'application/json');
-    // }
-
 }

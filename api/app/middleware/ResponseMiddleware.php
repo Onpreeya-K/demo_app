@@ -20,27 +20,31 @@ class ResponseMiddleware implements MiddlewareInterface
 
         $messageResponse = "";
         if ($statusCode >= 200 && $statusCode < 300) {
-            $messageResponse = "success";
-        } else if ($statusCode >= 400 && $statusCode < 500) {
-            $messageResponse = "not found";
+            $messageResponse = "Success";
+        } else if ($statusCode == 400 ) {
+            $messageResponse = "Bad Request";
+        } else if ($statusCode == 401 ) {
+            $messageResponse = "Unauthorized";
+        } else if ($statusCode == 404 ) {
+            $messageResponse = "Not Found";
         } else if ($statusCode >= 500) {
-            $messageResponse = "server error";
+            $messageResponse = "Internal Server Erro";
         }
-        
-            // Get the response body
-            $body = $response->getBody();
-            $body->rewind();
-            $data = $body->getContents();
 
-            // Convert the response data to JSON format
-            $formattedData = json_encode(['message' => $messageResponse, 'payload' => json_decode($data)]);
-            // Create a new response with the formatted data
-            $response = $response->withHeader('Content-Type', 'application/json');
-            
-            // Replace the body of the response with the new formatted data
-            $body = $response->getBody();
-            $body->rewind();
-            $body->write($formattedData);
+        // Get the response body
+        $body = $response->getBody();
+        $body->rewind();
+        $data = $body->getContents();
+
+        // Convert the response data to JSON format
+        $formattedData = json_encode(['message' => $messageResponse, 'payload' => json_decode($data)]);
+        // Create a new response with the formatted data
+        $response = $response->withHeader('Content-Type', 'application/json');
+
+        // Replace the body of the response with the new formatted data
+        $body = $response->getBody();
+        $body->rewind();
+        $body->write($formattedData);
 
         return $response;
     }
