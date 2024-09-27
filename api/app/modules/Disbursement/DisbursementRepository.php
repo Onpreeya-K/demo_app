@@ -26,9 +26,11 @@ class DisbursementRepository
     }
 
     public function getDisbursementByTeacherIDAndTermID($teacherId, $termOfYearId){
-        $data = Disbursement::where('teacher_id', $teacherId)
+        $data = Disbursement::with(['termOfYear','teacher.managementPosition', 'teacher.academicPosition'])
+                              ->where('teacher_id', $teacherId)
                               ->where('term_of_year_id', $termOfYearId)
                               ->get();
+
         if (count($data) == 0) {
             return null;
         }

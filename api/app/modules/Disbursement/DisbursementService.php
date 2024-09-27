@@ -41,7 +41,7 @@ class DisbursementService
         }
 
         $listDisbursementTeach = $this->disbursementRepository->getListDisbursementTeachByDisbursementID($dataDisbursement->disbursement_id);
-        $dataDisbursement->data = $listDisbursementTeach;
+        $dataDisbursement['data'] = $listDisbursementTeach;
 
 
         return $dataDisbursement;
@@ -142,8 +142,9 @@ class DisbursementService
 
         $listDisbursement = $this->getDisbursementsByTeacherIdAndTermOfYearId($disbursement->teacher_id, $disbursement->term_of_year_id);
 
+        $dataFinish = $this->preprocessPdfData($listDisbursement);
         //update pdf Data
-        $spdf = new PDFGen(pathFile: $disbursement->pdf_path);
+        $spdf = new PDFGen(pathFile: $disbursement->pdf_path, data: $dataFinish);
         $spdf->updatePDF();
 
         return $resp;
@@ -178,5 +179,23 @@ class DisbursementService
     public function deleteDisbursement($id)
     {
         return $this->disbursementRepository->deleteDisbursement($id);
+    }
+
+    private function preprocessPdfData($disbursement)
+    {
+        $teacher_name = $disbursement->teacher->prefix . $disbursement->teacher->fullname;
+
+        $disbursementData = [
+            'teacher_name' => $teacher_name,
+            'term_of_year' => $disbursement->termOfYear->term,
+            'academic_position' => $disbursement->teacher->academicPosition->name,
+            'management_position' => $disbursement->teacher->managementPosition->name,
+            'sum_yes_unit' => $disbursement->sum_yes_unit,
+            'sum_no_unit' => $disbursement->sum_no_unit,
+            'total' => $disbursement->total,
+            'data' => $disbursement->data,
+        ];
+
+        return $disbursementData;
     }
 }

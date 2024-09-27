@@ -4,279 +4,199 @@ namespace App\Utils;
 
 use TCPDF;
 
-class PDFGen {
-
-    private $pdf;
+class PDFGen
+{
+    private TCPDF $pdf;
     protected string $pathFile;
-
     protected $data;
 
-    public function __construct(string $pathFile, $data = null) {
+    public function __construct(string $pathFile, $data = null)
+    {
         $this->pdf = new TCPDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
         $this->pdf->setPrintHeader(false);
         $this->pdf->AddPage();
-
         $this->pathFile = $pathFile;
         $this->data = $data;
-
-    }
-    public function createPDF() {
-
-        $rootPath = __DIR__ . '/../../storage/pdfs/';
-        $pdfPath = $rootPath.$this->pathFile;
-
-        // Output the PDF and force download
-        $this->pdf->Output($pdfPath , 'F');
     }
 
-    public function updatePDF() {
-        $termOfYear = "2/2566";
-        $this->textHead($termOfYear);
+    public function createPDF()
+    {
+        $pdfPath = $this->getPDFPath();
+        $this->pdf->Output($pdfPath, 'F');
+    }
+
+    public function updatePDF()
+    {
+
+        
+        $this->textHead($this->data['term_of_year']);
         $this->textTeacherDetail();
         $this->bodyDetail();
-
-        // Set font
-        $this->pdf->SetFont('thsarabun', 'B', 30);
-
-        // Add a page
-        
-        // Add a cell with some text
-        // $this->pdf->Write(0, "ทดสอบ", '', 0, 'C', true, 0, false, false, 0);
-
-        $rootPath = __DIR__ . '/../../storage/pdfs/';
-        $pdfPath = $rootPath.$this->pathFile;
-
-        // Output the PDF and force download
-        $this->pdf->Output($pdfPath , 'F');
+        $pdfPath = $this->getPDFPath();
+        $this->pdf->Output($pdfPath, 'F');
     }
 
-    private function textHead($termOfYear){
-        $this->pdf->SetFont('thsarabun_b', 'B', size: 14);
-        $this->pdf->Write(0, "คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม", '', 0, 'C', true, 0, false, false, 0);
-        $this->pdf->Write(0, "ใบเบิกเงินค่าตอบแทนการสอน ประจำภาคเรียนที่ $termOfYear", '', 0, 'C', true, 0, false, false);
+    private function textHead($termOfYear)
+    {
+        $this->pdf->SetFont('thsarabun_b', 'B', 14);
+        $this->pdf->Write(h: 0, txt: "คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม",align: 'C', ln: true);
+        $this->pdf->Write(h: 0, txt: "ใบเบิกเงินค่าตอบแทนการสอน ประจำภาคเรียนที่ $termOfYear", align: 'C', ln: true);
     }
 
-    private function textTeacherDetail(){
-        $this->pdf->SetFont('thsarabun_b', 'B', size: 14);
-        $this->pdf->Write(0, "1. คำขอเบิก", '', 0, 'L', true, 0, false, false, 0);
-        $this->pdf->Cell(93, 0, "ข้าพเจ้า         อ.ดร.นิตยา วรรณกิต", 1, 0, 'L');
-        $this->pdf->Write(0, "ตำแหน่ง  คณบดีคณะ", '', 0, 'L', true, 0, false, false, 0);
-        $this->pdf->Write(0, "สังกัด            คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม ตำบลตลาด อำเภอเมือง จังหวัดมหาสารคาม 44000", '', 0, 'L', true, 0, false, false, 0);
-        $this->pdf->Write(0, "ขอเบิกเงินค่าตอบแทนการสอน ( / ) อาจารย์ประจำ     (   ) อาจารย์พิเศษ", '', 0, 'L', true, 0, false, false, 0);
+    private function textTeacherDetail()
+    {
+        $this->pdf->SetFont('thsarabun_b', 'B', 14);
+        $this->pdf->Write(h: 0, txt: "1. คำขอเบิก",ln: true);
+        $this->pdf->Cell(w: 93, h: 0, txt: "ข้าพเจ้า         " . $this->data['teacher_name']);
+        $this->pdf->Cell(w: 50, h: 0, txt: "ตำแหน่ง  " . $this->data['academic_position']);
+        $this->pdf->Cell(w: 80, h: 0, txt: "ตำแหน่ง  " . $this->data['management_position']);
+        $this->pdf->Ln();
+        $this->pdf->Write(h: 0, txt: "สังกัด            คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม ตำบลตลาด อำเภอเมือง จังหวัดมหาสารคาม 44000",  ln: true, );
+        $this->pdf->Write(h: 0, txt: "ขอเบิกเงินค่าตอบแทนการสอน (   ) อาจารย์ประจำ     (   ) อาจารย์พิเศษ", ln: true);
     }
 
-    private function bodyDetail(){
-        $this->pdf->SetFont('thsarabun_b', 'B', size: 14);
-        $cellWidth = [20, 67, 15, 10, 10, 15, 10, 10, 10, 25, 20,15, 10, 20, 22];
+    private function bodyDetail()
+    {
+        $this->pdf->SetFont('thsarabun_b', 'B', 14);
+        $cellWidth = [20, 55, 20, 15, 15, 20, 13, 15, 15, 15, 15, 15, 12, 18, 18];
 
-        $mock = [
-            [
-                "course_id" => "0501702-10",
-                "course_name" => "principles, theories and innovations in",
-                "credit" => "3 (2-2-5)",
-                "group" => "15",
-                "level" => "1",
-                "student" => "50",
-                "teacher" => "2",
-                "can_disburse" => "50",
-                "cannot_disburse" => "0",
-                "time" => "MON10:00-12:00",
-                "rate" => "500",
-                "pay" => "25000",
-                "general" => "25000",
-                "faculty" => "0",
-                "note" => "ทดสอบ"
-            ],
-            [
-                "course_id" => "0501908-3",
-                "course_name" => "Seminar  on Research in Educational Admin",
-                "credit" => "3 (2-2-5)",
-                "group" => "16",
-                "level" => "1",
-                "student" => "50",
-                "teacher" => "2",
-                "can_disburse" => "50",
-                "cannot_disburse" => "0",
-                "time" => "MON10:00-12:00",
-                "rate" => "500",
-                "pay" => "25000",
-                "general" => "25000",
-                "faculty" => "0",
-                "note" => "ทดสอบ"
-            ],
-            [
-                "course_id" => "0560301-2",
-                "course_name" => "Practicum 3",
-                "credit" => "3 (2-2-5)",
-                "group" => "17",
-                "level" => "1",
-                "student" => "50",
-                "teacher" => "2",
-                "can_disburse" => "50",
-                "cannot_disburse" => "0",
-                "time" => "MON10:00-12:00",
-                "rate" => "500",
-                "pay" => "25000",
-                "general" => "25000",
-                "faculty" => "0",
-                "note" => "ทดสอบ"
-            ],
-            [
-                "course_id" => "0501702-10",
-                "course_name" => "principles, theories and innovations in",
-                "credit" => "3 (2-2-5)",
-                "group" => "15",
-                "level" => "1",
-                "student" => "50",
-                "teacher" => "2",
-                "can_disburse" => "50",
-                "cannot_disburse" => "0",
-                "time" => "MON10:00-12:00",
-                "rate" => "500",
-                "pay" => "25000",
-                "general" => "25000",
-                "faculty" => "0",
-                "note" => "ทดสอบ"
-            ],
-            [
-                "course_id" => "0501908-3",
-                "course_name" => "Seminar  on Research in Educational Adm",
-                "credit" => "3 (2-2-5)",
-                "group" => "16",
-                "level" => "1",
-                "student" => "50",
-                "teacher" => "2",
-                "can_disburse" => "50",
-                "cannot_disburse" => "0",
-                "time" => "MON10:00-12:00",
-                "rate" => "500",
-                "pay" => "25000",
-                "general" => "25000",
-                "faculty" => "0",
-                "note" => "ทดสอบ"
-            ],
-            [
-                "course_id" => "0560301-2",
-                "course_name" => "Practicum 3",
-                "credit" => "3 (2-2-5)",
-                "group" => "17",
-                "level" => "1",
-                "student" => "50",
-                "teacher" => "2",
-                "can_disburse" => "50",
-                "cannot_disburse" => "0",
-                "time" => "MON10:00-12:00",
-                "rate" => "500",
-                "pay" => "25000",
-                "general" => "25000",
-                "faculty" => "0",
-                "note" => "ทดสอบ"
-            ],
-        ];
 
         $this->bodyHeader($cellWidth);
+
+        $this->subjectDatail($this->data['data'], $cellWidth);
         
+        $this->pdf->SetFont('thsarabun_b', 'B', 14);
+        $this->bodyCalRate($cellWidth);
+        $this->detailDisbursement($cellWidth);
+        $this->detailSignature();
+    }
 
-        foreach ($mock as $row) {
-            $this->pdf->Cell($cellWidth[0], 4, $row['course_id'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[1], 4, $row['course_name'], 1, 0, 'L',);
-            $this->pdf->Cell($cellWidth[2], 4, $row['credit'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[3], 4, $row['group'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[4], 4, $row['level'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[5], 4, $row['student'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[6], 4, $row['teacher'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[7], 4, $row['can_disburse'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[8], 4, $row['cannot_disburse'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[9], 4, $row['time'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[10], 4, $row['rate'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[11], 4, $row['pay'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[12], 4, $row['general'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[13], 4, $row['faculty'], 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[14], 4, $row['note'], 1, 0, 'L');
-            $this->pdf->Ln();
+    private function bodyHeader($cellWidth)
+    {
+        $this->pdf->SetFont('thsarabun_b', 'B', 14);
+        $headers = [
+            "รหัสวิชา", "รายวิชา", "หน่วยกิต", "กลุ่ม", "ระดับ", "จำนวนนิสิต\nลงทะเบียน",
+            "ผู้สอน\n(คน)", "เบิก\nได้", "เบิก\nไม่ได้", "เวลา\nเรียน", "จำนวน นิสิต จ่ายเงิน", 
+            "อัตราต่อ หัว/นก.", "เบิก ศึกษา ทั่วไป", "เบิกคณะฯ", "หมายเหตุ"
+        ];
+
+        foreach ($headers as $index => $header) {
+            $this->pdf->MultiCell($cellWidth[$index], 15, $header, 1, 'C', false, 0, '', '', true, 0, false, true, 15, 'M', true);
         }
+        $this->pdf->Ln();
+    }
 
-        $this->bodyFooter($cellWidth);
+    private function bodyCalRate($cellWidth)
+    {
+        $this->pdf->Cell($cellWidth[0], 4, "", 0, 0, 'L');
+        $this->pdf->Cell($cellWidth[1], 4, "รวม", 1, 0, 'L');
+        $this->pdf->Cell($cellWidth[2], 4, "", 1, 0, 'L');
+        $this->pdf->Cell($cellWidth[3], 4, "", 1, 0, 'L');
+        $this->pdf->Cell($cellWidth[4], 4, "", 1, 0, 'L');
+        $this->pdf->Cell($cellWidth[5], 4, "", 1, 0, 'L');
+        $this->pdf->Cell($cellWidth[6], 4, "", 1, 0, 'L');
+        $this->pdf->Cell($cellWidth[7], 4, $this->data['sum_yes_unit'], 1, 0, 'R');
+        $this->pdf->Cell($cellWidth[8], 4, $this->data['sum_no_unit'], 1, 0, 'R');
+        $this->pdf->Cell($cellWidth[9], 4, "", 1, 0, 'L');
+        $this->pdf->Cell($cellWidth[10], 4, "", 1, 0, 'L');
+        $this->pdf->Cell($cellWidth[11], 4, "", 1, 0, 'L');
+        $this->pdf->Cell($cellWidth[12], 4, "", 1, 0, 'L');
+        $this->pdf->Cell($cellWidth[13], 4, $this->data['total'], 1, 0, 'R');
+        $this->pdf->Cell($cellWidth[14], 4, "", 1, 0, 'L');
+        $this->pdf->Ln();
+    }
 
+    private function detailDisbursement($cellWidth)
+    {
         $this->pdf->Cell($cellWidth[0], 4, "2. ใบรับเงิน", 0, 0, 'L');
-        $this->pdf->Cell($cellWidth[1], 4, "เบิกจากคณะศึกษาศาสตร์", 0, 0, 'L',);
+        $this->pdf->Cell($cellWidth[1], 4, "เบิกจากคณะศึกษาศาสตร์", 0, 0, 'L');
         $this->pdf->Cell(60, 4, "ข้าพเจ้าได้รับเงินจำนวน", 0, 0, 'L');
         $this->pdf->Cell(30, 4, "6,500.00  บาท", 0, 0, 'L');
-        $this->pdf->Cell(60, 4, "หกพันห้าร้อยบาทถ้วน", 0, 0, 'L');
+        $this->pdf->Cell(80, 4, "หกพันห้าร้อยบาทถ้วน", 0, 0, 'L');
         $this->pdf->Cell(20, 4, "ไว้เรียบร้อยแล้ว", 0, 0, 'L');
         $this->pdf->Ln();
         $this->pdf->Ln();
-
-
-        $this->pdf->MultiCell(87, 0, "ข้าพเจ้าขอรับรองว่าฐานวิชาคณะถูกต้องครบถ้วนและได้ ตรวจสอบละเอียดในใบเบิกนี้ถูกต้องครบถ้วนแล้วโดยจะไม่มีการแก้ไขเอกสารไม่ว่ากรณีใดเมื่อเบิกจ่ายเสร็จเรียบร้อยแล้ว\n\n\nลงชื่อ...............................................................ผู้รับเงิน\nอ.ดร.นิตยา วรรณกิต\nอาจารย์ผู้สอน/ผู้ขอเบิก", 1, 'J', false, 0);
-        $this->pdf->MultiCell(50, 0, "ได้ตรวจสอบภาระงานสอน\nครบถ้วนเป็นไปตามประกาศที่\nมหาวิทยาลัยกำหนด\n\n\nลงชื่อ.......................................\n\nเจ้าหน้าที่การเงิน", 1, 'J', false, 0);
-        $this->pdf->MultiCell(45, 0, "ขอรับรองว่าผู้เบิกส่งเกรดและ\nมคอ.5รายวิชาคณะฯครบ\n\n\n\nลงชื่อ.......................................\n\nฝ่ายวิชาการ", 1, 'J', false, 0);
-        $this->pdf->MultiCell(47, 0, "รายวิชาข้างต้นถูกต้องตามที่ได้จัด\nการเรียนการสอน\n\n\n\nลงชื่อ.......................................\n\nรองคณบดี", 1, 'J', false, 0);
-        $this->pdf->MultiCell(50, 0, "\n\n\n\nลงชื่อ.......................................\n\n\nคณบดี", 1, 'J', false, 0);
-
-
-
-
-        // $this->pdf->Cell($cellWidth[0], 4, "รหัสวิชา", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[1], 4, "รายวิชา", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[2], 4, "หน่วยกิต", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[3], 4, "กลุ่ม", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[4], 4, "ระดับ", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[5], 4, "จำนวนนิสิตลงทะเบียน", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[6], 4, "ผู้สอน (คน)", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[7], 4, "เบิกได้", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[8], 4, "เบิกไม่ได้", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[9], 4, "เวลา", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[10], 4, "อัตรา(บาท)", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[11], 4, "จ่ายเงิน", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[12], 4, "ศึกษาทั่วไป", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[13], 4, "เบิกคณะ", 1, 0, 'L');
-        // $this->pdf->Cell($cellWidth[14], 4, "หมายเหตุ", 1, 0, 'L');
-
     }
 
-    private function bodyHeader($cellWidth){
-        $this->pdf->SetFont('thsarabun_b', 'B', size: 14);
-        $this->pdf->MultiCell($cellWidth[0], 0, "รหัสวิชา", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[1], 0, "รายวิชา", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[2], 0, "หน่วยกิต", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[3], 0, "กลุ่ม", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[4], 0, "ระดับ", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[5], 0, "จำนวนนิสิตลงทะเบียน", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[6], 0, "ผู้สอน (คน)", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[7], 0, "เบิกได้", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[8], 0, "เบิกไม่ได้", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[9], 0, "เวลา", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[10], 0, "อัตรา(บาท)", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[11], 0, "จ่ายเงิน", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[12], 0, "ศึกษาทั่วไป", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[13], 0, "เบิกคณะ", 1, 'J', false, 0);
-        $this->pdf->MultiCell($cellWidth[14], 0, "หมายเหตุ", 1, 'J', false, 0);
-        $this->pdf->Ln();
+    private function detailSignature()
+    {
+        $block1Text = 'ข้าพเจ้าขอรับรองว่าฐานวิชาคณะถูกต้องครบถ้วนและได้<br>ตรวจสอบละเอียดในใบเบิกนี้ถูกต้องครบถ้วนแล้วโดยจะ<br>ไม่มีการแก้ไขเอกสารไม่ว่ากรณีใดเมื่อเบิกจ่ายเสร็จ<br>เรียบร้อยแล้ว<br><br>   ลงชื่อ..........................................................ผู้รับเงิน<br>     <font face="thsarabun_b" size="14">' . $this->data['teacher_name'] . '</font><br>     อาจารย์ผู้สอน/ผู้ขอเบิก';
+        
+        $this->pdf->SetFont('thsarabun', 'B', 14);
+        $this->pdf->writeHTMLCell(75, 0, '', '', $block1Text , 1, 0, false);
+        $this->pdf->MultiCell(50, 0, "ได้ตรวจสอบภาระงานสอน\nครบถ้วนเป็นไปตามประกาศที่\nมหาวิทยาลัยกำหนด\n\n\n   ลงชื่อ.......................................\n\nเจ้าหน้าที่การเงิน", 1, 'J', false, 0);
+        $this->pdf->MultiCell(47, 0, "ขอรับรองว่าผู้เบิกส่งเกรดและ\nมคอ.5รายวิชาคณะฯครบ\n\n\n\n  ลงชื่อ.......................................\n\nฝ่ายวิชาการ", 1, 'J', false, 0);
+        $this->pdf->MultiCell(45, 0, "รายวิชาข้างต้นถูกต้องตามที่ได้จัด\nการเรียนการสอน\n\n\n\n ลงชื่อ.......................................\n\nรองคณบดี", 1, 'J', false, 0);
+        $this->pdf->MultiCell(64, 0, "\n\n\n\n   ลงชื่อ.......................................ผู้อนุมัติ\n\n\nคณบดี", 1, 'J', false, 0);
     }
 
-    private function bodyFooter($cellWidth){
-        $this->pdf->Cell($cellWidth[0], 4, "", 0, 0, 'L');
-            $this->pdf->Cell($cellWidth[1], 4, "รวม", 1, 0, 'L',);
-            $this->pdf->Cell($cellWidth[2], 4, "", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[3], 4, "", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[4], 4, "", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[5], 4, "", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[6], 4, "", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[7], 4, "7.00", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[8], 4, "6.25", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[9], 4, "", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[10], 4, "", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[11], 4, "", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[12], 4, "", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[13], 4, "6,5025.00", 1, 0, 'L');
-            $this->pdf->Cell($cellWidth[14], 4, "", 1, 0, 'L');
-            $this->pdf->Ln();
+
+
+    private function subjectDatail($data, $cellWidth)
+        {
+            $this->pdf->SetFont('thsarabun', '', 14);
+            foreach ($data as $row) {
+                $credit = $row->subject->unit . ' '. $row->subject->type;
+                $this->pdf->Cell($cellWidth[0], 6, $row->subject->subject_id, border: 1);
+                $this->pdf->Cell($cellWidth[1], 6, $this->shortenText($row->subject->name, $cellWidth[1]), 1);
+                $this->pdf->Cell(w: $cellWidth[2], h: 6, txt: $credit, border: 1, align: 'C');
+                $this->pdf->Cell(w: $cellWidth[3], h: 6, txt: $row->section, border: 1, align: 'C');
+                $this->pdf->Cell(w: $cellWidth[4], h: 6, txt: $row->level_id, border: 1, align: 'C');
+                $this->pdf->Cell(w: $cellWidth[5], h: 6, txt: $row->enroll_seat, border: 1, align: 'C');
+                $this->pdf->Cell(w: $cellWidth[6], h: 6, txt: $row->pivot->count_of_teach, border: 1, align: 'C');
+                $this->pdf->Cell(w: $cellWidth[7], h: 6, txt: $this->validateText($row->pivot->unit_yes), border: 1, align: 'R');
+                $this->pdf->Cell(w: $cellWidth[8], h: 6, txt: $this->validateText($row->pivot->unit_no), border: 1, align: 'R');
+                $this->pdf->Cell(w: $cellWidth[9], h: 6, txt: $row->teach_date, border: 1, align: 'C');
+                $this->pdf->Cell(w: $cellWidth[10], h: 6, txt: $row->enroll_seat, border: 1, align: 'R');
+
+                if (strlen($row->pivot->rate_of_unit) > 3) {
+                    $cellW = $cellWidth[11]+$cellWidth[12];
+                    $txt = $this->shortenText($row->pivot->rate_of_unit, $cellW);
+                    $txt = substr($txt, 0, -5);
+
+                    $this->pdf->Cell(w: $cellW, h: 6, txt: $txt, border: 1, align: 'L');
+                } else{
+                    $this->pdf->Cell(w: $cellWidth[11], h: 6, txt: $row->pivot->rate_of_unit, border: 1, align: 'R');
+                    if ($row->subject->is_internal == 1){
+                        $this->pdf->Cell(w: $cellWidth[12], h: 6, txt: '', border: 1, align: 'C');
+                    } else {
+                        $this->pdf->Cell(w: $cellWidth[12], h: 6, txt: '/', border: 1, align: 'C');
+                    }
+                    
+                }
+
+                $this->pdf->Cell(w: $cellWidth[13], h: 6, txt: $this->strToNumber($row->pivot->total), border: 1, align: 'R');
+                $this->pdf->Cell(w: $cellWidth[14], h: 6, txt: $row->pivot->note, border: 1);
+                $this->pdf->Ln();
+            }
+        }
+
+    private function getPDFPath()
+    {
+        $rootPath = __DIR__ . '/../../storage/pdfs/';
+        return $rootPath . $this->pathFile;
+    }
+
+    private function shortenText($text, $maxWidth)
+    {
+        $textWidth = $this->pdf->GetStringWidth($text);
+
+        while ($textWidth > $maxWidth && strlen($text) > 0) {
+            $text = substr($text, 0, -1);
+            $textWidth = $this->pdf->GetStringWidth($text);
+        }
+
+        return $text;
+    }
+
+    private function validateText($text) {
+        return $text === "0" ? "" : $text;
+    }
+
+    private function strToNumber($text) {
+        if ($text === "-") {
+            return $text;
+        }
+        return number_format((float)$text, 2, '.', ',');
     }
 }
-
-
-
-
-
-
