@@ -139,7 +139,7 @@ const Login = () => {
                         ...(!isDesktop && { backgroundColor: '#FD7301' }),
                     }}
                 >
-                    <Grid container item xs={12}>
+                    <Grid container item xs={12} justifyContent={'center'}>
                         <Box
                             sx={{
                                 my: 8,
