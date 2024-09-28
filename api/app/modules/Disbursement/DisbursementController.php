@@ -100,7 +100,6 @@ class DisbursementController {
 
         } catch (\Exception $e) {
             if ($e->getCode() === 404) {
-                echo $e->getMessage();
                 $response->getBody()->write(json_encode(['message' => $e->getMessage()]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
             }
