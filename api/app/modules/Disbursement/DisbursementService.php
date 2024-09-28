@@ -171,7 +171,7 @@ class DisbursementService
             $base64_pdf = base64_encode($pdf_content);
             return ["base64" => $base64_pdf];
         } else {
-            throw new Exception("File not found");
+            throw new Exception(File_Not_Found, 404);
         }
 
     }
