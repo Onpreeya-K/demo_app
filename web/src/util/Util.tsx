@@ -52,3 +52,17 @@ export const toMoneyFormat = (value: string): string => {
     }
     return `${integerPart}.${decimalPart}`;
 };
+
+export const moneyFormatComma = (value: string): string => {
+    if (!value) return value;
+    const numberValue = value.replace(/\D/g, '');
+    return new Intl.NumberFormat().format(Number(numberValue));
+};
+
+export const modalAlertOpen = (message: string, title?: string) => {
+    document.dispatchEvent(
+        new CustomEvent('modal.open', {
+            detail: { message: message, title: title },
+        })
+    );
+};

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getPdf } from '../../services/Disburse-service';
+import PopupError from '../../components/popupAlert/Popup-Error';
 
 const PreviewPdfPage = () => {
     const startComponent = useRef(false);
@@ -64,7 +65,10 @@ const PreviewPdfPage = () => {
     };
 
     return (
-        <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>{renderPreview()}</div>
+        <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
+            <PopupError />
+            {renderPreview()}
+        </div>
     );
 };
 

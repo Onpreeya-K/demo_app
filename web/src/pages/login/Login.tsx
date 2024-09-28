@@ -19,6 +19,7 @@ import { setAccessToken } from '../../util/Util';
 import { useEffect, useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import PopupAlert from '../../components/popupAlert/Popup-Alert';
+import PopupError from '../../components/popupAlert/Popup-Error';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -89,6 +90,7 @@ const Login = () => {
         <ThemeProvider theme={theme}>
             <Grid container component="main" sx={{ height: '100vh' }}>
                 <CssBaseline />
+                <PopupError />
                 <PopupAlert
                     isOpen={isOpenPopupAlert}
                     onClose={() => {

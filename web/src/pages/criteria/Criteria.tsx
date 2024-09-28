@@ -1,3 +1,4 @@
+import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import {
     Box,
@@ -25,7 +26,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import PopupAlert from '../../components/popupAlert/Popup-Alert';
 import { getCriteriaOfTeach, updateCriteriaOfTeach } from '../../services/Criteria-service';
-import CloseIcon from '@mui/icons-material/Close';
+import { moneyFormatComma } from '../../util/Util';
 
 interface Course {
     criteria_of_teach_id: number;
@@ -369,13 +370,17 @@ const CriteriaPage = () => {
                                                             align="center"
                                                             sx={{ minWidth: '150px' }}
                                                         >
-                                                            {row.teaching_rates}
+                                                            {moneyFormatComma(
+                                                                row.teaching_rates.toString()
+                                                            )}
                                                         </TableCell>
                                                         <TableCell
                                                             align="center"
                                                             sx={{ minWidth: '150px' }}
                                                         >
-                                                            {row.rate_unit}
+                                                            {moneyFormatComma(
+                                                                row.rate_unit.toString()
+                                                            )}
                                                         </TableCell>
                                                         <TableCell
                                                             align="center"

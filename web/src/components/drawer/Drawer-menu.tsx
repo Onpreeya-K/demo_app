@@ -38,6 +38,7 @@ import { IProfessor } from '../../interface/Professor-interface';
 import { updatePassword } from '../../services/User-service';
 import { getDataProfessor, getRoleUser } from '../../util/Util';
 import PopupAlert from '../popupAlert/Popup-Alert';
+import PopupError from '../popupAlert/Popup-Error';
 
 const drawerWidth = 240;
 
@@ -207,6 +208,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
     const onCloseDialog = () => {
         setProfessorData(undefined);
         setOpenDialog(false);
+        onCancelChangePassword();
     };
 
     const onClickChangePassword = () => {
@@ -285,6 +287,9 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                     variant: 'outlined',
                     InputLabelProps: {
                         shrink: true,
+                    },
+                    InputProps: {
+                        autoComplete: 'off',
                     },
                 },
             },
@@ -514,6 +519,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
         <ThemeProvider theme={theme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
+                <PopupError />
                 <AppBar
                     position="fixed"
                     open={open}

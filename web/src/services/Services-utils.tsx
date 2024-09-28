@@ -1,3 +1,4 @@
+import { modalAlertOpen } from '../util/Util';
 import environment from './../environment/environment.json';
 
 export const METHOD_TYPE = {
@@ -8,6 +9,18 @@ export const METHOD_TYPE = {
     DELETE: 'DELETE',
 };
 
+class CustomError extends Error {
+    status: number;
+    payload: any;
+
+    constructor(message: string, status: number, payload: any = null) {
+        super(message);
+        this.status = status;
+        this.payload = payload;
+        this.name = 'CustomError';
+    }
+}
+
 const handleResponse = async (url: string, response: Response) => {
     if (!response.ok) {
         const error = await response.json();
@@ -16,7 +29,11 @@ const handleResponse = async (url: string, response: Response) => {
                 window.location.href = `${environment.baseUrl}:3000/login`;
             }
         }
-        throw new Error(error.payload?.message);
+        const errorMessage = error.payload?.message || error.message || 'An error occurred';
+        if (errorMessage && error.payload) {
+            modalAlertOpen(error.payload.message);
+        }
+        throw new CustomError(errorMessage, response.status, error.payload);
     }
     return response.json();
 };
@@ -30,8 +47,7 @@ const post = async ({ url, header, data }: { url: string; header: any; data: any
         });
         return await handleResponse(url, response);
     } catch (error) {
-        // console.error('Error:', error);
-        throw error;
+        console.error('Error:', error);
     }
 };
 
@@ -44,8 +60,7 @@ const get = async ({ url, header, params }: { url: string; header: any; params: 
         });
         return await handleResponse(url, response);
     } catch (error) {
-        // console.error('Error:', error);
-        throw error;
+        console.error('Error:', error);
     }
 };
 
@@ -68,8 +83,7 @@ const put = async ({
         });
         return await handleResponse(url, response);
     } catch (error) {
-        // console.error('Error:', error);
-        throw error;
+        console.error('Error:', error);
     }
 };
 
@@ -81,8 +95,7 @@ const del = async ({ url, header, params }: { url: string; header: any; params: 
         });
         return await handleResponse(url, response);
     } catch (error) {
-        // console.error('Error:', error);
-        throw error;
+        console.error('Error:', error);
     }
 };
 
