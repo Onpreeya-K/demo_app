@@ -102,7 +102,7 @@ class DisbursementController {
             if ($e->getCode() === 404) {
                 echo $e->getMessage();
                 $response->getBody()->write(json_encode(['message' => $e->getMessage()]));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
             }
             $response->getBody()->write(json_encode(['message' => ErrorMessage::SOMETHING_WENT_WRONG]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
