@@ -7,6 +7,7 @@ use App\Modules\Teacher\TeacherRepository;
 use Firebase\JWT\JWT;
 
 use Exception;
+use App\Constant\ErrorMessage;
 
 class AuthService
 {
@@ -49,7 +50,7 @@ class AuthService
             return $resp;
             
         } else {
-            throw new Exception("Invalid username or password", 401);
+            throw new Exception(ErrorMessage::LOGIN_INVALID , 401);
         }
     }
 

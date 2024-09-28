@@ -28,7 +28,7 @@ class ResponseMiddleware implements MiddlewareInterface
         } else if ($statusCode == 404 ) {
             $messageResponse = "Not Found";
         } else if ($statusCode >= 500) {
-            $messageResponse = "Internal Server Erro";
+            $messageResponse = "Internal Server Error";
         }
 
         // Get the response body

@@ -5,6 +5,7 @@ namespace App\Modules\Disbursement;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use App\Constant\ErrorMessage;
 class DisbursementController {
     private $disbursementService;
 
@@ -99,10 +100,11 @@ class DisbursementController {
 
         } catch (\Exception $e) {
             if ($e->getCode() === 404) {
+                echo $e->getMessage();
                 $response->getBody()->write(json_encode(['message' => $e->getMessage()]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
             }
-            $response->getBody()->write(json_encode(['message' => Something_Went_Wrong]));
+            $response->getBody()->write(json_encode(['message' => ErrorMessage::SOMETHING_WENT_WRONG]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     }

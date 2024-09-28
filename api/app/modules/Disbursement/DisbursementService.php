@@ -6,6 +6,8 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Exception;
 use App\Utils\PDFGen;
 
+use App\Constant\ErrorMessage;
+
 class DisbursementService
 {
     protected $disbursementRepository;
@@ -171,7 +173,7 @@ class DisbursementService
             $base64_pdf = base64_encode($pdf_content);
             return ["base64" => $base64_pdf];
         } else {
-            throw new Exception(File_Not_Found, 404);
+            throw new Exception(ErrorMessage::PDF_FILE_NOT_FOUND, 404);
         }
 
     }
