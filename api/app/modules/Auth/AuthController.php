@@ -35,11 +35,11 @@ class AuthController
             ->withStatus(200);
         } catch (\Exception $e) {
             if ($e->getCode() === 401) {
-                $response->getBody()->write(json_encode(['message' => 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง']));
+                $response->getBody()->write(json_encode(['message' => Login_Invalid]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
             }
 
-            $response->getBody()->write(json_encode(['message' => Login_Invalid]));
+            $response->getBody()->write(json_encode(['message' => Something_Went_Wrong]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     }

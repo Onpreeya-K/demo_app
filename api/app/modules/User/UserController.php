@@ -42,9 +42,20 @@ class UserController {
 
     public function resetPassword(Request $request, Response $response, $args) {
         $userId = $args['id'];
-        $user = $this->userService->resetUserPassword($userId);
-        $response->getBody()->write(json_encode($user));
-        return $response->withHeader('Content-Type', 'application/json');
+
+        try {
+
+            $user = $this->userService->resetUserPassword($userId);
+            $response->getBody()->write(json_encode($user));
+
+            return $response
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(200);
+        } catch (\Exception $e) {
+            $errorData = ['error' => $e->getMessage()];
+            $response->getBody()->write(json_encode($errorData));
+            return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
+        }
     }
 
     public function delete(Request $request, Response $response, $args) {

@@ -87,10 +87,24 @@ class DisbursementController {
     }
 
     public function getPdfFile(Request $request, Response $response, $args) {
-        $data = $request->getParsedBody();
-        $resp = $this->disbursementService->generatePdf($data);
-        $response->getBody()->write(json_encode($resp));
-        return $response->withHeader('Content-Type', 'application/pdf');
+        try {
+
+            $data = $request->getParsedBody();
+            $resp = $this->disbursementService->generatePdf($data);
+            $response->getBody()->write(json_encode($resp));
+
+            return $response
+                    ->withHeader('Content-Type', 'application/pdf')
+                    ->withStatus(200);
+
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                $response->getBody()->write(json_encode(['message' => $e->getMessage()]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+            }
+            $response->getBody()->write(json_encode(['message' => Something_Went_Wrong]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
     }
 
     public function delete(Request $request, Response $response, $args) {
