@@ -40,7 +40,7 @@ class AuthMiddleware implements MiddlewareInterface
                     ->withStatus(401);
             }
         }else{
-            $message = array('message' => 'Unauthorized');
+            $message = array('message' => 'Token not found');
                 $payload = json_encode($message);
                 $response->getBody()->write($payload);
 

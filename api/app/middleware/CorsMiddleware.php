@@ -12,16 +12,21 @@ class CorsMiddleware implements MiddlewareInterface
 
     public function process(Request $request, RequestHandler $handler): Response
     {
-        $response = $handler->handle($request);
-        $response = $response->withHeader('Access-Control-Allow-Origin', '*')
-                            ->withHeader('Access-Control-Allow-Credentials', 'true')
-                             ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-                             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-
-        if ($request->getMethod() === 'OPTIONS') {
-            $response = new \Slim\Psr7\Response();
+         // Handle preflight request
+         if ($request->getMethod() === 'OPTIONS') {
+            $response = (new \Slim\Psr7\Response())
+                ->withHeader('Access-Control-Allow-Origin', '*')
+                ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+                ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->withHeader('Access-Control-Max-Age', '86400'); // Cache preflight response for 1 day
+            return $response;
         }
 
-        return $response;
+        // Handle actual request
+        $response = $handler->handle($request);
+        return $response
+            ->withHeader('Access-Control-Allow-Origin', '*')
+            ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     }
 }

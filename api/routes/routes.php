@@ -18,7 +18,6 @@ use App\Modules\ManagementPosition\ManagementPositionController;
 use App\Modules\AcademicPosition\AcademicPositionController;
 use App\Modules\Disbursement\DisbursementController;
 
-// Handle OPTIONS requests
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response
         ->withHeader('Access-Control-Allow-Origin', '*')
