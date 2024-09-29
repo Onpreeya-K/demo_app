@@ -7,12 +7,14 @@ class SubjectRepository
 {
     public function getAllSubjects()
     {
-        return Subject::get();
+        return Subject::with(['courseOfStudy'])
+                        ->get();
     }
 
     public function getSubjectById($id)
     {
-        return Subject::find($id);
+        return Subject::with(['courseOfStudy'])
+                        ->find($id);
     }
 
     public function createSubject($data)
