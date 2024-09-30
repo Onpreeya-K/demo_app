@@ -40,6 +40,7 @@ import { getDataProfessor, getRoleUser } from '../../util/Util';
 import PopupAlert from '../popupAlert/Popup-Alert';
 import PopupError from '../popupAlert/Popup-Error';
 import { MdSubject } from 'react-icons/md';
+import { IoIosTimer } from 'react-icons/io';
 
 const drawerWidth = 240;
 
@@ -155,6 +156,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                     'SUBJECT-INFO',
                     'CRITERIA-OF-TEACH',
                     'CRITERIA-PROCESS',
+                    'TERM',
                 ].includes(menu.key);
             }
         });
@@ -177,6 +179,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                                     <MdOutlineCalculate color="#FFF" />
                                 )}
                                 {item.key === 'CRITERIA-PROCESS' && <FaCalculator color="#FFF" />}
+                                {item.key === 'TERM' && <IoIosTimer color="#FFF" />}
                             </ListItemIcon>
                             <Typography variant="subtitle2" noWrap component="div" color="#FFFFFF">
                                 {item.name}

@@ -35,6 +35,11 @@
             "key": "CRITERIA-PROCESS",
             "name": "เกณฑ์คำนวณ",
             "link": "/criteria-process"
+        },
+        {
+            "key": "TERM",
+            "name": "ปีการศึกษา",
+            "link": "/term"
         }
     ],
     "role": {

@@ -8,6 +8,7 @@ import ProfessorInfoPage from './pages/professor-info/Professor-info';
 import SchedulePage from './pages/schedule/Schedule';
 import PreviewPdfPage from './pages/preview/Preview-Pdf';
 import SubjectInfoPage from './pages/subject-info/Subject-info';
+import TermPage from './pages/term/Term-info';
 
 const Routing: React.FC = () => {
     return (
@@ -27,6 +28,7 @@ const Routing: React.FC = () => {
                                 <Route path="criteria-of-teach" element={<CriteriaPage />} />
                                 <Route path="criteria-process" element={<CriteriaProcessPage />} />
                                 <Route path="criteria-process" element={<PreviewPdfPage />} />
+                                <Route path="term" element={<TermPage />} />
                                 <Route path="*" element={<Navigate to="/login" replace />} />
                             </Routes>
                         </MenuDrawer>
