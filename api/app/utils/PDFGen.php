@@ -101,7 +101,7 @@ class PDFGen
         $this->pdf->Cell($cellWidth[10], 4, "", 1, 0, 'L');
         $this->pdf->Cell($cellWidth[11], 4, "", 1, 0, 'L');
         $this->pdf->Cell($cellWidth[12], 4, "", 1, 0, 'L');
-        $this->pdf->Cell($cellWidth[13], 4, $this->data['total'], 1, 0, 'R');
+        $this->pdf->Cell($cellWidth[13], 4, $this->strToNumber($this->data['total']), 1, 0, 'R');
         $this->pdf->Cell($cellWidth[14], 4, "", 1, 0, 'L');
         $this->pdf->Ln();
     }
@@ -111,7 +111,7 @@ class PDFGen
         $this->pdf->Cell($cellWidth[0], 4, "2. ใบรับเงิน", 0, 0, 'L');
         $this->pdf->Cell($cellWidth[1], 4, "เบิกจากคณะศึกษาศาสตร์", 0, 0, 'L');
         $this->pdf->Cell(60, 4, "ข้าพเจ้าได้รับเงินจำนวน", 0, 0, 'L');
-        $this->pdf->Cell(30, 4, "6,500.00  บาท", 0, 0, 'L');
+        $this->pdf->Cell(30, 4, $this->strToNumber($this->data['total']) ."  บาท", 0, 0, 'L');
         $this->pdf->Cell(80, 4, "หกพันห้าร้อยบาทถ้วน", 0, 0, 'L');
         $this->pdf->Cell(20, 4, "ไว้เรียบร้อยแล้ว", 0, 0, 'L');
         $this->pdf->Ln();
@@ -151,10 +151,8 @@ class PDFGen
 
                 if (strlen($row->pivot->rate_of_unit) > 3) {
                     $cellW = $cellWidth[11]+$cellWidth[12];
-                    $txt = $this->shortenText($row->pivot->rate_of_unit, $cellW);
-                    $txt = substr($txt, 0, -5);
 
-                    $this->pdf->Cell(w: $cellW, h: 6, txt: $txt, border: 1, align: 'L');
+                    $this->pdf->Cell(w: $cellW, h: 6, txt: $row->pivot->rate_of_unit, border: 1, align: 'L', stretch: 1);
                 } else{
                     $this->pdf->Cell(w: $cellWidth[11], h: 6, txt: $row->pivot->rate_of_unit, border: 1, align: 'R');
                     if ($row->subject->is_internal == 1){
@@ -166,7 +164,7 @@ class PDFGen
                 }
 
                 $this->pdf->Cell(w: $cellWidth[13], h: 6, txt: $this->strToNumber($row->pivot->total), border: 1, align: 'R');
-                $this->pdf->Cell(w: $cellWidth[14], h: 6, txt: $row->pivot->note, border: 1);
+                $this->pdf->Cell(w: $cellWidth[14], h: 6, txt: $row->pivot->note, border: 1, align: 'C');
                 $this->pdf->Ln();
             }
         }
