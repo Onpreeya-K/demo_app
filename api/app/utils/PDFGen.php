@@ -69,10 +69,12 @@ class PDFGen
         $this->pdf->SetFont('thsarabun_b', 'B', 14);
         $this->bodyCalRate($cellWidth);
 
-        if ($this->pdf->GetY() > 50) { // 260 is an arbitrary limit for this example
+        echo $this->pdf->GetY();
+        if ($this->pdf->GetY() > 130) {
             $this->pdf->AddPage();
             $this->pageNumber();
             $this->pdf->SetFont('thsarabun_b', 'B', 14);
+            $this->pdf->Ln();
         }
 
         $this->detailDisbursement($cellWidth);
