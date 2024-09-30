@@ -42,7 +42,13 @@ class ScheduleTeachService
                     return $item['level_id'] == $level_id;
                 });
 
-                $value['criteria_of_teach'] = $filtered_criteria_of_teach[0];
+                if (!empty($filtered_criteria_of_teach[0])){
+                    $value['criteria_of_teach'] = $filtered_criteria_of_teach[0];
+                }else {
+                    $value['criteria_of_teach'] = null;
+                }
+
+                
 
                 unset($value['subject']['course_of_study']['criteria_of_teach']);
 
