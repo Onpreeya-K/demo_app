@@ -30,7 +30,6 @@ class TermOfYearController
 
     public function create(Request $request, Response $response, $args)
     {
-        echo "dfdfdfd";
         $data = $request->getParsedBody();
         $termOfYear = $this->termOfYearService->createTermOfYear($data);
         $response->getBody()->write(json_encode($termOfYear));
