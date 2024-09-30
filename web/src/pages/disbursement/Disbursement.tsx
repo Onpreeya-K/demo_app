@@ -543,14 +543,19 @@ const DisbursementPage = () => {
         }
 
         if (teacherRate && sumAcceptDisburse && sumRejectDisburse) {
-            const checkSumDisburse =
-                Number(sumAcceptDisburse) > teacherRate.criteria_of_process.min_unit &&
-                Number(sumAcceptDisburse) < teacherRate.criteria_of_process.max_unit;
-            if (!checkSumDisburse) {
+            if (Number(sumAcceptDisburse) > teacherRate.criteria_of_process.max_unit) {
+                // เบิกได้มากกว่า max unit
                 setTypePopupAlert('WARNING');
                 setIsOpenPopupAlert(true);
                 setMessagePopupAlert(
-                    `กรุณาระบุหน่วยกิตระหว่าง ${teacherRate.criteria_of_process.min_unit} ถึง ${teacherRate.criteria_of_process.max_unit}`
+                    `กรุณาระบุหน่วยกิตเบิกได้ไม่เกิน ${teacherRate.criteria_of_process.max_unit}`
+                );
+                return;
+            } else if (Number(sumRejectDisburse) < teacherRate.criteria_of_process.min_unit) {
+                setTypePopupAlert('WARNING');
+                setIsOpenPopupAlert(true);
+                setMessagePopupAlert(
+                    `กรุณาระบุหน่วยกิตเบิกไม่ได้มากกว่า ${teacherRate.criteria_of_process.min_unit}`
                 );
                 return;
             }
