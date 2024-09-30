@@ -42,15 +42,13 @@ class ScheduleTeachService
                     return $item['level_id'] == $level_id;
                 });
 
-                if (!empty($filtered_criteria_of_teach[0])){
+                if (!empty($filtered_criteria_of_teach)){
                     $value['criteria_of_teach'] = $filtered_criteria_of_teach[0];
+                    unset($value['subject']['course_of_study']['criteria_of_teach']);
                 }else {
-                    $value['criteria_of_teach'] = null;
+                    $value['criteria_of_teach'] = "0";
                 }
-
                 
-
-                unset($value['subject']['course_of_study']['criteria_of_teach']);
 
                 $course_of_study = $value['subject']['course_of_study'];
                 $value['course_of_study'] = $course_of_study;

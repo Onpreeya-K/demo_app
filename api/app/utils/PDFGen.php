@@ -3,6 +3,7 @@
 namespace App\Utils;
 
 use TCPDF;
+require 'BathText.php';
 
 class PDFGen
 {
@@ -119,7 +120,7 @@ class PDFGen
         $this->pdf->Cell($cellWidth[1], 4, "เบิกจากคณะศึกษาศาสตร์", 0, 0, 'L');
         $this->pdf->Cell(60, 4, "ข้าพเจ้าได้รับเงินจำนวน", 0, 0, 'L');
         $this->pdf->Cell(30, 4, $this->strToNumber($this->data['total']) ."  บาท", 0, 0, 'L');
-        $this->pdf->Cell(80, 4, "หกพันห้าร้อยบาทถ้วน", 0, 0, 'L');
+        $this->pdf->Cell(80, 4, baht_text($this->data['total']), 0, 0, 'L');
         $this->pdf->Cell(20, 4, "ไว้เรียบร้อยแล้ว", 0, 0, 'L');
         $this->pdf->Ln();
         $this->pdf->Ln();
@@ -134,7 +135,7 @@ class PDFGen
         $this->pdf->MultiCell(50, 0, "ได้ตรวจสอบภาระงานสอน\nครบถ้วนเป็นไปตามประกาศที่\nมหาวิทยาลัยกำหนด\n\n\n   ลงชื่อ.......................................\n\nเจ้าหน้าที่การเงิน", 1, 'J', false, 0);
         $this->pdf->MultiCell(47, 0, "ขอรับรองว่าผู้เบิกส่งเกรดและ\nมคอ.5รายวิชาคณะฯครบ\n\n\n\n  ลงชื่อ.......................................\n\nฝ่ายวิชาการ", 1, 'J', false, 0);
         $this->pdf->MultiCell(45, 0, "รายวิชาข้างต้นถูกต้องตามที่ได้จัด\nการเรียนการสอน\n\n\n\n ลงชื่อ.......................................\n\nรองคณบดี", 1, 'J', false, 0);
-        $this->pdf->MultiCell(64, 0, "\n\n\n\n   ลงชื่อ.......................................ผู้อนุมัติ\n\n\nคณบดี", 1, 'J', false, 0);
+        $this->pdf->MultiCell(64, 0, "\n\n\n\n\n   ลงชื่อ.......................................ผู้อนุมัติ\n\nคณบดี", 1, 'J', false, 0);
     }
 
 
@@ -207,7 +208,7 @@ class PDFGen
     private function pageNumber(){
         $this->pdf->SetXY(0,1);
         $this->pdf->SetFont('thsarabun', 'I', 10);
-        $this->pdf->Cell(300, 10, 'Page  ' . $this->pdf->getAliasNumPage() . '/' . $this->pdf->getAliasNbPages(), 0, 0, 'R');
+        $this->pdf->Cell(305, 10, $this->data['teacher_name']. ' หน้า  ' . $this->pdf->getAliasNumPage() . '/' . $this->pdf->getAliasNbPages(), 0, 0, 'R');
         $this->pdf->Ln();
     }
 }
