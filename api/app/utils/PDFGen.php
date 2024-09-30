@@ -28,7 +28,7 @@ class PDFGen
     public function updatePDF()
     {
 
-        
+        $this->pageNumber();
         $this->textHead($this->data['term_of_year']);
         $this->textTeacherDetail();
         $this->bodyDetail();
@@ -67,6 +67,13 @@ class PDFGen
         
         $this->pdf->SetFont('thsarabun_b', 'B', 14);
         $this->bodyCalRate($cellWidth);
+
+        if ($this->pdf->GetY() > 50) { // 260 is an arbitrary limit for this example
+            $this->pdf->AddPage();
+            $this->pageNumber();
+            $this->pdf->SetFont('thsarabun_b', 'B', 14);
+        }
+
         $this->detailDisbursement($cellWidth);
         $this->detailSignature();
     }
@@ -196,5 +203,11 @@ class PDFGen
             return $text;
         }
         return number_format((float)$text, 2, '.', ',');
+    }
+    private function pageNumber(){
+        $this->pdf->SetXY(0,1);
+        $this->pdf->SetFont('thsarabun', 'I', 10);
+        $this->pdf->Cell(300, 10, 'Page  ' . $this->pdf->getAliasNumPage() . '/' . $this->pdf->getAliasNbPages(), 0, 0, 'R');
+        $this->pdf->Ln();
     }
 }
