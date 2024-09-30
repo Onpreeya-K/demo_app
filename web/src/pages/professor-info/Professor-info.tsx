@@ -240,9 +240,9 @@ const ProfessorInfoPage = () => {
             setOpenDialog(false);
             if (modalAction === 'CREATE') {
                 const payload = {
-                    teacher_id: form.teacher_id,
-                    prefix: form.prefix,
-                    fullname: form.fullname,
+                    teacher_id: form.teacher_id.trim(),
+                    prefix: form.prefix.trim(),
+                    fullname: form.fullname.trim(),
                     a_id: form.academic_position?.a_id,
                     m_id: form.management_position?.m_id,
                 };
@@ -257,9 +257,9 @@ const ProfessorInfoPage = () => {
                 }
             } else {
                 const payload = {
-                    teacher_id: form.teacher_id,
-                    prefix: form.prefix,
-                    fullname: form.fullname,
+                    teacher_id: form.teacher_id.trim(),
+                    prefix: form.prefix.trim(),
+                    fullname: form.fullname.trim(),
                     a_id: form.academic_position?.a_id,
                     m_id: form.management_position?.m_id,
                 };
@@ -276,12 +276,15 @@ const ProfessorInfoPage = () => {
             console.log('Form has errors.');
         }
     };
-
-    const onChangeSaleOwnerAndRefer = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const replaceRegExp = (key: any) => {
+        return key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    };
+    const onChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         if (value) {
-            let filter = teacherAll.filter(
-                (item) => item.fullname.includes(value) || item.teacher_id.includes(value)
+            const keywords = replaceRegExp(value);
+            const filter = teacherAll.filter((item) =>
+                new RegExp(keywords, 'i').test(item.fullname + item.teacher_id)
             );
             setDataTable(filter);
         } else {
@@ -326,7 +329,7 @@ const ProfessorInfoPage = () => {
                     </IconButton>
                 </DialogTitle>
                 <DialogContent sx={{ padding: 3 }}>
-                    <Grid container spacing={2} paddingTop={1}>
+                    <Grid container rowSpacing={3} paddingTop={1}>
                         <Grid item xs={12}>
                             <TextField
                                 required
@@ -466,7 +469,7 @@ const ProfessorInfoPage = () => {
                             size="small"
                             label="ค้นหารายชื่อ"
                             variant="outlined"
-                            onChange={onChangeSaleOwnerAndRefer}
+                            onChange={onChangeSearch}
                         />
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -530,7 +533,7 @@ const ProfessorInfoPage = () => {
                                                     <EditIcon fontSize="inherit" />
                                                 </IconButton>
                                             </Tooltip>
-                                            <Tooltip title="แก้ไข" placement="top">
+                                            <Tooltip title="รีเซ็ตรหัสผ่าน" placement="top">
                                                 <IconButton
                                                     size="small"
                                                     onClick={() => onClickResetPassword(row)}

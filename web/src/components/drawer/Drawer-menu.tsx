@@ -39,6 +39,7 @@ import { updatePassword } from '../../services/User-service';
 import { getDataProfessor, getRoleUser } from '../../util/Util';
 import PopupAlert from '../popupAlert/Popup-Alert';
 import PopupError from '../popupAlert/Popup-Error';
+import { MdSubject } from 'react-icons/md';
 
 const drawerWidth = 240;
 
@@ -149,9 +150,12 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
             if (getRoleUser() === appConfig.role.ADMIN) {
                 return true;
             } else {
-                return !['PROFESSOR-INFO', 'CRITERIA-OF-TEACH', 'CRITERIA-PROCESS'].includes(
-                    menu.key
-                );
+                return ![
+                    'PROFESSOR-INFO',
+                    'SUBJECT-INFO',
+                    'CRITERIA-OF-TEACH',
+                    'CRITERIA-PROCESS',
+                ].includes(menu.key);
             }
         });
         return (
@@ -167,6 +171,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                             <ListItemIcon>
                                 {item.key === 'PROFESSOR-INFO' && <PiUserListBold color="#FFF" />}
                                 {item.key === 'CLASS_SCHEDULE' && <BsTable color="#FFF" />}
+                                {item.key === 'SUBJECT-INFO' && <MdSubject color="#FFF" />}
                                 {item.key === 'DISBURSEMENT' && <GiReceiveMoney color="#FFF" />}
                                 {item.key === 'CRITERIA-OF-TEACH' && (
                                     <MdOutlineCalculate color="#FFF" />
@@ -585,7 +590,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                             padding: '20px 0px 20px 0px',
                         }}
                     >
-                        <Typography variant="subtitle2" noWrap component="div" color="#FFFFFF">
+                        <Typography variant="subtitle1" noWrap component="div" color="#FFFFFF">
                             {getNameFromSession()}
                         </Typography>
                         <AccountCircleIcon
@@ -593,8 +598,14 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                                 fontSize: 50,
                                 color: '#FFFFFF',
                             }}
-                            onClick={onClickViewInfo}
                         />
+                        <Button
+                            fullWidth
+                            sx={{ marginTop: 1, color: '#FFFFFF' }}
+                            onClick={onClickViewInfo}
+                        >
+                            ข้อมูลส่วนตัว
+                        </Button>
                     </Box>
                     <Divider sx={{ borderColor: '#FFFFFF' }} />
                     {drawerListMenu()}
@@ -659,7 +670,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                             padding: '20px 0px 20px 0px',
                         }}
                     >
-                        <Typography variant="subtitle2" noWrap component="div" color="#FFFFFF">
+                        <Typography variant="subtitle1" noWrap component="div" color="#FFFFFF">
                             {getNameFromSession()}
                         </Typography>
                         <AccountCircleIcon
@@ -667,8 +678,14 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
                                 fontSize: 50,
                                 color: '#FFFFFF',
                             }}
-                            onClick={onClickViewInfo}
                         />
+                        <Button
+                            fullWidth
+                            sx={{ marginTop: 1, color: '#FFFFFF' }}
+                            onClick={onClickViewInfo}
+                        >
+                            ข้อมูลส่วนตัว
+                        </Button>
                     </Box>
                     <Divider sx={{ borderColor: '#FFFFFF' }} />
                     {drawerListMenu()}

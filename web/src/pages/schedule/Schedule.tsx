@@ -313,6 +313,11 @@ const SchedulePage = () => {
         }
     };
 
+    const formatUnitTotal = (unitTotal: string) => {
+        const formatted = unitTotal.replace(/\s/g, '').replace(/(\d+)\(/, '$1 (');
+        return formatted;
+    };
+
     const extractRowsFromWorksheet = (
         worksheet: XLSX.WorkSheet,
         xlsxData: MapData
@@ -330,13 +335,18 @@ const SchedulePage = () => {
             xlsxData.major.length
         );
         for (let i = 0; i < maxLength + 3; i++) {
+            const unitItem =
+                worksheet[xlsxData.courseUnit[i]] &&
+                !isNullOrUndefined(worksheet[xlsxData.courseUnit[i]].v)
+                    ? formatUnitTotal(worksheet[xlsxData.courseUnit[i]].v)
+                    : '';
             const row: ScheduleRow = {
                 schedule_teach_id: i,
                 level_id: worksheet[xlsxData.levelId[i]]?.v || '',
                 course_code: worksheet[xlsxData.courseCode[i]]?.v || '',
                 section: worksheet[xlsxData.sec[i]]?.v || '',
                 course_name: worksheet[xlsxData.courseNameEng[i]]?.v || '',
-                course_unit: worksheet[xlsxData.courseUnit[i]]?.v || '',
+                course_unit: unitItem && !isNullOrUndefined(unitItem) ? unitItem : '',
                 total_seat: worksheet[xlsxData.totalSeat[i]]?.v || '',
                 enroll_seat: worksheet[xlsxData.enrollSeat[i]]?.v?.toString() || '',
                 teach_date: worksheet[xlsxData.date[i]]?.v || '',
@@ -713,29 +723,20 @@ const SchedulePage = () => {
                         style={{
                             height: '100%',
                             width: '100%',
-                            // height:
-                            //     boxHeaderHeight && boxUserSectionTermHeight
-                            //         ? `calc(100vh - ${boxHeaderHeight}px - ${boxUserSectionTermHeight}px - 16px)`
-                            //         : '100%',
-                            // width:
-                            //     window?.innerWidth > 1024
-                            //         ? `calc(100vw - 272px)`
-                            //         : `calc(100vw - 32px)`,
                         }}
                     >
                         <TableContainer component={Paper}>
                             <Table>
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell align="center">Level ID</TableCell>
-                                        <TableCell align="center">Course Code</TableCell>
-                                        <TableCell align="center">Section</TableCell>
-                                        <TableCell align="center">Course Name</TableCell>
-                                        <TableCell align="center">Course Unit</TableCell>
-                                        <TableCell align="center">Total Seat</TableCell>
-                                        <TableCell align="center">Enroll Seat</TableCell>
-                                        <TableCell align="center">Date</TableCell>
-                                        <TableCell align="center">Major</TableCell>
+                                        <TableCell align="center">รหัสวิชา</TableCell>
+                                        <TableCell align="center">กลุ่ม</TableCell>
+                                        <TableCell align="center">รายวิชา</TableCell>
+                                        <TableCell align="center">หน่วยกิต</TableCell>
+                                        <TableCell align="center">จำนวนที่นั่งทั้งหมด</TableCell>
+                                        <TableCell align="center">จำนวนนิสิตลงทะเบียน</TableCell>
+                                        <TableCell align="center">เวลาเรียน </TableCell>
+                                        <TableCell align="center">หมายเหตุ</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -743,12 +744,6 @@ const SchedulePage = () => {
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row) => (
                                             <TableRow key={row.schedule_teach_id}>
-                                                <TableCell
-                                                    align="center"
-                                                    sx={{ minWidth: '100px' }}
-                                                >
-                                                    {row.level_id}
-                                                </TableCell>
                                                 <TableCell
                                                     align="center"
                                                     sx={{ minWidth: '120px' }}
@@ -810,9 +805,9 @@ const SchedulePage = () => {
                                 onPageChange={handleChangePage}
                                 onRowsPerPageChange={handleChangeRowsPerPage}
                                 labelDisplayedRows={({ from, to, count }) =>
-                                    `Showing ${from} to ${to} of ${count}`
+                                    `รายวิชาที่สอนตั้งแต่ ${from} ถึง ${to} จาก ${count}`
                                 }
-                                labelRowsPerPage="Rows per page"
+                                labelRowsPerPage="จำนวนรายวิชาที่สอนต่อหน้า"
                             />
                         </TableContainer>
                         {getRoleUser() === appConfig.role.ADMIN &&

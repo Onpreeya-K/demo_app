@@ -12,6 +12,11 @@
             "link": "/professor-info"
         },
         {
+            "key": "SUBJECT-INFO",
+            "name": "ข้อมูลรายวิชา",
+            "link": "/subject-info"
+        },
+        {
             "key": "CLASS_SCHEDULE",
             "name": "ตารางสอน",
             "link": "/schedule"

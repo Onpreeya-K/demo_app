@@ -22,15 +22,3 @@ export async function getAllLavel() {
         return null;
     }
 }
-
-export async function getAllSubject() {
-    const urlEndpoint = `/subject`;
-    const header = generateHeader();
-
-    try {
-        return ServiceUtil.callApi(urlEndpoint, header, {}, {}, METHOD_TYPE.GET);
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-}

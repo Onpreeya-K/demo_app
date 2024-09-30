@@ -268,6 +268,9 @@ const DisbursementPage = () => {
             ...prev,
             professor: opt,
         }));
+        setDataSchedule([]);
+        setDisburseScheduleData(null);
+        setStatus('');
     };
 
     const fetchTerm = async () => {
@@ -653,13 +656,19 @@ const DisbursementPage = () => {
     };
 
     const isAcceptDisburseError = (value: ScheduleTeach) => {
-        const sumDisburse = Number(value.accept_disburse) + Number(value.reject_disburse || 0);
-        return value.accept_disburse !== '' && sumDisburse > Number(value.subject.unit);
+        const sumDisburse = Number(value.accept_disburse || 0) + Number(value.reject_disburse || 0);
+        return (
+            (value.accept_disburse !== '' && sumDisburse > Number(value.subject.unit)) ||
+            (value.accept_disburse !== '' && sumDisburse > Number(value.teacher_unit))
+        );
     };
 
     const isRejectDisburseError = (value: ScheduleTeach) => {
         const sumDisburse = Number(value.accept_disburse || 0) + Number(value.reject_disburse);
-        return value.reject_disburse !== '' && sumDisburse > Number(value.subject.unit);
+        return (
+            (value.reject_disburse !== '' && sumDisburse > Number(value.subject.unit)) ||
+            (value.reject_disburse !== '' && sumDisburse > Number(value.teacher_unit))
+        );
     };
 
     const validateRow = (schedule_teach_id: number, data: ScheduleTeach[]) => {
