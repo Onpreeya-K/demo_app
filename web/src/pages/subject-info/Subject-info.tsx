@@ -163,14 +163,26 @@ const SubjectInfoPage = () => {
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setForm({
-            ...form,
-            [name]: value,
-        });
-        setErrors({
-            ...errors,
-            [name]: !value,
-        });
+        if (name === 'unit') {
+            const isValidFormat = /^[0-9]+\s{0,2}\(\d-\d-\d\)$/.test(value);
+            setForm((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+            setErrors((prev) => ({
+                ...prev,
+                [name]: !isValidFormat,
+            }));
+        } else {
+            setForm({
+                ...form,
+                [name]: value,
+            });
+            setErrors({
+                ...errors,
+                [name]: !value,
+            });
+        }
     };
 
     const onChangeAutocompleteCourseOfStudy = (option: CourseOfStudy | null) => {
@@ -229,26 +241,33 @@ const SubjectInfoPage = () => {
     };
 
     const validate = () => {
+        // Regular Expression to validate format x(x-x-x) or x (x-x-x)
+        const isValidUnitFormat = /^[0-9]+\s{0,2}\(\d-\d-\d\)$/.test(form.unit.trim());
+        console.log('!isValidUnitFormat :: ', !isValidUnitFormat);
+
         const tempErrors: ErrorState = {
             subject_id: form.subject_id.trim() === '',
             name: form.name.trim() === '',
-            unit: form.unit.trim() === '',
+            unit: form.unit.trim() === '' || !isValidUnitFormat,
             course_of_study: !form.course_of_study,
         };
+
         setErrors(tempErrors);
         return Object.values(tempErrors).every((x) => x === false);
     };
 
     const parseUnitTotal = (unitTotal: string) => {
         const cleanedUnitTotal = unitTotal.replace(/\s/g, '');
-        const match = cleanedUnitTotal.match(/^(\d+)\((.+)\)$/);
+        const match = cleanedUnitTotal.match(/^(\d+)\((\d-\d-\d)\)$/);
         if (match) {
-            const [unit, type] = match;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const [_, unit, type] = match;
             return {
                 unit: parseInt(unit, 10),
                 type: `(${type})`,
             };
         }
+
         return null;
     };
 
@@ -436,7 +455,7 @@ const SubjectInfoPage = () => {
                                 inputProps={{
                                     onInput: (event: any) => {
                                         event.target.value = event.target.value.replace(
-                                            /[^0-9-()]/g,
+                                            /[^0-9-() ]/g,
                                             ''
                                         );
                                     },
