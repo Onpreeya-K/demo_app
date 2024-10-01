@@ -770,7 +770,7 @@ const DisbursementPage = () => {
                             </TableCell>
                             {/* กลุ่มคอลัมน์สำหรับ "เบิก" */}
                             <TableCell align="center" colSpan={2}>
-                                เบิก
+                                หน่วยกิตที่ขอเบิก
                             </TableCell>
                             <TableCell align="center" rowSpan={2}>
                                 เวลาเรียน
@@ -793,8 +793,8 @@ const DisbursementPage = () => {
                         </TableRow>
                         {/* แถวสำหรับคอลัมน์ "ได้" และ "ไม่ได้" */}
                         <TableRow>
-                            <TableCell align="center">ได้</TableCell>
-                            <TableCell align="center">ไม่ได้</TableCell>
+                            <TableCell align="center">เบิก</TableCell>
+                            <TableCell align="center">ไม่เบิก</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -1139,7 +1139,7 @@ const DisbursementPage = () => {
                             </TableCell>
                             {/* กลุ่มคอลัมน์สำหรับ "เบิก" */}
                             <TableCell align="center" colSpan={2}>
-                                เบิก
+                                หน่วยกิตที่ขอเบิก
                             </TableCell>
                             <TableCell align="center" rowSpan={2}>
                                 เวลาเรียน
@@ -1162,8 +1162,8 @@ const DisbursementPage = () => {
                         </TableRow>
                         {/* แถวสำหรับคอลัมน์ "ได้" และ "ไม่ได้" */}
                         <TableRow>
-                            <TableCell align="center">ได้</TableCell>
-                            <TableCell align="center">ไม่ได้</TableCell>
+                            <TableCell align="center">เบิก</TableCell>
+                            <TableCell align="center">ไม่เบิก</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
