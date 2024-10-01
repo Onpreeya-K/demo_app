@@ -96,8 +96,6 @@ export async function deleteCriteraiProcess(param: any) {
 }
 
 export async function updateCriteriaOfTeach(criteriaOfTeachID: number, data: any) {
-    console.log('criteriaOfTeachID :: ', criteriaOfTeachID);
-
     const urlEndpoint = `/criteriaOfTeach`;
     const header = generateHeader();
 

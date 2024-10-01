@@ -13,8 +13,6 @@ const FileDropZone: React.FC<Props> = ({ onFileDrop, children }) => {
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         const fileList = event.dataTransfer.files;
-        console.log('fileList :: ',fileList);
-        
         if (fileList && fileList.length > 0) {
             const droppedFile = fileList[0];
             onFileDrop(droppedFile);

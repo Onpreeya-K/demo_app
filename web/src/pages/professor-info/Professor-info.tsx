@@ -236,44 +236,48 @@ const ProfessorInfoPage = () => {
     };
 
     const onSubmitAddProfessor = async () => {
-        if (validate()) {
-            setOpenDialog(false);
-            if (modalAction === 'CREATE') {
-                const payload = {
-                    teacher_id: form.teacher_id.trim(),
-                    prefix: form.prefix.trim(),
-                    fullname: form.fullname.trim(),
-                    a_id: form.academic_position?.a_id,
-                    m_id: form.management_position?.m_id,
-                };
-                const response = await createTeacher(payload);
-                if (response && response.message === 'Success') {
-                    setIsOpenPopupAlert(true);
-                    setModalAction('');
-                    setMessagePopupAlert('เพิ่มรายชื่ออาจารย์สำเร็จ');
-                    clearForm();
-                    fetchData();
-                    setOpenDialog(false);
+        try {
+            if (validate()) {
+                setOpenDialog(false);
+                if (modalAction === 'CREATE') {
+                    const payload = {
+                        teacher_id: form.teacher_id.trim(),
+                        prefix: form.prefix.trim(),
+                        fullname: form.fullname.trim(),
+                        a_id: form.academic_position?.a_id,
+                        m_id: form.management_position?.m_id,
+                    };
+                    const response = await createTeacher(payload);
+                    if (response && response.message === 'Success') {
+                        setIsOpenPopupAlert(true);
+                        setModalAction('');
+                        setMessagePopupAlert('เพิ่มรายชื่ออาจารย์สำเร็จ');
+                        clearForm();
+                        fetchData();
+                        setOpenDialog(false);
+                    }
+                } else {
+                    const payload = {
+                        teacher_id: form.teacher_id.trim(),
+                        prefix: form.prefix.trim(),
+                        fullname: form.fullname.trim(),
+                        a_id: form.academic_position?.a_id,
+                        m_id: form.management_position?.m_id,
+                    };
+                    const response = await updateTeacher(form.teacher_id, payload);
+                    if (response && response.message === 'Success') {
+                        setIsOpenPopupAlert(true);
+                        setModalAction('');
+                        setMessagePopupAlert('แก้ไขรายชื่ออาจารย์สำเร็จ');
+                        clearForm();
+                        fetchData();
+                    }
                 }
             } else {
-                const payload = {
-                    teacher_id: form.teacher_id.trim(),
-                    prefix: form.prefix.trim(),
-                    fullname: form.fullname.trim(),
-                    a_id: form.academic_position?.a_id,
-                    m_id: form.management_position?.m_id,
-                };
-                const response = await updateTeacher(form.teacher_id, payload);
-                if (response && response.message === 'Success') {
-                    setIsOpenPopupAlert(true);
-                    setModalAction('');
-                    setMessagePopupAlert('แก้ไขรายชื่ออาจารย์สำเร็จ');
-                    clearForm();
-                    fetchData();
-                }
+                console.log('Form has errors.');
             }
-        } else {
-            console.log('Form has errors.');
+        } catch (error) {
+            console.error('error ---> ', error);
         }
     };
     const replaceRegExp = (key: any) => {

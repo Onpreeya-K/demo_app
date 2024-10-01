@@ -82,6 +82,7 @@ const TermPage = () => {
     const onCloseDialog = () => {
         setTerm('');
         setTermId(null);
+        setErrorTerm(false);
         setOpenDialog(false);
     };
 
@@ -166,6 +167,14 @@ const TermPage = () => {
                                 onChange={onChangeTerm}
                                 error={errorTerm}
                                 helperText={errorTerm && 'กรุณาระบุปีการศึกษา'}
+                                inputProps={{
+                                    onInput: (event: any) => {
+                                        event.target.value = event.target.value.replace(
+                                            /[^0-9-/]/g,
+                                            ''
+                                        );
+                                    },
+                                }}
                             />
                             <FormHelperText>
                                 กรุณากรอกปีการศึกษาในรูปแบบ x/(ปี พ.ศ.) เช่น 1/2567 หรือ 2/2567

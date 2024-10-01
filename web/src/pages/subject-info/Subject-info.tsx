@@ -126,21 +126,7 @@ const SubjectInfoPage = () => {
             if (responseCourseOfStudy && responseCourseOfStudy.message === 'Success') {
                 setCourseOfStudyList(responseCourseOfStudy.payload);
                 await fetchSubject();
-                // const response = await getAllSubject();
-                // if (response && response.message === 'Success') {
-                //     console.log('response :: ', response);
-                //     setSubjectAll(response.payload);
-                //     setSubjectData(response.payload);
-                // }
             }
-            // const responseManagementPosition = await getManagementPosition();
-            // if (responseManagementPosition && responseManagementPosition.message === 'Success') {
-            //     setOptionManagementPosition(responseManagementPosition.payload);
-            // }
-            // const responseAcademicPosition = await getAcademicPosition();
-            // if (responseAcademicPosition && responseAcademicPosition.message === 'Success') {
-            //     setOptionAcademicPosition(responseAcademicPosition.payload);
-            // }
         } catch (error: any) {
             console.error('Error:', error);
         }
@@ -243,8 +229,6 @@ const SubjectInfoPage = () => {
     const validate = () => {
         // Regular Expression to validate format x(x-x-x) or x (x-x-x)
         const isValidUnitFormat = /^[0-9]+\s{0,2}\(\d-\d-\d\)$/.test(form.unit.trim());
-        console.log('!isValidUnitFormat :: ', !isValidUnitFormat);
-
         const tempErrors: ErrorState = {
             subject_id: form.subject_id.trim() === '',
             name: form.name.trim() === '',
@@ -272,52 +256,56 @@ const SubjectInfoPage = () => {
     };
 
     const onSubmitDialogSubject = async () => {
-        if (validate()) {
-            setOpenDialog(false);
-            if (modalAction === 'CREATE') {
-                const unitAndType = parseUnitTotal(form.unit.trim());
-                const payload = {
-                    subject_id: form.subject_id.trim(),
-                    name: form.name.trim(),
-                    unit: unitAndType?.unit,
-                    type: unitAndType?.type,
-                    course_of_study_id: form.course_of_study
-                        ? form.course_of_study.course_of_study_id
-                        : '',
-                };
-                const response = await createSubject(payload);
-                if (response && response.message === 'Success') {
-                    setIsOpenPopupAlert(true);
-                    setModalAction('');
-                    setMessagePopupAlert('เพิ่มรายวิชาสำเร็จ');
-                    clearForm();
-                    await fetchSubject();
-                    setOpenDialog(false);
+        try {
+            if (validate()) {
+                setOpenDialog(false);
+                if (modalAction === 'CREATE') {
+                    const unitAndType = parseUnitTotal(form.unit.trim());
+                    const payload = {
+                        subject_id: form.subject_id.trim(),
+                        name: form.name.trim(),
+                        unit: unitAndType?.unit,
+                        type: unitAndType?.type,
+                        course_of_study_id: form.course_of_study
+                            ? form.course_of_study.course_of_study_id
+                            : '',
+                    };
+                    const response = await createSubject(payload);
+                    if (response && response.message === 'Success') {
+                        setIsOpenPopupAlert(true);
+                        setModalAction('');
+                        setMessagePopupAlert('เพิ่มรายวิชาสำเร็จ');
+                        clearForm();
+                        await fetchSubject();
+                        setOpenDialog(false);
+                    }
+                } else {
+                    const unitAndType = parseUnitTotal(form.unit.trim());
+                    const subject_id = form.subject_id.trim();
+                    const payload = {
+                        subject_id: subject_id,
+                        name: form.name.trim(),
+                        course_of_study_id: form.course_of_study
+                            ? form.course_of_study.course_of_study_id
+                            : '',
+                        unit: unitAndType?.unit,
+                        type: unitAndType?.type,
+                    };
+
+                    const response = await updateSubject(subject_id, payload);
+                    if (response && response.message === 'Success') {
+                        setIsOpenPopupAlert(true);
+                        setModalAction('');
+                        setMessagePopupAlert('แก้ไขรายวิชาสำเร็จ');
+                        clearForm();
+                        await fetchSubject();
+                    }
                 }
             } else {
-                const unitAndType = parseUnitTotal(form.unit.trim());
-                const subject_id = form.subject_id.trim();
-                const payload = {
-                    subject_id: subject_id,
-                    name: form.name.trim(),
-                    course_of_study_id: form.course_of_study
-                        ? form.course_of_study.course_of_study_id
-                        : '',
-                    unit: unitAndType?.unit,
-                    type: unitAndType?.type,
-                };
-
-                const response = await updateSubject(subject_id, payload);
-                if (response && response.message === 'Success') {
-                    setIsOpenPopupAlert(true);
-                    setModalAction('');
-                    setMessagePopupAlert('แก้ไขรายวิชาสำเร็จ');
-                    clearForm();
-                    await fetchSubject();
-                }
+                console.log('Form has errors.');
             }
-        } else {
-            console.log('Form has errors.');
+        } catch (error) {
+            console.error('error ---> ', error);
         }
     };
 

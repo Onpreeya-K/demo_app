@@ -561,7 +561,6 @@ const DisbursementPage = () => {
             }
         }
         if (!hasError) {
-            console.log('Form submitted!');
             setMessagePopupConfirm('ต้องการยืนยันส่งข้อมูลเบิกค่าสอน ?');
             setIsOpenPopupConfirm(true);
         }
