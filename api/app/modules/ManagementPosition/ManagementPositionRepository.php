@@ -24,11 +24,11 @@ class ManagementPositionRepository
 
     public function updateManagementPosition($id, $data)
     {
-        return ManagementPosition::where('criteria_of_teach_id', $id)->update($data);
+        return ManagementPosition::where('m_id', $id)->update($data);
     }
 
     public function deleteManagementPosition($id)
     {
-        return ManagementPosition::where('criteria_of_teach_id', $id)->delete();
+        return ManagementPosition::where('m_id', $id)->delete();
     }
 }

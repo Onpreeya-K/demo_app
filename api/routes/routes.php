@@ -140,7 +140,7 @@ $app->group('/criteriaOfProcess', function (Group $group) {
 
 $app->group('/managementPosition', function (Group $group) {
     $group->get('', ManagementPositionController::class . ':fetch');
-    $group->get('/{id}', ManagementPositionController::class . ':fetchByID');
+    $group->get('/{id}', ManagementPositionController::class . ':fetchManagementPositionByID');
     $group->post('', ManagementPositionController::class . ':create');
     $group->put('/{id}', ManagementPositionController::class . ':update');
     $group->delete('/{id}', ManagementPositionController::class . ':delete');

@@ -48,9 +48,9 @@ class PDFGen
     {
         $this->pdf->SetFont('thsarabun_b', 'B', 14);
         $this->pdf->Write(h: 0, txt: "1. คำขอเบิก",ln: true);
-        $this->pdf->Cell(w: 93, h: 0, txt: "ข้าพเจ้า         " . $this->data['teacher_name']);
-        $this->pdf->Cell(w: 50, h: 0, txt: "ตำแหน่ง  " . $this->data['academic_position']);
-        $this->pdf->Cell(w: 80, h: 0, txt: "ตำแหน่ง  " . $this->data['management_position']);
+        $this->pdf->Cell(w: 75, h: 0, txt: "ข้าพเจ้า         " . $this->data['teacher_name']);
+        $this->pdf->Cell(w: 65, h: 0, txt: "ตำแหน่งทางวิชาการ  " . $this->data['academic_position']);
+        $this->pdf->Cell(w: 80, h: 0, txt: "ตำแหน่งบริหาร  " . $this->data['management_position']);
         $this->pdf->Ln();
         $this->pdf->Write(h: 0, txt: "สังกัด            คณะศึกษาศาสตร์ มหาวิทยาลัยมหาสารคาม ตำบลตลาด อำเภอเมือง จังหวัดมหาสารคาม 44000",  ln: true, );
         $this->pdf->Write(h: 0, txt: "ขอเบิกเงินค่าตอบแทนการสอน (   ) อาจารย์ประจำ     (   ) อาจารย์พิเศษ", ln: true);
@@ -68,15 +68,18 @@ class PDFGen
         
         $this->pdf->SetFont('thsarabun_b', 'B', 14);
         $this->bodyCalRate($cellWidth);
+        $this->detailDisbursement($cellWidth);
 
-        if ($this->pdf->GetY() > 130) {
+        echo $this->pdf->GetY();
+
+        if ($this->pdf->GetY() > 158) {
             $this->pdf->AddPage();
             $this->pageNumber();
             $this->pdf->SetFont('thsarabun_b', 'B', 14);
             $this->pdf->Ln();
         }
 
-        $this->detailDisbursement($cellWidth);
+        
         $this->detailSignature();
     }
 

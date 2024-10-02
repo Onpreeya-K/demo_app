@@ -83,5 +83,5 @@ function baht_text ($number, $include_unit = true, $display_zero = true)
         }
     }
 
-    return $text;
+    return "($text)";
 }

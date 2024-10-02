@@ -20,7 +20,6 @@ class AuthMiddleware implements MiddlewareInterface
     }
     public function process(Request $request, RequestHandler $handler): Response
     {
-        // Check for the presence of an Authorization header
         $token = $request->getHeaderLine('Authorization');
         $response = new \Slim\Psr7\Response();
         if (!empty($token)) {
@@ -28,11 +27,9 @@ class AuthMiddleware implements MiddlewareInterface
             try {
                 $decoded = JWT::decode($token, new Key($this->secret, 'HS256'));
                 $request = $request->withAttribute('jwt', $decoded);
-                // If decoding successful, you can proceed with the request
                 return $handler->handle($request);
             } catch (\Exception $e) {
-                // If decoding fails, return unauthorized response
-                $message = array('message' => $e->getMessage());
+                $message = ['message' => $e->getMessage()];
                 $payload = json_encode($message);
                 $response->getBody()->write($payload);
                 return $response
@@ -40,7 +37,7 @@ class AuthMiddleware implements MiddlewareInterface
                     ->withStatus(401);
             }
         }else{
-            $message = array('message' => 'Token not found');
+            $message = ['message' => 'Token not found'];
                 $payload = json_encode($message);
                 $response->getBody()->write($payload);
 
@@ -49,7 +46,5 @@ class AuthMiddleware implements MiddlewareInterface
                     ->withStatus(401);
         }
 
-        // If the token is valid, proceed to the next middleware/route handler
-        // return $handler->handle($request);
     }
 }
