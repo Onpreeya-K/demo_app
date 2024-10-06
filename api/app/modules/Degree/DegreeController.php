@@ -5,6 +5,7 @@ namespace App\Modules\Degree;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use App\Utils\HelperResponse;
 class DegreeController
 {
     protected $degreeService;
@@ -16,37 +17,53 @@ class DegreeController
 
     public function fetch(Request $request, Response $response, $args)
     {
-        $degrees = $this->degreeService->getAllDegrees();
-        $response->getBody()->write(json_encode($degrees));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $degrees = $this->degreeService->getAllDegrees();
+            return HelperResponse::json($response, $degrees);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function fetchByID(Request $request, Response $response, $args)
     {
-        $degree = $this->degreeService->getDegreeById($args['id']);
-        $response->getBody()->write(json_encode($degree));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $degree = $this->degreeService->getDegreeById($args['id']);
+            return HelperResponse::json($response, $degree);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function create(Request $request, Response $response, $args)
     {
-        $data = $request->getParsedBody();
-        $degree = $this->degreeService->createDegree($data);
-        $response->getBody()->write(json_encode($degree));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $data = $request->getParsedBody();
+            $degree = $this->degreeService->createDegree($data);
+            return HelperResponse::json($response, $degree, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function update(Request $request, Response $response, $args)
     {
-        $data = $request->getParsedBody();
-        $degree = $this->degreeService->updateDegree($args['id'], $data);
-        $response->getBody()->write(json_encode($degree));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $data = $request->getParsedBody();
+            $degree = $this->degreeService->updateDegree($args['id'], $data);
+            return HelperResponse::json($response, $degree, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function delete(Request $request, Response $response, $args)
     {
-        $this->degreeService->deleteDegree($args['id']);
-        return $response->withStatus(204);
+        try {
+            $data = $this->degreeService->deleteDegree($args['id']);
+            return HelperResponse::json($response, $data, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 }

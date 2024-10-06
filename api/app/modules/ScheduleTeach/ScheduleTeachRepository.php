@@ -26,7 +26,6 @@ class ScheduleTeachRepository
 
     public function createScheduleTeach($data)
     {
-        
         return ScheduleTeach::create($data);
     }
 

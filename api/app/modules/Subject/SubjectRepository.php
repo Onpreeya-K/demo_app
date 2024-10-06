@@ -19,7 +19,6 @@ class SubjectRepository
 
     public function createSubject($data)
     {
-        
         return Subject::create($data);
     }
 

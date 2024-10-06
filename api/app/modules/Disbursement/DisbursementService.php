@@ -20,19 +20,35 @@ class DisbursementService
 
     public function getAllDisbursements()
     {
-        return $this->disbursementRepository->getAllDisbursements();
+        $disb =  $this->disbursementRepository->getAllDisbursements();
+        if (!$disb) {
+            throw new Exception(ErrorMessage::NO_DISBURSEMENT_FOUND, 404);
+        }
+        return $disb;
     }
 
     public function getDisbursementsById($Id){
-        return $this->disbursementRepository->getDisbursementByID($Id);
+        $disb = $this->disbursementRepository->getDisbursementByID($Id);
+        if (!$disb) {
+            throw new Exception(ErrorMessage::DISBURSEMENT_NOT_FOUND, 404);
+        }
+        return $disb;
     }
 
     public function getDisbursementsByTermOfYearId($termOfYearId){
-        return $this->disbursementRepository->getDisbursementByTermID($termOfYearId);
+        $disb =  $this->disbursementRepository->getDisbursementByTermID($termOfYearId);
+        if (!$disb) {
+            throw new Exception(ErrorMessage::NO_DISBURSEMENT_FOUND, 404);
+        }
+        return $disb;
     }
 
     public function getDisbursementsByTeacherId($teacherId){
-        return $this->disbursementRepository->getDisbursementByTeacherID($teacherId);
+        $disb =  $this->disbursementRepository->getDisbursementByTeacherID($teacherId);
+        if (!$disb) {
+            throw new Exception(ErrorMessage::NO_DISBURSEMENT_FOUND, 404);
+        }
+        return $disb;
     }
 
     public function getDisbursementsByTeacherIdAndTermOfYearId($teacherId, $termOfYearId){

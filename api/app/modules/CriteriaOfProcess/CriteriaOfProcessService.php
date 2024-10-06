@@ -2,6 +2,8 @@
 
 namespace App\Modules\CriteriaOfProcess;
 
+use Exception;
+use App\Constant\ErrorMessage;
 class CriteriaOfProcessService
 {
     protected $criteriaOfProcessRepository;
@@ -11,29 +13,48 @@ class CriteriaOfProcessService
         $this->criteriaOfProcessRepository = $criteriaOfProcessRepository;
     }
 
+    public function createCriteriaOfProcess($data)
+    {
+        $created =  $this->criteriaOfProcessRepository->createCriteriaOfProcess($data);
+        if (!$created) {
+            throw new Exception(ErrorMessage::CREATE_CRITERIA_OF_PROCESS_ERROR, 500);
+        }
+        return ["message" => ErrorMessage::CREATE_CRITERIA_OF_PROCESS_SUCCESS];
+    }
+
     public function getAllCriteriaOfProcesss()
     {
-        return $this->criteriaOfProcessRepository->getAllCriteriaOfProcesss();
+        $fetchAll = $this->criteriaOfProcessRepository->getAllCriteriaOfProcesss();
+        if (!$fetchAll) {
+            throw new Exception(ErrorMessage::CRITERIA_OF_PROCESS_NOT_FOUND, 404);
+        }
+        return $fetchAll;
     }
 
     public function getCriteriaOfProcessById($id)
     {
-        return $this->criteriaOfProcessRepository->getCriteriaOfProcessById($id);
-    }
-
-    public function createCriteriaOfProcess($data)
-    {
-        return $this->criteriaOfProcessRepository->createCriteriaOfProcess($data);
+        $criteriaOfProcess = $this->criteriaOfProcessRepository->getCriteriaOfProcessById($id);
+        if (!$criteriaOfProcess) {
+            throw new Exception(ErrorMessage::CRITERIA_OF_PROCESS_NOT_FOUND, 404);
+        }
+        return $criteriaOfProcess;
     }
 
     public function updateCriteriaOfProcess($id, $data)
     {
-        // $data->
-        return $this->criteriaOfProcessRepository->updateCriteriaOfProcess($id, $data);
+        $updated =  $this->criteriaOfProcessRepository->updateCriteriaOfProcess($id, $data);
+        if (!$updated) {
+            throw new Exception(ErrorMessage::UPDATE_CRITERIA_OF_PROCESS_ERROR, 500);
+        }
+        return ["message" => ErrorMessage::UPDATE_CRITERIA_OF_PROCESS_SUCCESS];
     }
 
     public function deleteCriteriaOfProcess($id)
     {
-        return $this->criteriaOfProcessRepository->deleteCriteriaOfProcess($id);
+        $deleted = $this->criteriaOfProcessRepository->deleteCriteriaOfProcess($id);
+        if (!$deleted) {
+            throw new Exception(ErrorMessage::DELETE_CRITERIA_OF_PROCESS_ERROR, 500);
+        }
+        return ["message" => ErrorMessage::DELETE_CRITERIA_OF_PROCESS_SUCCESS];
     }
 }

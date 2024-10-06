@@ -10,13 +10,13 @@ use App\Modules\Subject\Model\Subject;
 
 
 class CourseOfStudy extends Model {
-    protected $table = 'courseOfStudy'; // Table name
-    protected $primaryKey = 'course_of_study_id'; // Primary key column
-    protected $fillable = ['degree_id', 'department_id', 'name']; // Fillable columns
+    protected $table = 'courseOfStudy';
+    protected $primaryKey = 'course_of_study_id';
+    protected $fillable = ['degree_id', 'department_id', 'name'];
     protected $hidden = ['created_at', 'updated_at'];
     public $timestamps = true;
-    public $incrementing = true; // If primary key is not auto-incrementing
-    protected $keyType = 'int'; // If primary key is not an integer
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     public function degree() {
         return $this->belongsTo(Degree::class, 'degree_id');

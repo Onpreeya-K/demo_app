@@ -5,44 +5,69 @@ namespace App\Modules\CourseOfStudy;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-class CourseOfStudyController {
+use App\Utils\HelperResponse;
+
+class CourseOfStudyController
+{
     private $courseOfStudyService;
 
-    public function __construct(CourseOfStudyService $courseOfStudyService) {
+    public function __construct(CourseOfStudyService $courseOfStudyService)
+    {
         $this->courseOfStudyService = $courseOfStudyService;
     }
 
-    public function create(Request $request, Response $response) {
-        $data = $request->getParsedBody();
-        $courseOfStudy = $this->courseOfStudyService->createCourseOfStudy($data);
-        $response->getBody()->write(json_encode($courseOfStudy));
-        return $response->withHeader('Content-Type', 'application/json');
+    public function create(Request $request, Response $response)
+    {
+        try {
+            $data = $request->getParsedBody();
+            $courseOfStudy = $this->courseOfStudyService->createCourseOfStudy($data);
+            return HelperResponse::json($response, $courseOfStudy, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function fetch(Request $request, Response $response, $args)
     {
-        $courseOfStudy = $this->courseOfStudyService->getAllCourseOfStudys();
-        $response->getBody()->write(json_encode($courseOfStudy));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $courseOfStudy = $this->courseOfStudyService->getAllCourseOfStudys();
+            return HelperResponse::json($response, $courseOfStudy);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
-    public function fetchCourseOfStudyByID(Request $request, Response $response, $args) {
-        $courseOfStudyId = $args['id'];
-        $courseOfStudy = $this->courseOfStudyService->getCourseOfStudyById($courseOfStudyId);
-        return $response->withHeader('Content-Type', 'application/json');
+    public function fetchCourseOfStudyByID(Request $request, Response $response, $args)
+    {
+        try {
+            $courseOfStudyId = $args['id'];
+            $courseOfStudy = $this->courseOfStudyService->getCourseOfStudyById($courseOfStudyId);
+            return HelperResponse::json($response, $courseOfStudy);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
-    public function update(Request $request, Response $response, $args) {
-        $courseOfStudyId = $args['id'];
-        $data = $request->getParsedBody();
-        $courseOfStudy = $this->courseOfStudyService->updateCourseOfStudy($courseOfStudyId, $data);
-        $response->getBody()->write(json_encode($courseOfStudy));
-        return $response->withHeader('Content-Type', 'application/json');
+    public function update(Request $request, Response $response, $args)
+    {
+        try {
+            $courseOfStudyId = $args['id'];
+            $data = $request->getParsedBody();
+            $courseOfStudy = $this->courseOfStudyService->updateCourseOfStudy($courseOfStudyId, $data);
+            return HelperResponse::json($response, $courseOfStudy, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
-    public function delete(Request $request, Response $response, $args) {
-        $courseOfStudyId = $args['id'];
-        $this->courseOfStudyService->deleteCourseOfStudy($courseOfStudyId);
-        return $response->withStatus(204);
+    public function delete(Request $request, Response $response, $args)
+    {
+        try {
+            $courseOfStudyId = $args['id'];
+            $data = $this->courseOfStudyService->deleteCourseOfStudy($courseOfStudyId);
+            return HelperResponse::json($response,$data,  201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 }

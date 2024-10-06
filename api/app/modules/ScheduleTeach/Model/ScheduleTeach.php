@@ -11,13 +11,13 @@ use App\Modules\Subject\Model\Subject;
 use App\Modules\TermOfYear\Model\TermOfYear;
 
 class ScheduleTeach extends Model {
-    protected $table = 'scheduleTeach'; // Table name
-    protected $primaryKey = 'schedule_teach_id'; // Primary key column
-    protected $fillable = ['teacher_id', 'subject_id', 'level_id', 'term_of_year_id', 'section', 'course_code', 'teach_date', 'total_seat', 'enroll_seat', 'major_name']; // Fillable columns
+    protected $table = 'scheduleTeach';
+    protected $primaryKey = 'schedule_teach_id';
+    protected $fillable = ['teacher_id', 'subject_id', 'level_id', 'term_of_year_id', 'section', 'course_code', 'teach_date', 'total_seat', 'enroll_seat', 'major_name'];
     protected $hidden = ['created_at', 'updated_at'];
     public $timestamps = true;
-    public $incrementing = true; // If primary key is not auto-incrementing
-    protected $keyType = 'int'; // If primary key is not an integer
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     public function teacher() {
         return $this->belongsTo(Teacher::class, 'teacher_id');

@@ -8,13 +8,13 @@ use App\Modules\Teacher\Model\Teacher;
 use App\Modules\TermOfYear\Model\TermOfYear;
 
 class Disbursement extends Model {
-    protected $table = 'disbursement'; // Table name
-    protected $primaryKey = 'disbursement_id'; // Primary key column
-    protected $fillable = ['teacher_id', 'term_of_year_id', 'sum_yes_unit', 'sum_no_unit', 'total', 'status', 'pdf_path', 'created_at']; // Fillable columns
+    protected $table = 'disbursement';
+    protected $primaryKey = 'disbursement_id';
+    protected $fillable = ['teacher_id', 'term_of_year_id', 'sum_yes_unit', 'sum_no_unit', 'total', 'status', 'pdf_path', 'created_at'];
     protected $hidden = ['updated_at'];
     public $timestamps = true;
-    public $incrementing = true; // If primary key is not auto-incrementing
-    protected $keyType = 'int'; // If primary key is not an integer
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     public function teacher() {
         return $this->belongsTo(Teacher::class, 'teacher_id');

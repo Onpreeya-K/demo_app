@@ -74,7 +74,7 @@ $app->group('/degree', function (Group $group) {
 // Define routes for courseOfStudy
 $app->group('/courseOfStudy', function (Group $group) {
     $group->get('', CourseOfStudyController::class . ':fetch');
-    $group->get('/{id}', CourseOfStudyController::class . ':fetchByID');
+    $group->get('/{id}', CourseOfStudyController::class . ':fetchCourseOfStudyByID');
     $group->post('', CourseOfStudyController::class . ':create');
     $group->put('/{id}', CourseOfStudyController::class . ':update');
     $group->delete('/{id}', CourseOfStudyController::class . ':delete');

@@ -18,17 +18,16 @@ class AcademicPositionRepository
 
     public function createAcademicPosition($data)
     {
-        
         return AcademicPosition::create($data);
     }
 
     public function updateAcademicPosition($id, $data)
     {
-        return AcademicPosition::where('criteria_of_teach_id', $id)->update($data);
+        return AcademicPosition::where('a_id', $id)->update($data);
     }
 
     public function deleteAcademicPosition($id)
     {
-        return AcademicPosition::where('criteria_of_teach_id', $id)->delete();
+        return AcademicPosition::where('a_id', $id)->delete();
     }
 }

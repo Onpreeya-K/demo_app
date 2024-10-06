@@ -5,6 +5,7 @@ namespace App\Modules\ScheduleTeach;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use App\Utils\HelperResponse;
 class ScheduleTeachController {
     private $scheduleTeachService;
 
@@ -13,46 +14,64 @@ class ScheduleTeachController {
     }
 
     public function create(Request $request, Response $response) {
-        $data = $request->getParsedBody();
-        $scheduleTeach = $this->scheduleTeachService->createScheduleTeach($data);
-        $response->getBody()->write(json_encode($scheduleTeach));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $data = $request->getParsedBody();
+            $scheduleTeach = $this->scheduleTeachService->createScheduleTeach($data);
+            return HelperResponse::json($response, $scheduleTeach, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function fetch(Request $request, Response $response, $args)
     {
-        $scheduleTeach = $this->scheduleTeachService->getAllScheduleTeachs();
-        $response->getBody()->write(json_encode($scheduleTeach));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $scheduleTeach = $this->scheduleTeachService->getAllScheduleTeachs();
+            return HelperResponse::json($response, $scheduleTeach);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function fetchScheduleTeachByTermIdAndTeacherID(Request $request, Response $response, $args) {
-        $termID = $args['termId'];
-        $teacherID = $args['teacherID'];
-        $scheduleTeach = $this->scheduleTeachService->getScheduleTeachByTermIdAndTeacherID($termID, $teacherID);
-        $response->getBody()->write(json_encode($scheduleTeach));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $termID = $args['termId'];
+            $teacherID = $args['teacherID'];
+            $scheduleTeach = $this->scheduleTeachService->getScheduleTeachByTermIdAndTeacherID($termID, $teacherID);
+            return HelperResponse::json($response, $scheduleTeach);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
-    // /scheduleTeach/teacherSchedule/{id}
     public function fetchListTeacherBytermOfID(Request $request, Response $response, $args) {
-        $termOfYearId = $args['id'];
-        $scheduleTeach = $this->scheduleTeachService->getTeacherScheduleByTermOfYearId($termOfYearId);
-        $response->getBody()->write(json_encode($scheduleTeach));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $termOfYearId = $args['id'];
+            $scheduleTeach = $this->scheduleTeachService->getTeacherScheduleByTermOfYearId($termOfYearId);
+            return HelperResponse::json($response, $scheduleTeach);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function update(Request $request, Response $response, $args) {
-        $scheduleTeachId = $args['id'];
-        $data = $request->getParsedBody();
-        $scheduleTeach = $this->scheduleTeachService->updateScheduleTeach($scheduleTeachId, $data);
-        $response->getBody()->write(json_encode($scheduleTeach));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $scheduleTeachId = $args['id'];
+            $data = $request->getParsedBody();
+            $scheduleTeach = $this->scheduleTeachService->updateScheduleTeach($scheduleTeachId, $data);
+            return HelperResponse::json($response, $scheduleTeach, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function delete(Request $request, Response $response, $args) {
-        $scheduleTeachId = $args['id'];
-        $this->scheduleTeachService->deleteScheduleTeach($scheduleTeachId);
-        return $response->withStatus(204);
+        try {
+            $scheduleTeachId = $args['id'];
+            $data = $this->scheduleTeachService->deleteScheduleTeach($scheduleTeachId);
+            return HelperResponse::json($response, $data, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 }

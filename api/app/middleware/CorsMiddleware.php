@@ -12,7 +12,6 @@ class CorsMiddleware implements MiddlewareInterface
 
     public function process(Request $request, RequestHandler $handler): Response
     {
-         // Handle preflight request
          if ($request->getMethod() === 'OPTIONS') {
             $response = (new \Slim\Psr7\Response())
                 ->withHeader('Access-Control-Allow-Origin', '*')
@@ -22,7 +21,6 @@ class CorsMiddleware implements MiddlewareInterface
             return $response;
         }
 
-        // Handle actual request
         $response = $handler->handle($request);
         return $response
             ->withHeader('Access-Control-Allow-Origin', '*')

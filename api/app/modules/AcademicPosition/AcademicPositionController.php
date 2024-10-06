@@ -5,6 +5,8 @@ namespace App\Modules\AcademicPosition;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+
+use App\Utils\HelperResponse;
 class AcademicPositionController {
     private $academicPositionService;
 
@@ -13,37 +15,54 @@ class AcademicPositionController {
     }
 
     public function create(Request $request, Response $response) {
-        $data = $request->getParsedBody();
-        $academicPosition = $this->academicPositionService->createAcademicPosition($data);
-        $response->getBody()->write(json_encode($academicPosition));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $data = $request->getParsedBody();
+            $academicPosition = $this->academicPositionService->createAcademicPosition($data);
+
+            return HelperResponse::json( $response,  $academicPosition, 201);
+
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
-    public function fetch(Request $request, Response $response, $args)
-    {
-        $academicPosition = $this->academicPositionService->getAllAcademicPositions();
-        $response->getBody()->write(json_encode($academicPosition));
-        return $response->withHeader('Content-Type', 'application/json');
+    public function fetch(Request $request, Response $response, $args) {
+        try {
+            $academicPosition = $this->academicPositionService->getAllAcademicPositions();
+            return HelperResponse::json($response, $academicPosition);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException( $response, $e);
+        }
     }
 
     public function fetchByID(Request $request, Response $response, $args) {
-        $academicPositionId = $args['id'];
-        $academicPosition = $this->academicPositionService->getAcademicPositionById($academicPositionId);
-        $response->getBody()->write(json_encode($academicPosition));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $academicPositionId = $args['id'];
+            $academicPosition = $this->academicPositionService->getAcademicPositionById($academicPositionId);
+            return HelperResponse::json($response, $academicPosition);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function update(Request $request, Response $response, $args) {
-        $academicPositionId = $args['id'];
-        $data = $request->getParsedBody();
-        $academicPosition = $this->academicPositionService->updateAcademicPosition($academicPositionId, $data);
-        $response->getBody()->write(json_encode($academicPosition));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $academicPositionId = $args['id'];
+            $data = $request->getParsedBody();
+            $academicPosition = $this->academicPositionService->updateAcademicPosition($academicPositionId, $data);
+            return HelperResponse::json($response,  $academicPosition, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function delete(Request $request, Response $response, $args) {
-        $academicPositionId = $args['id'];
-        $this->academicPositionService->deleteAcademicPosition($academicPositionId);
-        return $response->withStatus(204);
+        try {
+            $academicPositionId = $args['id'];
+            $data = $this->academicPositionService->deleteAcademicPosition($academicPositionId);
+            return HelperResponse::json($response, $data, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 }
