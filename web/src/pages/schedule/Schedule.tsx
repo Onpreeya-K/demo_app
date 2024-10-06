@@ -29,7 +29,14 @@ import {
     getScheduleByTermIdAndTeacherId,
     saveScheduleTeach,
 } from '../../services/Schedule-service';
-import { getDataProfessor, getRoleUser, isNullOrUndefined, sourceList } from '../../util/Util';
+import {
+    getDataProfessor,
+    getRoleUser,
+    isNullOrUndefined,
+    loadingClose,
+    loadingOpen,
+    sourceList,
+} from '../../util/Util';
 import { ScheduleTeach } from '../disbursement/Disbursement';
 
 interface Professor {
@@ -125,12 +132,15 @@ const SchedulePage = () => {
 
     const fetchTerm = async () => {
         try {
+            loadingOpen();
             const response = await getTermOfYear();
             if (response && response.message === 'Success') {
                 setTermOfYear(response.payload);
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -189,127 +199,132 @@ const SchedulePage = () => {
     };
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const data = new Uint8Array(e.target?.result as ArrayBuffer);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-                if (!worksheet || !worksheet['!ref']) {
-                    console.error('Worksheet or worksheet reference is undefined');
-                    return;
-                }
-                const range = XLSX.utils.decode_range(worksheet['!ref']);
-                const targetValues = [
-                    'ID',
-                    'PREFIXNAME1',
-                    'DEPARTMENT',
-                    'CAMPUSID',
-                    'LEVELID',
-                    'COURSECODE',
-                    'SECX',
-                    'COURSENAMEENG',
-                    'COURSEUNIT',
-                    'TOTALSEAT',
-                    'ENROLLSEAT',
-                    'DATE',
-                    'MAJOR',
-                ];
-                const foundValues: { value: string; cellRef: string }[] = [];
-                for (let row = range.s.r; row <= range.e.r; ++row) {
-                    for (let col = range.s.c; col <= range.e.c; ++col) {
-                        const cellAddress = { c: col, r: row };
-                        const cellRef = XLSX.utils.encode_cell(cellAddress);
-                        const cell = worksheet[cellRef];
-                        const cellValue = cell ? cell.v : undefined;
-                        if (targetValues.includes(cellValue)) {
-                            foundValues.push({ value: cellValue, cellRef });
+        try {
+            loadingOpen();
+            const file = event.target.files?.[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target?.result as ArrayBuffer);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    if (!worksheet || !worksheet['!ref']) {
+                        console.error('Worksheet or worksheet reference is undefined');
+                        return;
+                    }
+                    const range = XLSX.utils.decode_range(worksheet['!ref']);
+                    const targetValues = [
+                        'ID',
+                        'PREFIXNAME1',
+                        'DEPARTMENT',
+                        'CAMPUSID',
+                        'LEVELID',
+                        'COURSECODE',
+                        'SECX',
+                        'COURSENAMEENG',
+                        'COURSEUNIT',
+                        'TOTALSEAT',
+                        'ENROLLSEAT',
+                        'DATE',
+                        'MAJOR',
+                    ];
+                    const foundValues: { value: string; cellRef: string }[] = [];
+                    for (let row = range.s.r; row <= range.e.r; ++row) {
+                        for (let col = range.s.c; col <= range.e.c; ++col) {
+                            const cellAddress = { c: col, r: row };
+                            const cellRef = XLSX.utils.encode_cell(cellAddress);
+                            const cell = worksheet[cellRef];
+                            const cellValue = cell ? cell.v : undefined;
+                            if (targetValues.includes(cellValue)) {
+                                foundValues.push({ value: cellValue, cellRef });
+                            }
                         }
                     }
-                }
 
-                const xlsxData: MapData = {
-                    levelId: [],
-                    courseCode: [],
-                    sec: [],
-                    courseNameEng: [],
-                    courseUnit: [],
-                    totalSeat: [],
-                    enrollSeat: [],
-                    date: [],
-                    major: [],
-                };
-                const mapping: { [key: string]: keyof MapData } = {
-                    LEVELID: 'levelId',
-                    COURSECODE: 'courseCode',
-                    SECX: 'sec',
-                    COURSENAMEENG: 'courseNameEng',
-                    COURSEUNIT: 'courseUnit',
-                    TOTALSEAT: 'totalSeat',
-                    ENROLLSEAT: 'enrollSeat',
-                    DATE: 'date',
-                    MAJOR: 'major',
-                };
+                    const xlsxData: MapData = {
+                        levelId: [],
+                        courseCode: [],
+                        sec: [],
+                        courseNameEng: [],
+                        courseUnit: [],
+                        totalSeat: [],
+                        enrollSeat: [],
+                        date: [],
+                        major: [],
+                    };
+                    const mapping: { [key: string]: keyof MapData } = {
+                        LEVELID: 'levelId',
+                        COURSECODE: 'courseCode',
+                        SECX: 'sec',
+                        COURSENAMEENG: 'courseNameEng',
+                        COURSEUNIT: 'courseUnit',
+                        TOTALSEAT: 'totalSeat',
+                        ENROLLSEAT: 'enrollSeat',
+                        DATE: 'date',
+                        MAJOR: 'major',
+                    };
+                    if (foundValues) {
+                        const colID = foundValues[0].cellRef.charAt(0);
+                        const rowID = parseInt(foundValues[0].cellRef.slice(1)) + 1;
+                        const teacherIdFromXlsx = worksheet[colID + rowID]?.v;
 
-                if (foundValues) {
-                    const colID = foundValues[0].cellRef.charAt(0);
-                    const rowID = parseInt(foundValues[0].cellRef.slice(1)) + 1;
-                    const teacherIdFromXlsx = worksheet[colID + rowID]?.v;
-
-                    const colDepartment = foundValues[1].cellRef.charAt(0);
-                    const rowDepartment = parseInt(foundValues[1].cellRef.slice(1)) + 1;
-                    const departmentValue = worksheet[colDepartment + rowDepartment]?.v;
-                    if (!isNullOrUndefined(departmentValue)) {
-                        setDepartment(departmentValue);
-                    }
-                    if (
-                        teacherIdFromXlsx &&
-                        teacherIdFromXlsx.toString() !== formSearch.professor.teacher_id
-                    ) {
-                        setOpenPopupAlertError(true);
-                    } else {
-                        const startValueIndex = foundValues.findIndex(
-                            (item) => item.value === 'LEVELID'
-                        );
-                        if (startValueIndex !== -1) {
-                            for (
-                                let i = startValueIndex;
-                                i < startValueIndex + 30 && i < foundValues.length;
-                                i++
-                            ) {
-                                const { value, cellRef } = foundValues[i];
-                                const col = cellRef.charAt(0);
-                                const row = parseInt(cellRef.slice(1));
-                                for (let j = row + 2; j <= 27; j++) {
-                                    const newCellRef = col + j;
-                                    const mapKey = mapping[value];
-                                    if (mapKey) {
-                                        xlsxData[mapKey].push(newCellRef);
+                        const colDepartment = foundValues[1].cellRef.charAt(0);
+                        const rowDepartment = parseInt(foundValues[1].cellRef.slice(1)) + 1;
+                        const departmentValue = worksheet[colDepartment + rowDepartment]?.v;
+                        if (!isNullOrUndefined(departmentValue)) {
+                            setDepartment(departmentValue);
+                        }
+                        if (
+                            teacherIdFromXlsx &&
+                            teacherIdFromXlsx.toString() !== formSearch.professor.teacher_id
+                        ) {
+                            setOpenPopupAlertError(true);
+                        } else {
+                            const startValueIndex = foundValues.findIndex(
+                                (item) => item.value === 'LEVELID'
+                            );
+                            if (startValueIndex !== -1) {
+                                for (
+                                    let i = startValueIndex;
+                                    i < startValueIndex + 30 && i < foundValues.length;
+                                    i++
+                                ) {
+                                    const { value, cellRef } = foundValues[i];
+                                    const col = cellRef.charAt(0);
+                                    const row = parseInt(cellRef.slice(1));
+                                    for (let j = row + 2; j <= 27; j++) {
+                                        const newCellRef = col + j;
+                                        const mapKey = mapping[value];
+                                        if (mapKey) {
+                                            xlsxData[mapKey].push(newCellRef);
+                                        }
                                     }
                                 }
+                            } else {
+                                console.error('Start value LEVELID not found in the worksheet');
                             }
-                        } else {
-                            console.error('Start value LEVELID not found in the worksheet');
+                            const xlsxDataRows = extractRowsFromWorksheet(worksheet, xlsxData);
+                            const filterData = xlsxDataRows.filter(
+                                (item) => !isNullOrUndefined(item.course_code)
+                            );
+                            setFormSearch((prev) => ({
+                                ...prev,
+                                professor: {
+                                    ...prev.professor,
+                                    dataTable: filterData,
+                                },
+                            }));
                         }
-                        const xlsxDataRows = extractRowsFromWorksheet(worksheet, xlsxData);
-                        const filterData = xlsxDataRows.filter(
-                            (item) => !isNullOrUndefined(item.course_code)
-                        );
-
-                        setFormSearch((prev) => ({
-                            ...prev,
-                            professor: {
-                                ...prev.professor,
-                                dataTable: filterData,
-                            },
-                        }));
                     }
-                }
-            };
-            reader.readAsArrayBuffer(file);
-            event.target.value = '';
+                };
+                reader.readAsArrayBuffer(file);
+                event.target.value = '';
+            }
+        } catch (error) {
+            console.error('error :: ', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -378,6 +393,7 @@ const SchedulePage = () => {
 
     const fetchTeacherListByTerm = async (param: any) => {
         try {
+            loadingOpen();
             const response = await getTeacherSchedule(param);
             if (response && response.message === 'Success') {
                 if (!isNullOrUndefined(response.payload)) {
@@ -388,6 +404,8 @@ const SchedulePage = () => {
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -417,11 +435,11 @@ const SchedulePage = () => {
 
     const onClickSearch = async () => {
         try {
+            loadingOpen();
             let payload = {
                 termId: formSearch.term?.term_of_year_id,
                 teacherID: formSearch.professor.teacher_id,
             };
-            // const response = await getScheduleByTeacherId(payload);
             const response = await getScheduleByTermIdAndTeacherId(payload);
             if (response && response.message === 'Success') {
                 if (!isNullOrUndefined(response.payload)) {
@@ -456,51 +474,61 @@ const SchedulePage = () => {
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
     const onClickSave = async () => {
-        if (!isNullOrUndefined(formSearch.professor.dataTable)) {
-            const dataTable = formSearch.professor?.dataTable;
-            const mapData = dataTable.map((item) => {
-                return {
-                    level_id: item.level_id,
-                    course_code: item.course_code,
-                    section: item.section,
-                    course_name: item.course_name,
-                    course_unit: item.course_unit,
-                    total_seat: item.total_seat,
-                    enroll_seat: Number(item.enroll_seat),
-                    teach_date: item.teach_date,
-                    major_name: item.major_name,
+        try {
+            loadingOpen();
+            if (!isNullOrUndefined(formSearch.professor.dataTable)) {
+                const dataTable = formSearch.professor?.dataTable;
+                const mapData = dataTable.map((item) => {
+                    return {
+                        level_id: item.level_id,
+                        course_code: item.course_code,
+                        section: item.section,
+                        course_name: item.course_name,
+                        course_unit: item.course_unit,
+                        total_seat: item.total_seat,
+                        enroll_seat: Number(item.enroll_seat),
+                        teach_date: item.teach_date,
+                        major_name: item.major_name,
+                    };
+                });
+                let payload = {
+                    term_of_year_id: formSearch.term?.term_of_year_id,
+                    teacher_id: formSearch.professor?.teacher_id,
+                    teacher_name: formSearch.professor?.fullname,
+                    department: department,
+                    data: mapData,
                 };
-            });
-            let payload = {
-                term_of_year_id: formSearch.term?.term_of_year_id,
-                teacher_id: formSearch.professor?.teacher_id,
-                teacher_name: formSearch.professor?.fullname,
-                department: department,
-                data: mapData,
-            };
-            const response = await saveScheduleTeach(payload);
-            if (response && response.message === 'Success') {
-                setOpenPopupAlert(true);
-                setMessagePopupAlert('บันทึกตารางสอนสำเร็จ');
-                setFormSearch((prev) => ({
-                    ...prev,
-                    professor: {
-                        ...prev.professor,
-                        has_schedule: true,
-                    },
-                }));
-                fetchTeacherListAfterUploadSchedule();
+                const response = await saveScheduleTeach(payload);
+                if (response && response.message === 'Success') {
+                    setMessagePopupAlert(response.payload.message ? response.payload.message : '');
+                    setOpenPopupAlert(!!response.payload.message);
+                    setFormSearch((prev) => ({
+                        ...prev,
+                        professor: {
+                            ...prev.professor,
+                            has_schedule: true,
+                        },
+                    }));
+                    fetchTeacherListAfterUploadSchedule();
+                }
+                setDepartment('');
             }
-            setDepartment('');
+        } catch (error) {
+            console.error('error :: ', error);
+        } finally {
+            loadingClose();
         }
     };
 
     const fetchTeacherListAfterUploadSchedule = async () => {
         try {
+            loadingOpen();
             const response = await getTeacherSchedule(formSearch.term?.term_of_year_id);
             if (response && response.message === 'Success') {
                 if (!isNullOrUndefined(response.payload)) {
@@ -511,6 +539,8 @@ const SchedulePage = () => {
             }
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 

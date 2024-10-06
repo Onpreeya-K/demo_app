@@ -25,7 +25,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import PopupAlert from '../../components/popupAlert/Popup-Alert';
 import { addTerm, getAllTerm, updateTerm } from '../../services/Term-service';
-import { isNullOrUndefined } from '../../util/Util';
+import { isNullOrUndefined, loadingClose, loadingOpen } from '../../util/Util';
 
 interface Term {
     term_of_year_id: number;
@@ -58,12 +58,15 @@ const TermPage = () => {
 
     const fetchAllTerm = async () => {
         try {
+            loadingOpen();
             const response = await getAllTerm();
             if (response && response.message === 'Success') {
                 setTermList(response.payload);
             }
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -101,6 +104,7 @@ const TermPage = () => {
 
     const onSubmitAddTerm = async () => {
         try {
+            loadingOpen();
             if (!isNullOrUndefined(term)) {
                 const payload = {
                     term: term.trim(),
@@ -108,16 +112,22 @@ const TermPage = () => {
                 if (dialogMode === 'ADD') {
                     const response = await addTerm(payload);
                     if (response && response.message === 'Success') {
-                        setIsOpenPopupAlert(true);
-                        setMessagePopupAlert('เพิ่มปีการศึกษาสำเร็จ');
+                        loadingClose();
+                        setMessagePopupAlert(
+                            response.payload.message ? response.payload.message : ''
+                        );
+                        setIsOpenPopupAlert(!!response.payload.message);
                         onCloseDialog();
                         await fetchAllTerm();
                     }
                 } else {
                     const response = await updateTerm(termId, payload);
                     if (response && response.message === 'Success') {
-                        setIsOpenPopupAlert(true);
-                        setMessagePopupAlert('แก้ไขปีการศึกษาสำเร็จ');
+                        loadingClose();
+                        setMessagePopupAlert(
+                            response.payload.message ? response.payload.message : ''
+                        );
+                        setIsOpenPopupAlert(!!response.payload.message);
                         onCloseDialog();
                         await fetchAllTerm();
                     }
@@ -127,6 +137,8 @@ const TermPage = () => {
             }
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 

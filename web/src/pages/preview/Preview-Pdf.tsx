@@ -1,7 +1,11 @@
+import { createTheme, ThemeProvider } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getPdf } from '../../services/Disburse-service';
+import CustomLoading from '../../components/loading/Loading';
 import PopupError from '../../components/popupAlert/Popup-Error';
+import appConfig from '../../config/application-config.json';
+import { getPdf } from '../../services/Disburse-service';
+import { loadingClose, loadingOpen } from '../../util/Util';
 
 const PreviewPdfPage = () => {
     const startComponent = useRef(false);
@@ -11,15 +15,19 @@ const PreviewPdfPage = () => {
 
     const fetchPdfFile = async () => {
         try {
+            loadingOpen();
             let payload = {
                 pdf_path: pdf_path || '',
             };
             const response = await getPdf(payload);
             if (response && response.message === 'Success' && response.payload) {
+                loadingClose();
                 setFileData(response.payload.base64);
             }
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -64,11 +72,21 @@ const PreviewPdfPage = () => {
         );
     };
 
+    const theme = createTheme({
+        typography: {
+            fontFamily: appConfig.fontFamily,
+            fontSize: 16,
+        },
+    });
+
     return (
-        <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
-            <PopupError />
-            {renderPreview()}
-        </div>
+        <ThemeProvider theme={theme}>
+            <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
+                <CustomLoading />
+                <PopupError />
+                {renderPreview()}
+            </div>
+        </ThemeProvider>
     );
 };
 

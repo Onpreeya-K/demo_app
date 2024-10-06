@@ -36,6 +36,7 @@ import {
     resetPasswordById,
     updateTeacher,
 } from '../../services/Teacher-service';
+import { loadingClose, loadingOpen } from '../../util/Util';
 
 interface Teacher {
     teacher_id: string;
@@ -122,21 +123,30 @@ const ProfessorInfoPage = () => {
     };
 
     const onConfirm = async () => {
-        if (typeOfPopupConfirm === 'DELETE') {
-            const response = await deleteTeacher(form.teacher_id);
-            setIsOpenPopupConfirm(false);
-            if (response && response.message === 'Success') {
-                await fetchData();
-                setIsOpenPopupAlert(true);
-                setMessagePopupAlert('ลบรายชื่ออาจารย์สำเร็จ');
+        try {
+            loadingOpen();
+            if (typeOfPopupConfirm === 'DELETE') {
+                const response = await deleteTeacher(form.teacher_id);
+                setIsOpenPopupConfirm(false);
+                if (response && response.message === 'Success') {
+                    await fetchData();
+                    loadingClose();
+                    setMessagePopupAlert(response.payload.message ? response.payload.message : '');
+                    setIsOpenPopupAlert(!!response.payload.message);
+                }
+            } else {
+                const response = await resetPasswordById(form.teacher_id);
+                setIsOpenPopupConfirm(false);
+                if (response && response.message === 'Success') {
+                    loadingClose();
+                    setMessagePopupAlert(response.payload.message ? response.payload.message : '');
+                    setIsOpenPopupAlert(!!response.payload.message);
+                }
             }
-        } else {
-            const response = await resetPasswordById(form.teacher_id);
-            setIsOpenPopupConfirm(false);
-            if (response && response.message === 'Success') {
-                setIsOpenPopupAlert(true);
-                setMessagePopupAlert('รีเซ็ตรหัสผ่านสำเร็จ');
-            }
+        } catch (error) {
+            console.error('error :: ', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -156,6 +166,7 @@ const ProfessorInfoPage = () => {
 
     const fetchData = async () => {
         try {
+            loadingOpen();
             const response = await getAllTeacher();
             if (response && response.message === 'Success') {
                 setTeacherAll(response.payload);
@@ -171,6 +182,8 @@ const ProfessorInfoPage = () => {
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -237,6 +250,7 @@ const ProfessorInfoPage = () => {
 
     const onSubmitAddProfessor = async () => {
         try {
+            loadingOpen();
             if (validate()) {
                 setOpenDialog(false);
                 if (modalAction === 'CREATE') {
@@ -249,12 +263,15 @@ const ProfessorInfoPage = () => {
                     };
                     const response = await createTeacher(payload);
                     if (response && response.message === 'Success') {
+                        loadingClose();
                         setIsOpenPopupAlert(true);
                         setModalAction('');
-                        setMessagePopupAlert('เพิ่มรายชื่ออาจารย์สำเร็จ');
+                        setMessagePopupAlert(
+                            response.payload.message ? response.payload.message : ''
+                        );
                         clearForm();
                         fetchData();
-                        setOpenDialog(false);
+                        setIsOpenPopupAlert(!!response.payload.message);
                     }
                 } else {
                     const payload = {
@@ -266,9 +283,12 @@ const ProfessorInfoPage = () => {
                     };
                     const response = await updateTeacher(form.teacher_id, payload);
                     if (response && response.message === 'Success') {
-                        setIsOpenPopupAlert(true);
+                        loadingClose();
+                        setMessagePopupAlert(
+                            response.payload.message ? response.payload.message : ''
+                        );
                         setModalAction('');
-                        setMessagePopupAlert('แก้ไขรายชื่ออาจารย์สำเร็จ');
+                        setIsOpenPopupAlert(!!response.payload.message);
                         clearForm();
                         fetchData();
                     }
@@ -278,6 +298,8 @@ const ProfessorInfoPage = () => {
             }
         } catch (error) {
             console.error('error ---> ', error);
+        } finally {
+            loadingClose();
         }
     };
     const replaceRegExp = (key: any) => {

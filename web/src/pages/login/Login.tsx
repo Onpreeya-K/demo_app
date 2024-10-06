@@ -1,3 +1,4 @@
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
     Box,
     Button,
@@ -11,15 +12,15 @@ import {
     Typography,
     createTheme,
 } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import educationMSULogo from '../../asset/images/Education_MSU_Logo.svg';
-import appConfig from '../../config/application-config.json';
-import { callLoginService } from '../../services/Authen-service';
-import { setAccessToken } from '../../util/Util';
-import { useEffect, useState } from 'react';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import CustomLoading from '../../components/loading/Loading';
 import PopupAlert from '../../components/popupAlert/Popup-Alert';
 import PopupError from '../../components/popupAlert/Popup-Error';
+import appConfig from '../../config/application-config.json';
+import { callLoginService } from '../../services/Authen-service';
+import { loadingClose, loadingOpen, setAccessToken } from '../../util/Util';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -30,6 +31,7 @@ const Login = () => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
+            loadingOpen();
             const data = new FormData(event.currentTarget);
             const username = data.get('username') as string;
             const password = data.get('password') as string;
@@ -39,14 +41,16 @@ const Login = () => {
             };
             const response = await callLoginService(payloadData);
             if (response && response.message === 'Success') {
+                loadingClose();
                 setAccessToken(response.payload.token);
                 sessionStorage.setItem('ROLE', response.payload.role.toUpperCase());
                 sessionStorage.setItem('DATA', JSON.stringify(response.payload.data));
                 navigate('/schedule');
             }
         } catch (error: any) {
-            setIsOpenPopupAlert(true);
-            setMessagePopupAlert(error.message);
+            console.error('error :: ', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -88,6 +92,7 @@ const Login = () => {
 
     return (
         <ThemeProvider theme={theme}>
+            <CustomLoading />
             <Grid container component="main" sx={{ height: '100vh' }}>
                 <CssBaseline />
                 <PopupError />

@@ -66,3 +66,66 @@ export const modalAlertOpen = (message: string, title?: string) => {
         })
     );
 };
+
+export class CustomError extends Error {
+    status: number;
+    payload: any;
+
+    constructor(message: string, status: number, payload: any = null) {
+        super(message);
+        this.status = status;
+        this.payload = payload;
+        this.name = 'CustomError';
+    }
+}
+
+export const checkError = (error: unknown) => {
+    if (error instanceof CustomError) {
+        loadingClose();
+        if (error.message) {
+            modalAlertOpen(error.message);
+        } else {
+            let messageResponse = '';
+            switch (error.status) {
+                case 400:
+                    messageResponse = 'Bad Request';
+                    break;
+                case 401:
+                    messageResponse = 'Unauthorized';
+                    break;
+                case 403:
+                    messageResponse = 'Forbidden';
+                    break;
+                case 404:
+                    messageResponse = 'Not Found';
+                    break;
+                case 422:
+                    messageResponse = 'Unprocessable Entity';
+                    break;
+                case 500:
+                case 501:
+                case 502:
+                case 503:
+                    messageResponse = 'Internal Server Error';
+                    break;
+                default:
+                    messageResponse = 'Unknown Error';
+                    break;
+            }
+            if (messageResponse) {
+                modalAlertOpen(messageResponse);
+            }
+        }
+    } else {
+        loadingClose();
+        console.error('Unexpected Error:', error);
+    }
+};
+
+export const loadingOpen = () => {
+    document.dispatchEvent(new CustomEvent('backdrop.open'));
+};
+
+export const loadingClose = () => {
+    document.dispatchEvent(new CustomEvent('backdrop.close'));
+};

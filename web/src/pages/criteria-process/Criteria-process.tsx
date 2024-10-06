@@ -31,7 +31,7 @@ import {
     getCriteraiProcess,
     updateCriteraiProcess,
 } from '../../services/Criteria-service';
-import { isNullOrUndefined } from '../../util/Util';
+import { isNullOrUndefined, loadingClose, loadingOpen } from '../../util/Util';
 
 interface CriteriaProcess {
     criteria_of_process_id: number;
@@ -93,12 +93,20 @@ const CriteriaProcessPage = () => {
     };
 
     const onConfirmDelete = async () => {
-        const response = await deleteCriteraiProcess(form.criteria_of_process_id);
-        setIsOpenPopupConfirm(false);
-        if (response && response.message === 'Success') {
-            fetchCriteriaProcess();
-            setIsOpenPopupAlert(true);
-            setMessagePopupAlert('ลบเกณฑ์คำนวณสำเร็จ');
+        try {
+            loadingOpen();
+            const response = await deleteCriteraiProcess(form.criteria_of_process_id);
+            setIsOpenPopupConfirm(false);
+            if (response && response.message === 'Success') {
+                loadingClose();
+                fetchCriteriaProcess();
+                setMessagePopupAlert(response.payload.message ? response.payload.message : '');
+                setIsOpenPopupAlert(!!response.payload.message);
+            }
+        } catch (error) {
+            console.error('error :: ', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -109,18 +117,23 @@ const CriteriaProcessPage = () => {
     };
 
     const onClickAdd = () => {
+        setForm(initForm);
         setDialogMode('ADD');
         setOpenDialog(true);
     };
 
     const fetchCriteriaProcess = async () => {
         try {
+            loadingOpen();
             const response = await getCriteraiProcess();
             if (response && response.message === 'Success') {
+                loadingClose();
                 setCriteriaData(response.payload);
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -167,24 +180,37 @@ const CriteriaProcessPage = () => {
     };
 
     const onSubmitCriteria = async () => {
-        if (validate()) {
-            if (dialogMode === 'ADD') {
-                const response = await createCriteraiProcess(form);
-                if (response && response.message === 'Success') {
-                    setMessagePopupAlert('เพิ่มเกณฑ์คำนวณสำเร็จ');
-                    onCloseDialog();
-                    fetchCriteriaProcess();
-                    setIsOpenPopupAlert(true);
-                }
-            } else {
-                const response = await updateCriteraiProcess(form.criteria_of_process_id, form);
-                if (response && response.message === 'Success') {
-                    setMessagePopupAlert('แก้ไขเกณฑ์คำนวณสำเร็จ');
-                    onCloseDialog();
-                    fetchCriteriaProcess();
-                    setIsOpenPopupAlert(true);
+        try {
+            loadingOpen();
+            if (validate()) {
+                if (dialogMode === 'ADD') {
+                    const response = await createCriteraiProcess(form);
+                    if (response && response.message === 'Success') {
+                        loadingClose();
+                        setMessagePopupAlert(
+                            response.payload.message ? response.payload.message : ''
+                        );
+                        onCloseDialog();
+                        fetchCriteriaProcess();
+                        setIsOpenPopupAlert(!!response.payload.message);
+                    }
+                } else {
+                    const response = await updateCriteraiProcess(form.criteria_of_process_id, form);
+                    if (response && response.message === 'Success') {
+                        loadingClose();
+                        setMessagePopupAlert(
+                            response.payload.message ? response.payload.message : ''
+                        );
+                        onCloseDialog();
+                        fetchCriteriaProcess();
+                        setIsOpenPopupAlert(!!response.payload.message);
+                    }
                 }
             }
+        } catch (error) {
+            console.error('error :: ', error);
+        } finally {
+            loadingClose();
         }
     };
 

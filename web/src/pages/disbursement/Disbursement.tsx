@@ -38,7 +38,14 @@ import {
 } from '../../services/Disburse-service';
 import { getScheduleByTermIdAndTeacherId } from '../../services/Schedule-service';
 import { getRateByTeacherId } from '../../services/Teacher-service';
-import { getDataProfessor, getRoleUser, isNullOrUndefined, toMoneyFormat } from '../../util/Util';
+import {
+    getDataProfessor,
+    getRoleUser,
+    isNullOrUndefined,
+    loadingClose,
+    loadingOpen,
+    toMoneyFormat,
+} from '../../util/Util';
 
 interface DropdownTerm {
     term_of_year_id: string;
@@ -232,14 +239,18 @@ const DisbursementPage = () => {
 
     const fetchTeacherListByTerm = async (param: any) => {
         try {
+            loadingOpen();
             const response = await getTeacherListByTermID(param);
             if (response && response.message === 'Success') {
+                loadingClose();
                 if (!isNullOrUndefined(response.payload)) {
                     setProfessorList(response.payload);
                 }
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -275,23 +286,31 @@ const DisbursementPage = () => {
 
     const fetchTerm = async () => {
         try {
+            loadingOpen();
             const response = await getTermOfYear();
             if (response && response.message === 'Success') {
+                loadingClose();
                 setTermOfYear(response.payload);
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
     const fetchRate = async (teacher_id: string) => {
         try {
+            loadingOpen();
             const response = await getRateByTeacherId(teacher_id);
             if (response && response.message === 'Success') {
+                loadingClose();
                 setTeacherRate(response.payload);
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -330,26 +349,34 @@ const DisbursementPage = () => {
     }, []);
 
     const fetchScheduleByTermIdAndTeacherId = async () => {
-        let payload = {
-            termId: form.term?.term_of_year_id,
-            teacherID: form.professor?.teacher_id,
-        };
-        const response = await getScheduleByTermIdAndTeacherId(payload);
-        if (response && response.message === 'Success') {
-            if (!isNullOrUndefined(response.payload)) {
-                const mapData = response.payload.map((item: any) => {
-                    return {
-                        ...item,
-                        teacher_no: '',
-                        teacher_unit: '',
-                        accept_disburse: '',
-                        reject_disburse: '',
-                        faculty_disburse: '',
-                        isEdit: false,
-                    };
-                });
-                setDataSchedule(mapData);
+        try {
+            loadingOpen();
+            let payload = {
+                termId: form.term?.term_of_year_id,
+                teacherID: form.professor?.teacher_id,
+            };
+            const response = await getScheduleByTermIdAndTeacherId(payload);
+            if (response && response.message === 'Success') {
+                loadingClose();
+                if (!isNullOrUndefined(response.payload)) {
+                    const mapData = response.payload.map((item: any) => {
+                        return {
+                            ...item,
+                            teacher_no: '',
+                            teacher_unit: '',
+                            accept_disburse: '',
+                            reject_disburse: '',
+                            faculty_disburse: '',
+                            isEdit: false,
+                        };
+                    });
+                    setDataSchedule(mapData);
+                }
             }
+        } catch (error) {
+            console.error('error :: ', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -567,73 +594,89 @@ const DisbursementPage = () => {
     };
 
     const onConfirmSubmit = async () => {
-        if (getRoleUser() === appConfig.role.ADMIN) {
-            let payload = {
-                status: adminStatusBtn === 'REJECT' ? 'reject' : 'accept',
-            };
-            const response = await updateStatus(form.professor?.disbursement_id, payload);
-            if (response && response.message === 'Success') {
-                setTypePopupAlert('SUCCESS');
-                setIsOpenPopupAlert(true);
-                setMessagePopupAlert('ให้ผลรายการขอเบิกค่าสอนสำเร็จ');
-                onClosePopupConfirm();
-                fetchTeacherListByTerm(form.term?.term_of_year_id);
-                fetchScheduleDisburse();
+        try {
+            loadingOpen();
+            if (getRoleUser() === appConfig.role.ADMIN) {
+                let payload = {
+                    status: adminStatusBtn === 'REJECT' ? 'reject' : 'accept',
+                };
+                const response = await updateStatus(form.professor?.disbursement_id, payload);
+                if (response && response.message === 'Success') {
+                    loadingClose();
+                    setTypePopupAlert('SUCCESS');
+                    setMessagePopupAlert(response.payload.message ? response.payload.message : '');
+                    setIsOpenPopupAlert(!!response.payload.message);
+                    onClosePopupConfirm();
+                    fetchTeacherListByTerm(form.term?.term_of_year_id);
+                    fetchScheduleDisburse();
+                }
+            } else {
+                const mapPayload = {
+                    teacher_id: form.professor?.teacher_id,
+                    term_of_year_id: form.term?.term_of_year_id,
+                    sum_yes_unit: sumAcceptDisburse,
+                    sum_no_unit: sumRejectDisburse,
+                    total: sumFacultyDisburse,
+                    status: 'pending',
+                    data: dataSchedule.map((item) => {
+                        return {
+                            schedule_teach_id: item.schedule_teach_id,
+                            count_of_teach: item.teacher_no,
+                            unit: item.teacher_unit,
+                            unit_yes: item.accept_disburse,
+                            unit_no: item.reject_disburse,
+                            rate_of_unit: item.isEdit
+                                ? `${textRateUnits[item.schedule_teach_id]?.days}วัน*${
+                                      textRateUnits[item.schedule_teach_id]?.hours
+                                  }ชม/${textRateUnits[item.schedule_teach_id]?.weeks}สัปดาห์`
+                                : item.criteria_of_teach
+                                ? item.criteria_of_teach.rate_unit
+                                : '',
+                            total: item.faculty_disburse,
+                            note: item.major_name,
+                        };
+                    }),
+                };
+                setIsOpenPopupConfirm(false);
+                const response =
+                    status === 'reject'
+                        ? await updateDisbursement(form.professor?.disbursement_id, mapPayload)
+                        : await addDisbursement(mapPayload);
+                if (response && response.message === 'Success') {
+                    loadingClose();
+                    setDataSchedule([]);
+                    setTypePopupAlert('SUCCESS');
+                    setMessagePopupAlert(response.payload.message ? response.payload.message : '');
+                    setIsOpenPopupAlert(!!response.payload.message);
+                    fetchScheduleByUser();
+                }
             }
-        } else {
-            const mapPayload = {
-                teacher_id: form.professor?.teacher_id,
-                term_of_year_id: form.term?.term_of_year_id,
-                sum_yes_unit: sumAcceptDisburse,
-                sum_no_unit: sumRejectDisburse,
-                total: sumFacultyDisburse,
-                status: 'pending',
-                data: dataSchedule.map((item) => {
-                    return {
-                        schedule_teach_id: item.schedule_teach_id,
-                        count_of_teach: item.teacher_no,
-                        unit: item.teacher_unit,
-                        unit_yes: item.accept_disburse,
-                        unit_no: item.reject_disburse,
-                        rate_of_unit: item.isEdit
-                            ? `${textRateUnits[item.schedule_teach_id]?.days}วัน*${
-                                  textRateUnits[item.schedule_teach_id]?.hours
-                              }ชม/${textRateUnits[item.schedule_teach_id]?.weeks}สัปดาห์`
-                            : item.criteria_of_teach
-                            ? item.criteria_of_teach.rate_unit
-                            : '',
-                        total: item.faculty_disburse,
-                        note: item.major_name,
-                    };
-                }),
-            };
-            setIsOpenPopupConfirm(false);
-            const response =
-                status === 'reject'
-                    ? await updateDisbursement(form.professor?.disbursement_id, mapPayload)
-                    : await addDisbursement(mapPayload);
-            // const response = await updateDisbursement(mapPayload);
-            if (response && response.message === 'Success') {
-                setDataSchedule([]);
-                setTypePopupAlert('SUCCESS');
-                setIsOpenPopupAlert(true);
-                setMessagePopupAlert('ส่งรายการขอเบิกค่าสอนสำเร็จ');
-                fetchScheduleByUser();
-            }
+        } catch (error) {
+            console.error('error :: ', error);
+        } finally {
+            loadingClose();
         }
     };
 
     const fetchScheduleDisburse = async () => {
-        let payload = {
-            termId: form.term?.term_of_year_id,
-            teacherID: form.professor?.teacher_id,
-        };
-        const response = await getDataDisbursementByTeacherIDAndTermID(payload);
-        if (response && response.message === 'Success' && response.payload) {
-            setDisburseScheduleData(response.payload);
-            return response.payload;
+        try {
+            loadingOpen();
+            let payload = {
+                termId: form.term?.term_of_year_id,
+                teacherID: form.professor?.teacher_id,
+            };
+            const response = await getDataDisbursementByTeacherIDAndTermID(payload);
+            if (response && response.message === 'Success' && response.payload) {
+                loadingClose();
+                setDisburseScheduleData(response.payload);
+                return response.payload;
+            }
+            return null;
+        } catch (error) {
+            console.error('error :: ', error);
+        } finally {
+            loadingClose();
         }
-        return null;
     };
 
     const onClickApprove = () => {
@@ -715,12 +758,14 @@ const DisbursementPage = () => {
 
     const onClickDownloadPdf = async () => {
         try {
+            loadingOpen();
             const fileName = form.professor ? form.professor.pdf_path : '';
             let payload = {
                 pdf_path: fileName,
             };
             const response = await getPdf(payload);
             if (response && response.message === 'Success' && response.payload?.base64) {
+                loadingClose();
                 const base64 = response.payload.base64;
                 const byteCharacters = atob(base64);
                 const byteNumbers = new Array(byteCharacters.length);
@@ -738,6 +783,8 @@ const DisbursementPage = () => {
             }
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 

@@ -29,7 +29,8 @@ import { ReactNode, useEffect, useState } from 'react';
 import { BsTable } from 'react-icons/bs';
 import { FaCalculator } from 'react-icons/fa';
 import { GiReceiveMoney } from 'react-icons/gi';
-import { MdOutlineCalculate } from 'react-icons/md';
+import { IoIosTimer } from 'react-icons/io';
+import { MdOutlineCalculate, MdSubject } from 'react-icons/md';
 import { PiUserListBold } from 'react-icons/pi';
 import { TbLogout } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
@@ -37,10 +38,9 @@ import appConfig from '../../config/application-config.json';
 import { IProfessor } from '../../interface/Professor-interface';
 import { updatePassword } from '../../services/User-service';
 import { getDataProfessor, getRoleUser } from '../../util/Util';
+import CustomLoading from '../loading/Loading';
 import PopupAlert from '../popupAlert/Popup-Alert';
 import PopupError from '../popupAlert/Popup-Error';
-import { MdSubject } from 'react-icons/md';
-import { IoIosTimer } from 'react-icons/io';
 
 const drawerWidth = 240;
 
@@ -101,7 +101,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
     const [typePopupAlert, setTypePopupAlert] = useState<'ERROR' | 'SUCCESS' | 'WARNING'>(
         'WARNING'
     );
-    const [isChangePassword, setIsChangePassword] = useState<boolean>();
+    const [isChangePassword, setIsChangePassword] = useState<boolean>(false);
     const [oldPassword, setOldPassword] = useState<string>('');
     const [newPassword, setNewPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -216,7 +216,12 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
     const onCloseDialog = () => {
         setProfessorData(undefined);
         setOpenDialog(false);
-        onCancelChangePassword();
+        setIsChangePassword(false);
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setPasswordError(false);
+        setErrorMessage('');
     };
 
     const onClickChangePassword = () => {
@@ -280,7 +285,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
         palette: {
             mode: 'light',
             primary: {
-                main: '#2c517b',
+                main: '#2C517B',
             },
             error: {
                 main: '#ff0000',
@@ -304,7 +309,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
             MuiTableCell: {
                 styleOverrides: {
                     root: {
-                        border: '1px solid #e0e0e0',
+                        border: '1px solid #E0E0E0',
                     },
                 },
             },
@@ -525,6 +530,7 @@ const MenuDrawer = ({ children }: MenuDrawerProps) => {
 
     return (
         <ThemeProvider theme={theme}>
+            <CustomLoading />
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <PopupError />

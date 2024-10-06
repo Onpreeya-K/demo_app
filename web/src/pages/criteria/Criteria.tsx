@@ -26,7 +26,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import PopupAlert from '../../components/popupAlert/Popup-Alert';
 import { getCriteriaOfTeach, updateCriteriaOfTeach } from '../../services/Criteria-service';
-import { moneyFormatComma } from '../../util/Util';
+import { loadingClose, loadingOpen, moneyFormatComma } from '../../util/Util';
 
 interface Course {
     criteria_of_teach_id: number;
@@ -100,12 +100,16 @@ const CriteriaPage = () => {
 
     const fetchCriteriaOfTeach = async () => {
         try {
+            loadingOpen();
             const response = await getCriteriaOfTeach();
             if (response && response.message === 'Success') {
+                loadingClose();
                 setData(response.payload);
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
@@ -153,15 +157,26 @@ const CriteriaPage = () => {
     };
 
     const onConfirmUpdateCriteriaOfTeach = async () => {
-        let payload = {
-            teaching_rates: dataCriteria.teaching_rates,
-            rate_unit: dataCriteria.rate_unit,
-        };
-        const response = await updateCriteriaOfTeach(dataCriteria.criteria_of_teach_id, payload);
-        if (response) {
-            onCloseDialog();
-            setIsOpenPopupAlert(true);
-            setMessagePopupAlert('แก้ไขเกณฑ์ค่าสอนสำเร็จ');
+        try {
+            loadingOpen();
+            let payload = {
+                teaching_rates: dataCriteria.teaching_rates,
+                rate_unit: dataCriteria.rate_unit,
+            };
+            const response = await updateCriteriaOfTeach(
+                dataCriteria.criteria_of_teach_id,
+                payload
+            );
+            if (response && response.message === 'Success') {
+                onCloseDialog();
+                loadingClose();
+                setMessagePopupAlert(response.payload.message ? response.payload.message : '');
+                setIsOpenPopupAlert(!!response.payload.message);
+            }
+        } catch (error) {
+            console.log('error');
+        } finally {
+            loadingClose();
         }
     };
 

@@ -1,3 +1,6 @@
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import EditIcon from '@mui/icons-material/Edit';
 import {
     Autocomplete,
     Box,
@@ -24,7 +27,8 @@ import {
     useTheme,
 } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import CloseIcon from '@mui/icons-material/Close';
+import PopupAlert from '../../components/popupAlert/Popup-Alert';
+import PopupConfirm from '../../components/popupConfirm/Popup-Confirm';
 import {
     createSubject,
     deleteSubject,
@@ -32,10 +36,7 @@ import {
     getAllSubject,
     updateSubject,
 } from '../../services/Subject-service';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import EditIcon from '@mui/icons-material/Edit';
-import PopupConfirm from '../../components/popupConfirm/Popup-Confirm';
-import PopupAlert from '../../components/popupAlert/Popup-Alert';
+import { loadingClose, loadingOpen } from '../../util/Util';
 
 interface CourseOfStudy {
     course_of_study_id: number;
@@ -110,6 +111,7 @@ const SubjectInfoPage = () => {
 
     const fetchSubject = async () => {
         try {
+            loadingOpen();
             const response = await getAllSubject();
             if (response && response.message === 'Success') {
                 setSubjectAll(response.payload);
@@ -117,11 +119,14 @@ const SubjectInfoPage = () => {
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
 
     const fetchData = async () => {
         try {
+            loadingOpen();
             const responseCourseOfStudy = await getAllCourseOfStudy();
             if (responseCourseOfStudy && responseCourseOfStudy.message === 'Success') {
                 setCourseOfStudyList(responseCourseOfStudy.payload);
@@ -129,6 +134,8 @@ const SubjectInfoPage = () => {
             }
         } catch (error: any) {
             console.error('Error:', error);
+        } finally {
+            loadingClose();
         }
     };
     const replaceRegExp = (key: any) => {
@@ -257,6 +264,7 @@ const SubjectInfoPage = () => {
 
     const onSubmitDialogSubject = async () => {
         try {
+            loadingOpen();
             if (validate()) {
                 setOpenDialog(false);
                 if (modalAction === 'CREATE') {
@@ -272,9 +280,12 @@ const SubjectInfoPage = () => {
                     };
                     const response = await createSubject(payload);
                     if (response && response.message === 'Success') {
-                        setIsOpenPopupAlert(true);
+                        loadingClose();
                         setModalAction('');
-                        setMessagePopupAlert('เพิ่มรายวิชาสำเร็จ');
+                        setMessagePopupAlert(
+                            response.payload.message ? response.payload.message : ''
+                        );
+                        setIsOpenPopupAlert(!!response.payload.message);
                         clearForm();
                         await fetchSubject();
                         setOpenDialog(false);
@@ -294,9 +305,12 @@ const SubjectInfoPage = () => {
 
                     const response = await updateSubject(subject_id, payload);
                     if (response && response.message === 'Success') {
-                        setIsOpenPopupAlert(true);
+                        loadingClose();
+                        setMessagePopupAlert(
+                            response.payload.message ? response.payload.message : ''
+                        );
+                        setIsOpenPopupAlert(!!response.payload.message);
                         setModalAction('');
-                        setMessagePopupAlert('แก้ไขรายวิชาสำเร็จ');
                         clearForm();
                         await fetchSubject();
                     }
@@ -306,18 +320,28 @@ const SubjectInfoPage = () => {
             }
         } catch (error) {
             console.error('error ---> ', error);
+        } finally {
+            loadingClose();
         }
     };
 
     const onConfirm = async () => {
-        if (typeOfPopupConfirm === 'DELETE') {
-            const response = await deleteSubject(form.subject_id);
-            setIsOpenPopupConfirm(false);
-            if (response && response.message === 'Success') {
-                await fetchSubject();
-                setIsOpenPopupAlert(true);
-                setMessagePopupAlert('ลบรายวิชาสำเร็จ');
+        try {
+            loadingOpen();
+            if (typeOfPopupConfirm === 'DELETE') {
+                const response = await deleteSubject(form.subject_id);
+                setIsOpenPopupConfirm(false);
+                if (response && response.message === 'Success') {
+                    loadingClose();
+                    await fetchSubject();
+                    setIsOpenPopupAlert(!!response.payload.message);
+                    setMessagePopupAlert(response.payload.message ? response.payload.message : '');
+                }
             }
+        } catch (error) {
+            console.error('error :: ', error);
+        } finally {
+            loadingClose();
         }
     };
 
