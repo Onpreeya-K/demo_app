@@ -5,6 +5,8 @@ namespace App\Modules\TermOfYear;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use App\Utils\HelperResponse;
+
 class TermOfYearController
 {
     protected $termOfYearService;
@@ -16,37 +18,53 @@ class TermOfYearController
 
     public function fetch(Request $request, Response $response, $args)
     {
-        $termOfYears = $this->termOfYearService->getAllTermOfYears();
-        $response->getBody()->write(json_encode($termOfYears));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $termOfYears = $this->termOfYearService->getAllTermOfYears();
+            return HelperResponse::json($response, $termOfYears);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function fetchByID(Request $request, Response $response, $args)
     {
-        $termOfYear = $this->termOfYearService->getTermOfYearById($args['id']);
-        $response->getBody()->write(json_encode($termOfYear));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $termOfYear = $this->termOfYearService->getTermOfYearById($args['id']);
+            return HelperResponse::json($response, $termOfYear);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function create(Request $request, Response $response, $args)
     {
-        $data = $request->getParsedBody();
-        $termOfYear = $this->termOfYearService->createTermOfYear($data);
-        $response->getBody()->write(json_encode($termOfYear));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $data = $request->getParsedBody();
+            $termOfYear = $this->termOfYearService->createTermOfYear($data);
+            return HelperResponse::json($response, $termOfYear, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function update(Request $request, Response $response, $args)
     {
-        $data = $request->getParsedBody();
-        $termOfYear = $this->termOfYearService->updateTermOfYear($args['id'], $data);
-        $response->getBody()->write(json_encode($termOfYear));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $data = $request->getParsedBody();
+            $termOfYear = $this->termOfYearService->updateTermOfYear($args['id'], $data);
+            return HelperResponse::json($response, $termOfYear,201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function delete(Request $request, Response $response, $args)
     {
-        $this->termOfYearService->deleteTermOfYear($args['id']);
-        return $response->withStatus(204);
+        try {
+            $data = $this->termOfYearService->deleteTermOfYear($args['id']);
+            return HelperResponse::json($response, $data, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 }

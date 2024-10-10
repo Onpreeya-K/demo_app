@@ -19,7 +19,7 @@ class SubjectService
         $subjects =  $this->majorRepository->getAllSubjects();
 
         if ($subjects->isEmpty()) {
-            throw new Exception(ErrorMessage::NO_SUBJECTS_FOUND, 404);
+            throw new Exception(ErrorMessage::SUBJECTS_NOT_FOUND, 404);
         }
 
         return $subjects;
@@ -30,7 +30,7 @@ class SubjectService
         $subject = $this->majorRepository->getSubjectById($id);
 
         if (!$subject) {
-            throw new Exception(ErrorMessage::SUBJECT_NOT_FOUND, 404);
+            throw new Exception(ErrorMessage::SUBJECTS_NOT_FOUND, 404);
         }
 
         return $subject;
@@ -40,30 +40,28 @@ class SubjectService
     {
         $created =  $this->majorRepository->createSubject($data);
         if (!$created) {
-            throw new Exception(ErrorMessage::SUBJECT_CREATION_FAILED, 400);
+            throw new Exception(ErrorMessage::CREATE_SUBJECTS_ERROR, 400);
         }
 
-        return $created;
-
-        
+        return ["message" => ErrorMessage::CREATE_SUBJECTS_SUCCESS];
     }
 
     public function updateSubject($id, $data)
     {
         $updated = $this->majorRepository->updateSubject($id, $data);
         if (!$updated) {
-            throw new Exception(ErrorMessage::SUBJECT_UPDATE_FAILED, 400);
+            throw new Exception(ErrorMessage::UPDATE_SUBJECTS_ERROR, 400);
         }
 
-        return $updated;
+        return ["message" => ErrorMessage::UPDATE_SUBJECTS_SUCCESS];
     }
 
     public function deleteSubject($id)
     {
         $deleted = $this->majorRepository->deleteSubject($id);
         if (!$deleted) {
-            throw new Exception(ErrorMessage::SUBJECT_DELETION_FAILED, 400);
+            throw new Exception(ErrorMessage::DELETE_SUBJECTS_ERROR, 400);
         }
-        return $deleted;
+        return ["message" => ErrorMessage::DELETE_SUBJECTS_SUCCESS];
     }
 }

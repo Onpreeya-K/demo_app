@@ -50,7 +50,7 @@ class DisbursementRepository
 
     public function getListTeacherStatusByTermID($termOfYearId){
         return Disbursement::with(['teacher' => function($query) {
-            $query->select('teacher_id', 'prefix', 'fullname',); // Customize columns from the 'product' table
+            $query->select('teacher_id', 'prefix', 'fullname',);
         }])
         ->where('term_of_year_id', $termOfYearId)
         ->get();

@@ -5,6 +5,7 @@ namespace App\Utils;
 use Psr\Http\Message\ResponseInterface;
 use Exception;
 use App\Constant\ErrorMessage;
+use Monolog\Logger;
 
 class HelperResponse
 {
@@ -15,9 +16,9 @@ class HelperResponse
     }
     public static function jsonWithException(ResponseInterface $response, Exception $exception, int $statusCode = 200): ResponseInterface
     {
-
         $mes = $exception->getMessage();
         $statusCode = $exception->getCode();
+
         if($exception->getCode() === 500){
             $mes = ErrorMessage::SOMETHING_WENT_WRONG;
         }

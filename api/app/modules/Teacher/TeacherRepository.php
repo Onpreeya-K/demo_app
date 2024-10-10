@@ -11,6 +11,14 @@ class TeacherRepository
         return Teacher::with(['managementPosition', 'academicPosition'])->where('is_active', 1)->get();
     }
 
+    public function getAllTeachersWithOutAdmin($listId)
+    {
+        return Teacher::with(['managementPosition', 'academicPosition'])
+                        ->where('is_active', 1)
+                        ->whereNotIn('teacher_id', $listId)
+                        ->get();
+    }
+
     public function getTeacherById($id)
     {
         return Teacher::with(['managementPosition', 'academicPosition'])->find($id);

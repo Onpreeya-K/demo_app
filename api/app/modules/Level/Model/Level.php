@@ -7,13 +7,13 @@ use App\Modules\CriteriaOfTeach\Model\CriteriaOfTeach;
 use App\Modules\ScheduleTeach\Model\ScheduleTeach;
 
 class Level extends Model {
-    protected $table = 'level'; // Table name
-    protected $primaryKey = 'level_id'; // Primary key column
-    protected $fillable = ['level_id', 'name']; // Fillable columns
+    protected $table = 'level';
+    protected $primaryKey = 'level_id';
+    protected $fillable = ['level_id', 'name'];
     protected $hidden = ['created_at', 'updated_at'];
     public $timestamps = true;
-    public $incrementing = false; // If primary key is not auto-incrementing
-    protected $keyType = 'int'; // If primary key is not an integer
+    public $incrementing = false;
+    protected $keyType = 'int';
 
     public function criteriaOfTeach() {
         return $this->hasMany(CriteriaOfTeach::class, 'level_id'); 

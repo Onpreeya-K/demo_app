@@ -22,12 +22,13 @@ class DisbursementService
     {
         $disb =  $this->disbursementRepository->getAllDisbursements();
         if (!$disb) {
-            throw new Exception(ErrorMessage::NO_DISBURSEMENT_FOUND, 404);
+            throw new Exception(ErrorMessage::DISBURSEMENT_NOT_FOUND, 404);
         }
         return $disb;
     }
 
-    public function getDisbursementsById($Id){
+    public function getDisbursementsById($Id)
+    {
         $disb = $this->disbursementRepository->getDisbursementByID($Id);
         if (!$disb) {
             throw new Exception(ErrorMessage::DISBURSEMENT_NOT_FOUND, 404);
@@ -35,82 +36,94 @@ class DisbursementService
         return $disb;
     }
 
-    public function getDisbursementsByTermOfYearId($termOfYearId){
+    public function getDisbursementsByTermOfYearId($termOfYearId)
+    {
         $disb =  $this->disbursementRepository->getDisbursementByTermID($termOfYearId);
         if (!$disb) {
-            throw new Exception(ErrorMessage::NO_DISBURSEMENT_FOUND, 404);
+            throw new Exception(ErrorMessage::DISBURSEMENT_NOT_FOUND, 404);
         }
         return $disb;
     }
 
-    public function getDisbursementsByTeacherId($teacherId){
+    public function getDisbursementsByTeacherId($teacherId)
+    {
         $disb =  $this->disbursementRepository->getDisbursementByTeacherID($teacherId);
         if (!$disb) {
-            throw new Exception(ErrorMessage::NO_DISBURSEMENT_FOUND, 404);
+            throw new Exception(ErrorMessage::DISBURSEMENT_NOT_FOUND, 404);
         }
         return $disb;
     }
 
-    public function getDisbursementsByTeacherIdAndTermOfYearId($teacherId, $termOfYearId){
+    public function getDisbursementsByTeacherIdAndTermOfYearId($teacherId, $termOfYearId)
+    {
 
         $dataDisbursement = $this->disbursementRepository->getDisbursementByTeacherIDAndTermID($teacherId, $termOfYearId);
         if (!$dataDisbursement) {
-            return null;
+            throw new Exception(ErrorMessage::DISBURSEMENT_NOT_FOUND, 404);
         }
 
         $listDisbursementTeach = $this->disbursementRepository->getListDisbursementTeachByDisbursementID($dataDisbursement->disbursement_id);
-        $dataDisbursement['data'] = $listDisbursementTeach;
+        if (!$listDisbursementTeach) {
+            throw new Exception(ErrorMessage::DISBURSEMENT_TEACH_NOT_FOUND, 404);
+        }
 
+        $dataDisbursement['data'] = $listDisbursementTeach;
 
         return $dataDisbursement;
     }
 
     public function createDisbursementWithTech($data)
     {
-        $pdfPath = 'disbursement_'. $data['term_of_year_id']. '_' . $data['teacher_id']. '_' . time() . '.pdf';
+        $pdfPath = 'disbursement_' . $data['term_of_year_id'] . '_' . $data['teacher_id'] . '_' . time() . '.pdf';
 
-        $spdf = new PDFGen(pathFile: $pdfPath);
-        $spdf->createPDF();
-        
-        return DB::transaction(function () use ($data, $pdfPath) {
+        try {
+            $spdf = new PDFGen(pathFile: $pdfPath);
+            $spdf->createPDF();
 
-            $disbursementData = [
-                'teacher_id' => $data['teacher_id'],
-                'term_of_year_id' => $data['term_of_year_id'],
-                'sum_yes_unit' => $data['sum_yes_unit'],
-                'sum_no_unit' => $data['sum_no_unit'],
-                'total' => $data['total'],
-                'status' => $data['status'],
-                'pdf_path' => $pdfPath
-            ];
+            DB::transaction(function () use ($data, $pdfPath) {
 
-            $disbursement = $this->disbursementRepository->createDisbursement($disbursementData);
+                $disbursementData = [
+                    'teacher_id' => $data['teacher_id'],
+                    'term_of_year_id' => $data['term_of_year_id'],
+                    'sum_yes_unit' => $data['sum_yes_unit'],
+                    'sum_no_unit' => $data['sum_no_unit'],
+                    'total' => $data['total'],
+                    'status' => $data['status'],
+                    'pdf_path' => $pdfPath
+                ];
 
-            foreach ($data['data'] as $subject) {
-                $disbursement->scheduleTeachs()->attach($subject['schedule_teach_id'], [
-                    'count_of_teach' => $subject['count_of_teach'],
-                    'unit' => $subject['unit'],
-                    'unit_yes' => $subject['unit_yes'],
-                    'unit_no' => $subject['unit_no'],
-                    'rate_of_unit' => $subject['rate_of_unit'],
-                    'total' => $subject['total'],
-                    'note' => $subject['note']
-                ]);
-            }
+                $disbursement = $this->disbursementRepository->createDisbursement($disbursementData);
 
-            return $disbursement;
-        });
+                foreach ($data['data'] as $subject) {
+                    $disbursement->scheduleTeachs()->attach($subject['schedule_teach_id'], [
+                        'count_of_teach' => $subject['count_of_teach'],
+                        'unit' => $subject['unit'],
+                        'unit_yes' => $subject['unit_yes'],
+                        'unit_no' => $subject['unit_no'],
+                        'rate_of_unit' => $subject['rate_of_unit'],
+                        'total' => $subject['total'],
+                        'note' => $subject['note']
+                    ]);
+                }
+            });
+
+            return ["message" => ErrorMessage::CREATE_DISBURSEMENT_SUCCESS]; 
+
+        } catch (Exception $e) {
+            throw new Exception(ErrorMessage::CREATE_DISBURSEMENT_ERROR, 400);
+        }
     }
 
-    public function getListTeacherStatusByTermID($termOfYearId) {
+    public function getListTeacherStatusByTermID($termOfYearId)
+    {
         return $this->disbursementRepository->getListTeacherStatusByTermID($termOfYearId);
-
     }
 
     public function updateDisbursement($id, $data)
     {
 
-        return DB::transaction(function () use ($id, $data) {
+        try {
+            return DB::transaction(function () use ($id, $data) {
 
             $disbursementData = [
                 'sum_yes_unit' => $data['sum_yes_unit'],
@@ -119,53 +132,60 @@ class DisbursementService
                 'status' => $data['status'],
             ];
 
-            $disbursement = $this->disbursementRepository->updateDisbursement($id,$disbursementData);
+            $disbursement = $this->disbursementRepository->updateDisbursement($id, $disbursementData);
 
             if (!$disbursement) {
                 throw new Exception('disbursement not found.');
             }
 
-            // Sync the products with the pivot table
             $pivotData = [];
             foreach ($data['data'] as $subject) {
                 $pivotData[$subject['schedule_teach_id']] = [
-                    'count_of_teach' => $subject['count_of_teach'],
-                    'unit' => $subject['unit'],
-                    'unit_yes' => $subject['unit_yes'],
-                    'unit_no' => $subject['unit_no'],
-                    'rate_of_unit' => $subject['rate_of_unit'],
-                    'total' => $subject['total'],
-                    'note' => $subject['note']
+                'count_of_teach' => $subject['count_of_teach'],
+                'unit' => $subject['unit'],
+                'unit_yes' => $subject['unit_yes'],
+                'unit_no' => $subject['unit_no'],
+                'rate_of_unit' => $subject['rate_of_unit'],
+                'total' => $subject['total'],
+                'note' => $subject['note']
                 ];
             }
 
             $disbursement->scheduleTeachs()->sync($pivotData);
 
-            return $disbursement;
-        });
+            return ["message" => ErrorMessage::UPDATE_DISBURSEMENT_SUCCESS];
+            });
+        } catch (Exception $e) {
+            throw new Exception(ErrorMessage::UPDATE_DISBURSEMENT_ERROR, 400);
+        }
     }
 
     public function updateAcceptDisbursement($id, $data)
     {
-        $status = [
+        try {
+            $status = [
             'status' => $data['status']
-        ];
+            ];
 
-        $resp = $this->disbursementRepository->updateDisbursement($id, $status);
-        if (!$resp) {
-            throw new Exception('disbursement not found.');
+            $resp = $this->disbursementRepository->updateDisbursement($id, $status);
+            if (!$resp) {
+            throw new Exception(ErrorMessage::UPDATE_DISBURSEMENT_STATUS_ERROR, 400);
+            }
+
+            $disbursement = $this->disbursementRepository->getDisbursementByID($id);
+
+            $listDisbursement = $this->getDisbursementsByTeacherIdAndTermOfYearId($disbursement->teacher_id, $disbursement->term_of_year_id);
+
+            $dataFinish = $this->preprocessPdfData($listDisbursement);
+            //update pdf Data
+            
+            $spdf = new PDFGen(pathFile: $disbursement->pdf_path, data: $dataFinish);
+            $spdf->updatePDF();
+
+            return ["message" => ErrorMessage::UPDATE_DISBURSEMENT_STATUS_SUCCESS];
+        } catch (Exception $e) {
+            throw new Exception(ErrorMessage::UPDATE_DISBURSEMENT_STATUS_ERROR, 400);
         }
-
-        $disbursement = $this->disbursementRepository->getDisbursementByID($id);
-
-        $listDisbursement = $this->getDisbursementsByTeacherIdAndTermOfYearId($disbursement->teacher_id, $disbursement->term_of_year_id);
-
-        $dataFinish = $this->preprocessPdfData($listDisbursement);
-        //update pdf Data
-        $spdf = new PDFGen(pathFile: $disbursement->pdf_path, data: $dataFinish);
-        $spdf->updatePDF();
-
-        return $resp;
     }
 
     public function updateRejectDisbursement($id, $data)
@@ -175,14 +195,15 @@ class DisbursementService
         ];
         $resp = $this->disbursementRepository->updateDisbursement($id, $status);
         if (!$resp) {
-            throw new Exception('disbursement not found.');
+            throw new Exception(ErrorMessage::UPDATE_DISBURSEMENT_STATUS_ERROR, 400);
         }
-        return $resp;
+        return ["message" => ErrorMessage::UPDATE_DISBURSEMENT_STATUS_SUCCESS];
     }
 
-    public function generatePdf($data){
+    public function generatePdf($data)
+    {
         $pdfPath = $data["pdf_path"];
-        $fullPath = __DIR__. '/../../../storage/pdfs/' . $pdfPath;
+        $fullPath = __DIR__ . '/../../../storage/pdfs/' . $pdfPath;
 
         if (file_exists($fullPath)) {
             $pdf_content = file_get_contents($fullPath);
@@ -191,12 +212,15 @@ class DisbursementService
         } else {
             throw new Exception(ErrorMessage::PDF_FILE_NOT_FOUND, 404);
         }
-
     }
 
     public function deleteDisbursement($id)
     {
-        return $this->disbursementRepository->deleteDisbursement($id);
+        $deleted = $this->disbursementRepository->deleteDisbursement($id);
+        if(!$deleted){
+            throw new Exception(ErrorMessage::DELETE_DISBURSEMENT_ERROR, 400);
+        }
+        return ["message" => ErrorMessage::DELETE_DISBURSEMENT_SUCCESS];
     }
 
     private function preprocessPdfData($disbursement)

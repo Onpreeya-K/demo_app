@@ -11,6 +11,11 @@ class UserRepository
         return User::get();
     }
 
+    public function getAllUsersRole()
+    {
+        return User::where('role', 'admin')->select('username')->get();
+    }
+
     public function getUserById($id)
     {
         return User::find($id);

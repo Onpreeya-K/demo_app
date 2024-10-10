@@ -21,7 +21,7 @@ class DisbursementController
         try {
             $data = $request->getParsedBody();
             $disbursement = $this->disbursementService->createDisbursementWithTech($data);
-            return HelperResponse::json($response, $disbursement);
+            return HelperResponse::json($response, $disbursement, 201);
         } catch (\Exception $e) {
             return HelperResponse::jsonWithException($response, $e);
         }
@@ -101,7 +101,7 @@ class DisbursementController
             $data = $request->getParsedBody();
             $disbursement = $this->disbursementService->updateDisbursement($disbursementId, $data);
 
-            return HelperResponse::json($response, $disbursement);
+            return HelperResponse::json($response, $disbursement, 201);
         } catch (\Exception $e) {
             return HelperResponse::jsonWithException($response, $e);
         }
@@ -117,8 +117,7 @@ class DisbursementController
             } else {
                 $resp = $this->disbursementService->updateAcceptDisbursement($disbursementId, $data);
             }
-            $response->getBody()->write(json_encode($resp));
-            return $response->withHeader('Content-Type', 'application/json');
+            return HelperResponse::json($response, $resp, 201);
         } catch (\Exception $e) {
             return HelperResponse::jsonWithException($response, $e);
         }
@@ -140,8 +139,8 @@ class DisbursementController
     {
         try {
             $disbursementId = $args['id'];
-            $this->disbursementService->deleteDisbursement($disbursementId);
-            return HelperResponse::json($response, null, 200);
+            $data = $this->disbursementService->deleteDisbursement($disbursementId);
+            return HelperResponse::json($response, $data, 201);
             
         } catch (\Exception $e) {
             return HelperResponse::jsonWithException($response, $e);

@@ -5,6 +5,7 @@ namespace App\Modules\Level;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use App\Utils\HelperResponse;
 class LevelController
 {
     protected $levelService;
@@ -16,37 +17,53 @@ class LevelController
 
     public function fetch(Request $request, Response $response, $args)
     {
-        $levels = $this->levelService->getAllLevels();
-        $response->getBody()->write(json_encode($levels));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $levels = $this->levelService->getAllLevels();
+            return HelperResponse::json($response, $levels);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function fetchByID(Request $request, Response $response, $args)
     {
-        $level = $this->levelService->getLevelById($args['id']);
-        $response->getBody()->write(json_encode($level));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $level = $this->levelService->getLevelById($args['id']);
+            return HelperResponse::json($response, $level);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function create(Request $request, Response $response, $args)
     {
-        $data = $request->getParsedBody();
-        $level = $this->levelService->createLevel($data);
-        $response->getBody()->write(json_encode($level));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $data = $request->getParsedBody();
+            $level = $this->levelService->createLevel($data);
+            return HelperResponse::json($response, $level,201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function update(Request $request, Response $response, $args)
     {
-        $data = $request->getParsedBody();
-        $level = $this->levelService->updateLevel($args['id'], $data);
-        $response->getBody()->write(json_encode($level));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $data = $request->getParsedBody();
+            $level = $this->levelService->updateLevel($args['id'], $data);
+            return HelperResponse::json($response, $level,201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function delete(Request $request, Response $response, $args)
     {
-        $this->levelService->deleteLevel($args['id']);
-        return $response->withStatus(204);
+        try {
+            $data = $this->levelService->deleteLevel($args['id']);
+            return HelperResponse::json($response, $data, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 }

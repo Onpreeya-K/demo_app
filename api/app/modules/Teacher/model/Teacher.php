@@ -9,13 +9,13 @@ use App\Modules\AcademicPosition\Model\AcademicPosition;
 use App\Modules\Disbursement\Model\Disbursement;
 
 class Teacher extends Model {
-    protected $table = 'teacher'; // Table name
-    protected $primaryKey = 'teacher_id'; // Primary key column
-    protected $fillable = ['teacher_id', 'a_id', 'm_id', 'prefix', 'fullname', 'is_active']; // Fillable columns
+    protected $table = 'teacher';
+    protected $primaryKey = 'teacher_id';
+    protected $fillable = ['teacher_id', 'a_id', 'm_id', 'prefix', 'fullname', 'is_active'];
     protected $hidden = ['created_at', 'updated_at', 'is_active', 'm_id', 'a_id'];
     public $timestamps = true;
-    public $incrementing = false; // If primary key is not auto-incrementing
-    protected $keyType = 'string'; // If primary key is not an integerq                             
+    public $incrementing = false;
+    protected $keyType = 'string';                             
 
     public function user() {
         return $this->hasOne(User::class, 'username', 'teacher_id');

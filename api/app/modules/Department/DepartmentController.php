@@ -5,6 +5,8 @@ namespace App\Modules\Department;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use App\Utils\HelperResponse;
+
 class DepartmentController
 {
     protected $departmentService;
@@ -16,37 +18,53 @@ class DepartmentController
 
     public function fetch(Request $request, Response $response, $args)
     {
-        $departments = $this->departmentService->getAllDepartments();
-        $response->getBody()->write(json_encode($departments));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $departments = $this->departmentService->getAllDepartments();
+            return HelperResponse::json($response, $departments,201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function fetchByID(Request $request, Response $response, $args)
     {
-        $department = $this->departmentService->getDepartmentById($args['id']);
-        $response->getBody()->write(json_encode($department));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $department = $this->departmentService->getDepartmentById($args['id']);
+            return HelperResponse::json($response, $department);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function create(Request $request, Response $response, $args)
     {
-        $data = $request->getParsedBody();
-        $department = $this->departmentService->createDepartment($data);
-        $response->getBody()->write(json_encode($department));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $data = $request->getParsedBody();
+            $department = $this->departmentService->createDepartment($data);
+            return HelperResponse::json($response, $department);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function update(Request $request, Response $response, $args)
     {
-        $data = $request->getParsedBody();
-        $department = $this->departmentService->updateDepartment($args['id'], $data);
-        $response->getBody()->write(json_encode($department));
-        return $response->withHeader('Content-Type', 'application/json');
+        try {
+            $data = $request->getParsedBody();
+            $department = $this->departmentService->updateDepartment($args['id'], $data);
+            return HelperResponse::json($response, $department,201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 
     public function delete(Request $request, Response $response, $args)
     {
-        $this->departmentService->deleteDepartment($args['id']);
-        return $response->withStatus(204);
+        try {
+            $data = $this->departmentService->deleteDepartment($args['id']);
+            return HelperResponse::json($response, $data, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
     }
 }

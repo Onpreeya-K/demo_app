@@ -53,6 +53,10 @@ class ComposerStaticInit026509606a55be5c56c243e48adc6597
         array (
             'Nyholm\\Psr7\\' => 12,
         ),
+        'M' => 
+        array (
+            'Monolog\\' => 8,
+        ),
         'L' => 
         array (
             'Laravel\\SerializableClosure\\' => 28,
@@ -178,6 +182,10 @@ class ComposerStaticInit026509606a55be5c56c243e48adc6597
         'Nyholm\\Psr7\\' => 
         array (
             0 => __DIR__ . '/..' . '/nyholm/psr7/src',
+        ),
+        'Monolog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
         'Laravel\\SerializableClosure\\' => 
         array (

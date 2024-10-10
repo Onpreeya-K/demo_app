@@ -110,7 +110,7 @@ class ScheduleTeachService
     {
         try {
             $scheduleTeach = $this->scheduleTeachRepository->getTeacherSchedule($termOfYearId)->toArray();
-            $teacherList = $this->teacherService->getAllTeachers();
+            $teacherList = $this->teacherService->getAllTeachersWithoutAdmin();
             $thecherID = array_column($scheduleTeach, "teacher_id");
             $result = [];
 

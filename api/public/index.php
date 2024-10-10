@@ -14,12 +14,10 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Firebase\JWT\JWT;
 use Slim\Factory\AppFactory;
 
-use Symfony\Component\Validator\Validation;
 
-use App\Middleware\AuthMiddleware;
 use App\Middleware\CorsMiddleware;
 use App\Middleware\ResponseMiddleware;
-use Slim\Middleware\BodyParsingMiddleware;
+use App\Middleware\LoggerMiddleware;
 
 use App\Utils\PDFGen;
 // Load environment variables
@@ -52,6 +50,7 @@ $secret = $_ENV['SECRET_KEY'];
 
 $app->add(ResponseMiddleware::class);
 $app->add(CorsMiddleware::class);
+$app->add(LoggerMiddleware::class,);
 
 // Load routes file
 require __DIR__ . '/../routes/routes.php';

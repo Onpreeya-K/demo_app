@@ -7,13 +7,13 @@ use App\Modules\CourseOfStudy\Model\CourseOfStudy;
 use App\Modules\ScheduleTeach\Model\ScheduleTeach;
 
 class Subject extends Model {
-    protected $table = 'subject'; // Table name
-    protected $primaryKey = 'subject_id'; // Primary key column
-    protected $fillable = ['subject_id', 'course_of_study_id', 'name', 'unit', 'type', 'is_internal']; // Fillable columns
+    protected $table = 'subject';
+    protected $primaryKey = 'subject_id';
+    protected $fillable = ['subject_id', 'course_of_study_id', 'name', 'unit', 'type', 'is_internal'];
     protected $hidden = ['created_at', 'updated_at', 'status'];
     public $timestamps = true;
-    public $incrementing = false; // If primary key is not auto-incrementing
-    protected $keyType = 'string'; // If primary key is not an integer
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     public function courseOfStudy() {
         return $this->belongsTo(CourseOfStudy::class, 'course_of_study_id');
