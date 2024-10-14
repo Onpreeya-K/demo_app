@@ -18,7 +18,7 @@ class TeacherController
     public function fetch(Request $request, Response $response, $args)
     {
         try {
-            $teachers = $this->teacherService->getAllTeachers();
+            $teachers = $this->teacherService->getAllTeachersWithoutAdmin();
             return HelperResponse::json($response, $teachers);
         } catch (\Exception $e) {
             return HelperResponse::jsonWithException($response, $e);
