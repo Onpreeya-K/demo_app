@@ -30,7 +30,16 @@ class SubjectService
         $subject = $this->majorRepository->getSubjectById($id);
 
         if (!$subject) {
-            // throw new Exception(ErrorMessage::SUBJECTS_NOT_FOUND, 404);
+            throw new Exception(ErrorMessage::SUBJECTS_NOT_FOUND, 404);
+        }
+
+        return $subject;
+    }
+    public function getSubjectIsInternal($id)
+    {
+        $subject = $this->majorRepository->getSubjectIsInternal($id);
+
+        if (!$subject) {
             return null;
         }
 

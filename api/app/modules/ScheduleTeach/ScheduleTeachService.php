@@ -32,7 +32,7 @@ class ScheduleTeachService
 
             DB::transaction(function () use ($scheduleList, $teacherID, $termID) {
                 foreach ($scheduleList as $value) {
-                    $checkSubject = $this->subjectService->getSubjectById($value['course_code']);
+                    $checkSubject = $this->subjectService->getSubjectIsInternal($value['course_code']);
                     if ($checkSubject == null) {
                         $spiltUnit = explode(" ", $value['course_unit']);
                         $subject = array(

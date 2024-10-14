@@ -16,6 +16,12 @@ class SubjectRepository
         return Subject::with(['courseOfStudy'])
                         ->find($id);
     }
+    public function getSubjectIsInternal($id)
+    {
+        return Subject::with(['courseOfStudy'])
+                ->whereNotNull('course_of_study_id')
+                ->find($id);
+    }
 
     public function createSubject($data)
     {
