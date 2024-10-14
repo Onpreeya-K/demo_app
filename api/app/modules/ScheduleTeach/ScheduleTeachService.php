@@ -54,7 +54,7 @@ class ScheduleTeachService
 
             return ["message" => ErrorMessage::CREATE_SCHEDULE_TEACH_SUCCESS];
         } catch (Exception $e) {
-            throw new Exception(ErrorMessage::CREATE_SCHEDULE_TEACH_ERROR, 400);
+            throw new Exception($e->getMessage(), 400);
         }
     }
 
