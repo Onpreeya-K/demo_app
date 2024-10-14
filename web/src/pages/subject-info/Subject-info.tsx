@@ -402,6 +402,7 @@ const SubjectInfoPage = () => {
                                 size="small"
                                 value={form.subject_id || ''}
                                 onChange={handleChange}
+                                disabled={modalAction === 'UPDATE'}
                                 error={errors.subject_id}
                                 helperText={errors.subject_id && 'กรุณาระบุรหัสวิชา'}
                                 inputProps={{
