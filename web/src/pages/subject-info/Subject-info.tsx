@@ -157,7 +157,7 @@ const SubjectInfoPage = () => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         if (name === 'unit') {
-            const isValidFormat = /^[0-9]+\s{0,2}\(\d-\d-\d\)$/.test(value);
+            const isValidFormat = /^[0-9]{1,2}\(\d{1,2}-\d{1,2}-\d{1,2}\)$/.test(value);
             setForm((prev) => ({
                 ...prev,
                 [name]: value,
