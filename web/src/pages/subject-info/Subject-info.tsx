@@ -235,7 +235,7 @@ const SubjectInfoPage = () => {
 
     const validate = () => {
         // Regular Expression to validate format x(x-x-x) or x (x-x-x)
-        const isValidUnitFormat = /^[0-9]+\s{0,2}\(\d-\d-\d\)$/.test(form.unit.trim());
+        const isValidUnitFormat = /^[0-9]{1,2}\(\d{1,2}-\d{1,2}-\d{1,2}\)$/.test(form.unit.trim());
         const tempErrors: ErrorState = {
             subject_id: form.subject_id.trim() === '',
             name: form.name.trim() === '',
@@ -249,14 +249,15 @@ const SubjectInfoPage = () => {
 
     const parseUnitTotal = (unitTotal: string) => {
         const cleanedUnitTotal = unitTotal.replace(/\s/g, '');
-        const match = cleanedUnitTotal.match(/^(\d+)\((\d-\d-\d)\)$/);
+        const match = cleanedUnitTotal.match(/^(\d{1,2})\((\d{1,2})-(\d{1,2})-(\d{1,2})\)$/);
         if (match) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const [_, unit, type] = match;
-            return {
+            const [_, unit, type1, type2, type3] = match;
+            const parsedResult = {
                 unit: parseInt(unit, 10),
-                type: `(${type})`,
+                type: `(${type1}-${type2}-${type3})`,
             };
+            return parsedResult;
         }
 
         return null;
@@ -371,7 +372,7 @@ const SubjectInfoPage = () => {
 
     const renderDialogAddProfessor = () => {
         return (
-            <Dialog open={openDialog} disableEnforceFocus fullWidth maxWidth={getMaxWidth()}>
+            <Dialog open={openDialog} fullWidth maxWidth={getMaxWidth()}>
                 <DialogTitle sx={{ padding: '16px 24px 8px 24px', position: 'relative' }}>
                     <Typography textAlign="center" variant="h6" component="div">
                         {modalAction === 'CREATE' ? 'เพิ่มรายวิชา' : 'แก้ไขรายวิชา'}
