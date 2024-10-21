@@ -1,4 +1,4 @@
 {
     "baseUrl": "http://localhost",
-    "base_path": "/api/v1"
+    "base_path": "/teaching/api/v1"
 }

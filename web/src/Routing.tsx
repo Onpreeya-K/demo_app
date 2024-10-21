@@ -12,7 +12,7 @@ import TermPage from './pages/term/Term-info';
 
 const Routing: React.FC = () => {
     return (
-        <BrowserRouter>
+        <BrowserRouter basename='/teaching'>
             <Routes>
                 <Route path="/" element={<Navigate to="login" replace={true} />} />
                 <Route path="login" element={<Login />} />

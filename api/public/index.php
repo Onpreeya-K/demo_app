@@ -34,7 +34,7 @@ AppFactory::setContainer($container);
 
 // Create App
 $app = AppFactory::create();
-$app->setBasePath('/api/v1');
+$app->setBasePath('/teaching/api/v1');
 
 $app->addRoutingMiddleware();
 
