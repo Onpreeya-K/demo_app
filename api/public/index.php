@@ -1,9 +1,4 @@
 <?php
-
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
-
 require  '../vendor/autoload.php';
 
 use Psr\Http\Message\ResponseInterface as Response;
@@ -54,39 +49,5 @@ $app->add(LoggerMiddleware::class,);
 
 // Load routes file
 require __DIR__ . '/../routes/routes.php';
-
-
-
-$app->get('/key', function (Request $request, Response $response, $args) use ($secret)  {
-    $now = new DateTime();
-    $future = new DateTime("now +5 hours");
-    $jti = base64_encode(random_bytes(16));
-
-    $payload = [
-        "iat" => $now->getTimeStamp(),
-        "exp" => $future->getTimeStamp(),
-        "jti" => $jti,
-        "sub" => "abc",
-    ];
-
-    $token = JWT::encode($payload, $secret , $_ENV["ALGRO"]);
-    $resp = array('token' => $token);
-    $payload = json_encode($resp);
-    $response->getBody()->write($payload);
-
-    return $response
-             ->withHeader('Content-Type', 'application/json')
-             ->withStatus(200);
-});
-
-$app->get('/111', function (Request $request, Response $response, $args) {
-    $spdf = new PDFGen("test.pdf");
-    $spdf->createPDF();
-
-    $response->getBody()->write(json_encode(['status' => 'success']));
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
-
 
 $app->run();
