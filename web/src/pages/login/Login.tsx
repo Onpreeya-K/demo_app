@@ -12,7 +12,7 @@ import {
     Typography,
     createTheme,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import educationMSULogo from '../../asset/images/Education_MSU_Logo.svg';
 import CustomLoading from '../../components/loading/Loading';
@@ -27,6 +27,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isOpenPopupAlert, setIsOpenPopupAlert] = useState<boolean>(false);
     const [messagePopupAlert, setMessagePopupAlert] = useState<string>('');
+    const startComponent = useRef(false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -89,6 +90,13 @@ const Login = () => {
         window.addEventListener('resize', checkWindowSize);
         return () => window.removeEventListener('resize', checkWindowSize);
     }, []);
+
+    useEffect(() => {
+        if (!startComponent.current) {
+            sessionStorage.clear();
+            startComponent.current = true;
+        }
+    });
 
     return (
         <ThemeProvider theme={theme}>
