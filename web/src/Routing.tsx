@@ -9,10 +9,11 @@ import SchedulePage from './pages/schedule/Schedule';
 import PreviewPdfPage from './pages/preview/Preview-Pdf';
 import SubjectInfoPage from './pages/subject-info/Subject-info';
 import TermPage from './pages/term/Term-info';
+import environment from './environment/environment.json';
 
 const Routing: React.FC = () => {
     return (
-        <BrowserRouter basename='/teaching'>
+        <BrowserRouter basename={environment.base_href_content_path}>
             <Routes>
                 <Route path="/" element={<Navigate to="login" replace={true} />} />
                 <Route path="login" element={<Login />} />

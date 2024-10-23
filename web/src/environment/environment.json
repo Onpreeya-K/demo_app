@@ -1,4 +1,5 @@
 {
     "baseUrl": "http://localhost",
-    "base_path": "/teaching/api/v1"
+    "base_href_content_path": "/teaching",
+    "path_api": "/api/v1"
 }

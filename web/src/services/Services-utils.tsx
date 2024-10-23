@@ -14,7 +14,9 @@ const handleResponse = async (url: string, response: Response) => {
         const error = await response.json();
         if (response.status === 401 || response.statusText === 'Unauthorized') {
             if (!window.location.pathname.endsWith('/login')) {
-                window.location.href = `${environment.baseUrl}:3000/teaching/login`;
+                const currentOrigin = window.location.origin;
+                const loginUrl = `${currentOrigin}${environment.base_href_content_path}/login`;
+                window.location.href = loginUrl;
             }
         }
         const errorMessage = error.payload?.message || error.message || 'An error occurred';
@@ -95,7 +97,7 @@ const callApi = async (
     requestBody: any,
     httpMethod: string
 ) => {
-    const urlEndpoint = `${environment.baseUrl}${environment.base_path}${url}`;
+    const urlEndpoint = `${environment.baseUrl}${environment.base_href_content_path}${environment.path_api}${url}`;
 
     switch (httpMethod) {
         case 'GET':
