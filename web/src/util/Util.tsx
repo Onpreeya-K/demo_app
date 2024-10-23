@@ -118,6 +118,7 @@ export const checkError = (error: unknown) => {
         }
     } else {
         loadingClose();
+        modalAlertOpen('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
         console.error('Unexpected Error:', error);
     }
 };
