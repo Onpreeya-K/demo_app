@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 require  '../vendor/autoload.php';
 
 use Psr\Http\Message\ResponseInterface as Response;
@@ -42,10 +46,11 @@ $capsule->addConnection($dbConfig);
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
 $secret = $_ENV['SECRET_KEY'];
+$hostUrl = $_ENV['HOST_URL'];
 
 $app->add(ResponseMiddleware::class);
-$app->add(CorsMiddleware::class);
-$app->add(LoggerMiddleware::class,);
+$app->add( new CorsMiddleware($hostUrl));
+$app->add(LoggerMiddleware::class,); 
 
 // Load routes file
 require __DIR__ . '/../routes/routes.php';
