@@ -9,37 +9,37 @@
         {
             "key": "PROFESSOR-INFO",
             "name": "ข้อมูลอาจารย์",
-            "link": "/professor-info"
+            "link": "/teaching/professor-info"
         },
         {
             "key": "SUBJECT-INFO",
             "name": "ข้อมูลรายวิชา",
-            "link": "/subject-info"
+            "link": "/teaching/subject-info"
         },
         {
             "key": "CLASS_SCHEDULE",
             "name": "ตารางสอน",
-            "link": "/schedule"
+            "link": "/teaching/schedule"
         },
         {
             "key": "DISBURSEMENT",
             "name": "เบิกค่าสอน",
-            "link": "/disbursement"
+            "link": "/teaching/disbursement"
         },
         {
             "key": "CRITERIA-OF-TEACH",
             "name": "เกณฑ์ค่าสอน",
-            "link": "/criteria-of-teach"
+            "link": "/teaching/criteria-of-teach"
         },
         {
             "key": "CRITERIA-PROCESS",
             "name": "เกณฑ์คำนวณ",
-            "link": "/criteria-process"
+            "link": "/teaching/criteria-process"
         },
         {
             "key": "TERM",
             "name": "ปีการศึกษา",
-            "link": "/term"
+            "link": "/teaching/term"
         }
     ],
     "role": {
