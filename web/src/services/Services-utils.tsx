@@ -13,8 +13,8 @@ const handleResponse = async (url: string, response: Response) => {
     if (!response.ok) {
         const error = await response.json();
         if (response.status === 401 || response.statusText === 'Unauthorized') {
-            if (window.location.pathname !== '/login') {
-                window.location.href = `${environment.baseUrl}:3000/login`;
+            if (!window.location.pathname.endsWith('/login')) {
+                window.location.href = `${environment.baseUrl}:3000/teaching/login`;
             }
         }
         const errorMessage = error.payload?.message || error.message || 'An error occurred';
