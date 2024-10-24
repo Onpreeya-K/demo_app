@@ -97,7 +97,8 @@ const callApi = async (
     requestBody: any,
     httpMethod: string
 ) => {
-    const urlEndpoint = `${environment.baseUrl}${environment.base_href_content_path}${environment.path_api}${url}`;
+    const currentOrigin = window.location.origin;
+    const urlEndpoint = `${currentOrigin}${environment.base_href_content_path}${environment.path_api}${url}`;
 
     switch (httpMethod) {
         case 'GET':
