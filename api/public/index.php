@@ -2,27 +2,20 @@
 
 require  '../vendor/autoload.php';
 
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use DI\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
-
-use Firebase\JWT\JWT;
 use Slim\Factory\AppFactory;
-
-
 use App\Middleware\CorsMiddleware;
 use App\Middleware\ResponseMiddleware;
 use App\Middleware\LoggerMiddleware;
+use Dotenv\Dotenv;
 
-use App\Utils\PDFGen;
 // Load environment variables
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 // Load database configuration
 $dbConfig = require __DIR__ . '/../configs/database.php';
-
 
 // Create Container
 $container = new Container();
