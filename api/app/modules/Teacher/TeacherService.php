@@ -67,6 +67,11 @@ class TeacherService
 
     public function createTeacher($data)
     {   
+        $teacher = $this->teacherRepository->getTeacherById($data['teacher_id']);
+        if ($teacher) {
+            throw new Exception(ErrorMessage::TEACHER_EXIST, 400);
+        }
+        
         $data["is_active"] = 1;
         $insertTeacher = $this->teacherRepository->createTeacher($data);
 

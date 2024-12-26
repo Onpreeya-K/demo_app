@@ -48,6 +48,11 @@ class SubjectService
 
     public function createSubject($data)
     {
+        $subject = $this->majorRepository->getSubjectById($data['subject_id']);
+        if ($subject) {
+                throw new Exception(ErrorMessage::SUBJECTS_EXIST, 400);
+        }
+        
         $created =  $this->majorRepository->createSubject($data);
         if (!$created) {
             throw new Exception(ErrorMessage::CREATE_SUBJECTS_ERROR, 400);

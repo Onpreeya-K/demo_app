@@ -97,6 +97,7 @@ class ErrorMessage
   //Subject
   const CREATE_SUBJECTS_SUCCESS = 'เพิ่มรายวิชาสำเร็จ';
   const CREATE_SUBJECTS_ERROR = 'เพิ่มรายวิชาไม่สำเร็จ';
+  const SUBJECTS_EXIST = 'รายวิชานี้มีอยู่แล้ว';
   const SUBJECTS_NOT_FOUND = 'ไม่พบรายวิชา';
   const UPDATE_SUBJECTS_ERROR = 'แก้ไขรายวิชาไม่สำเร็จ';
   const UPDATE_SUBJECTS_SUCCESS = 'แก้ไขรายวิชาสำเร็จ';
@@ -107,6 +108,7 @@ class ErrorMessage
   const CREATE_TEACHER_SUCCESS = 'เพิ่มอาจารย์สำเร็จ';
   const CREATE_TEACHER_ERROR = 'เพิ่มอาจารย์ไม่สำเร็จ';
   const TEACHER_NOT_FOUND = 'ไม่พบอาจารย์';
+  const TEACHER_EXIST = 'อาจารย์นี้มีอยู่แล้ว';
   const UPDATE_TEACHER_ERROR = 'แก้ไขอาจารย์ไม่สำเร็จ';
   const UPDATE_TEACHER_SUCCESS = 'แก้ไขอาจารย์สำเร็จ';
   const DELETE_TEACHER_ERROR = 'ลบอาจารย์ไม่สำเร็จ';
