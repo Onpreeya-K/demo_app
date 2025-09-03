@@ -6,16 +6,16 @@ use Exception;
 use App\Constant\ErrorMessage;
 class LevelService
 {
-    protected $degreeRepository;
+    protected $levelRepository;
 
-    public function __construct(LevelRepository $degreeRepository)
+    public function __construct(LevelRepository $levelRepository)
     {
-        $this->degreeRepository = $degreeRepository;
+        $this->levelRepository = $levelRepository;
     }
 
     public function getAllLevels()
     {
-        $fetchAll = $this->degreeRepository->getAllLevels();
+        $fetchAll = $this->levelRepository->getAllLevels();
         if (!$fetchAll) {
             throw new Exception(ErrorMessage::LEVEL_NOT_FOUND, 404);
         }
@@ -24,7 +24,7 @@ class LevelService
 
     public function getLevelById($id)
     {
-        $fetch = $this->degreeRepository->getLevelById($id);
+        $fetch = $this->levelRepository->getLevelById($id);
         if (!$fetch) {
             throw new Exception(ErrorMessage::LEVEL_NOT_FOUND,404);
         }
@@ -33,7 +33,7 @@ class LevelService
 
     public function createLevel($data)
     {
-        $created = $this->degreeRepository->createLevel($data);
+        $created = $this->levelRepository->createLevel($data);
         if (!$created) {
             throw new Exception(ErrorMessage::CREATE_LEVEL_ERROR, 400);
         }
@@ -42,7 +42,7 @@ class LevelService
 
     public function updateLevel($id, $data)
     {
-        $updated = $this->degreeRepository->updateLevel($id, $data);
+        $updated = $this->levelRepository->updateLevel($id, $data);
         if (!$updated) {
             throw new Exception(ErrorMessage::UPDATE_LEVEL_ERROR, 400);
         }
@@ -51,7 +51,7 @@ class LevelService
 
     public function deleteLevel($id)
     {
-        $deleted = $this->degreeRepository->deleteLevel($id);
+        $deleted = $this->levelRepository->deleteLevel($id);
         if (!$deleted) {
             throw new Exception(ErrorMessage::DELETE_LEVEL_ERROR, 400);
         }

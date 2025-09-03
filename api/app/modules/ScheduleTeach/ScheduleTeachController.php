@@ -74,4 +74,16 @@ class ScheduleTeachController {
             return HelperResponse::jsonWithException($response, $e);
         }
     }
+
+    public function deleteByTermIdAndTeacherId(Request $request, Response $response, $args) {
+        try {
+            $termID = $args['termId'];
+            $teacherID = $args['teacherID'];
+            $data = $this->scheduleTeachService->deleteByTermIdAndTeacherId($termID, $teacherID);
+            return HelperResponse::json($response, $data, 201);
+        } catch (\Exception $e) {
+            return HelperResponse::jsonWithException($response, $e);
+        }
+    }
+    
 }

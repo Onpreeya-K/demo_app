@@ -84,6 +84,7 @@ class ErrorMessage
   const UPDATE_LEVEL_SUCCESS = 'แก้ไขระดับการศึกษาสำเร็จ';
   const DELETE_LEVEL_ERROR = 'ลบระดับการศึกษาไม่สำเร็จ';
   const DELETE_LEVEL_SUCCESS = 'ลบระดับการศึกษาสำเร็จ';
+  const LEVEL_INVALID = 'ระดับการศึกษาไม่ถูกต้อง';
 
   //ManagementPosition
   const CREATE_MANAGEMENT_POSITION_SUCCESS = 'เพิ่มตำแหน่งบริหารสำเร็จ';
@@ -103,6 +104,7 @@ class ErrorMessage
   const UPDATE_SUBJECTS_SUCCESS = 'แก้ไขรายวิชาสำเร็จ';
   const DELETE_SUBJECTS_ERROR = 'ลบรายวิชาไม่สำเร็จ';
   const DELETE_SUBJECTS_SUCCESS = 'ลบรายวิชาสำเร็จ';
+  const SUBJECTS_INVALID = 'ข้อมูลรายวิชาไม่ถูกต้อง';
 
   //Teacher
   const CREATE_TEACHER_SUCCESS = 'เพิ่มอาจารย์สำเร็จ';
@@ -113,6 +115,7 @@ class ErrorMessage
   const UPDATE_TEACHER_SUCCESS = 'แก้ไขอาจารย์สำเร็จ';
   const DELETE_TEACHER_ERROR = 'ลบอาจารย์ไม่สำเร็จ';
   const DELETE_TEACHER_SUCCESS = 'ลบอาจารย์สำเร็จ';
+  const TEACHER_NOT_ACTIVE = 'ไม่มีข้อมูลอาจารย์ในระบบ';
 
     //TermOfYear
     const CREATE_TERM_OF_YEAR_SUCCESS = 'เพิ่มปีการศึกษาสำเร็จ';
@@ -144,4 +147,10 @@ class ErrorMessage
   const UPDATE_SCHEDULE_TEACH_SUCCESS = 'แก้ไขตารางสอนสำเร็จ';
   const DELETE_SCHEDULE_TEACH_SUCCESS = 'ลบตารางสอนสำเร็จ';
   const DELETE_SCHEDULE_TEACH_FAILED = 'ลบตารางสอนไม่สำเร็จ';
+  const DELETE_SCHEDULE_TEACH_FAILED_EXIST = 'ลบตารางสอนไม่ได้เนื่องจากเบิกค่าสอนแล้ว';
+
+  const SECTION_INVALID = 'ข้อมูล section ไม่ถูกต้อง';
+  const COURSE_UNIT_NOT_FOUND = 'ไม่พบข้อมูลหน่วยกิต';
+  const TOTAL_SEAT_INVALID = 'จำนวนที่นั่งทั้งหมดไม่ถูกต้อง';
+  const ENROLL_SEAT_INVALID = 'จจำนวนนิสิตลงทะเบียนไม่ถูกต้อง';
 }

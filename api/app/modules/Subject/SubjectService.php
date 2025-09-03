@@ -7,16 +7,16 @@ use App\Constant\ErrorMessage;
 
 class SubjectService
 {
-    protected $majorRepository;
+    protected $subjectRepository;
 
     public function __construct(SubjectRepository $majorRepository)
     {
-        $this->majorRepository = $majorRepository;
+        $this->subjectRepository = $majorRepository;
     }
 
     public function getAllSubjects()
     {
-        $subjects =  $this->majorRepository->getAllSubjects();
+        $subjects =  $this->subjectRepository->getAllSubjects();
 
         if ($subjects->isEmpty()) {
             throw new Exception(ErrorMessage::SUBJECTS_NOT_FOUND, 404);
@@ -27,7 +27,7 @@ class SubjectService
 
     public function getSubjectById($id)
     {
-        $subject = $this->majorRepository->getSubjectById($id);
+        $subject = $this->subjectRepository->getSubjectById($id);
 
         if (!$subject) {
             throw new Exception(ErrorMessage::SUBJECTS_NOT_FOUND, 404);
@@ -35,9 +35,9 @@ class SubjectService
 
         return $subject;
     }
-    public function getSubjectIsInternal($id)
+    public function getSubjectIsExist($id)
     {
-        $subject = $this->majorRepository->getSubjectIsInternal($id);
+        $subject = $this->subjectRepository->getSubjectById($id);
 
         if (!$subject) {
             return null;
@@ -48,12 +48,12 @@ class SubjectService
 
     public function createSubject($data)
     {
-        $subject = $this->majorRepository->getSubjectById($data['subject_id']);
+        $subject = $this->subjectRepository->getSubjectById($data['subject_id']);
         if ($subject) {
                 throw new Exception(ErrorMessage::SUBJECTS_EXIST, 400);
         }
         
-        $created =  $this->majorRepository->createSubject($data);
+        $created =  $this->subjectRepository->createSubject($data);
         if (!$created) {
             throw new Exception(ErrorMessage::CREATE_SUBJECTS_ERROR, 400);
         }
@@ -63,7 +63,7 @@ class SubjectService
 
     public function updateSubject($id, $data)
     {
-        $updated = $this->majorRepository->updateSubject($id, $data);
+        $updated = $this->subjectRepository->updateSubject($id, $data);
         if (!$updated) {
             throw new Exception(ErrorMessage::UPDATE_SUBJECTS_ERROR, 400);
         }
@@ -73,7 +73,7 @@ class SubjectService
 
     public function deleteSubject($id)
     {
-        $deleted = $this->majorRepository->deleteSubject($id);
+        $deleted = $this->subjectRepository->deleteSubject($id);
         if (!$deleted) {
             throw new Exception(ErrorMessage::DELETE_SUBJECTS_ERROR, 400);
         }

@@ -45,6 +45,10 @@ class AuthService
                 "sub" => "abc",
             ];
             $teacher = $this->teacherRopository->getTeacherById($data["username"]);
+            if ($teacher['is_active'] != 1){
+                throw new Exception(ErrorMessage::TEACHER_NOT_ACTIVE , 401);
+            }
+
             $token = JWT::encode($payload, $this->secret , $_ENV["ALGRO"]);
             $resp = array('token' => $token, 'role' =>$user['role'] , 'data' => $teacher);
             return $resp;

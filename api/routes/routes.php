@@ -103,12 +103,11 @@ $app->group('/level', function (Group $group) {
 $app->group('/scheduleTeach', function (Group $group) {
     $group->get('', ScheduleTeachController::class . ':fetch');
     $group->get('/teacherSchedule/{termId}/{teacherID}', ScheduleTeachController::class . ':fetchScheduleTeachByTermIdAndTeacherID');
-    $group->get('/term/{id}', ScheduleTeachController::class . ':fetchListTeacherBytermOfID');
-    
-    
+    $group->get('/term/{id}', ScheduleTeachController::class . ':fetchListTeacherBytermOfID');  
     $group->post('', ScheduleTeachController::class . ':create');
     $group->put('/{id}', ScheduleTeachController::class . ':update');
     $group->delete('/{id}', ScheduleTeachController::class . ':delete');
+    $group->delete('/term/{termId}/teacher/{teacherID}', ScheduleTeachController::class . ':deleteByTermIdAndTeacherId');
 })->add(new AuthMiddleware($_ENV['SECRET_KEY']));
 
 // Define routes for subject
