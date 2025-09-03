@@ -159,6 +159,7 @@ class ScheduleTeachService
 
     public function deleteByTermIdAndTeacherId($termID, $teacherID)
     {
+        
         $countScheduleTeachId = $this->scheduleTeachRepository->scheduleTeachIdByTermAndTeacherIdExistInDisbursementTeach($termID, $teacherID);
         if ($countScheduleTeachId > 0){
             throw new Exception(ErrorMessage::DELETE_SCHEDULE_TEACH_FAILED_EXIST, 400);

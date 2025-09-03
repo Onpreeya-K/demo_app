@@ -3,7 +3,7 @@
 namespace App\Modules\ScheduleTeach;
 
 use App\Modules\ScheduleTeach\Model\ScheduleTeach;
-use Illuminate\Support\Facades\DB;
+use App\Modules\Disbursement\Model\DisbursementTeach;
 
 class ScheduleTeachRepository
 {
@@ -44,10 +44,9 @@ class ScheduleTeachRepository
         $scheduleTeachId = ScheduleTeach::where('teacher_id', $teacherID)
                             ->where('term_of_year_id', $termID)
                             ->pluck('schedule_teach_id');
-        $count = DB::table('disbursementTeach')
-                    ->whereIn('schedule_teach_id', $scheduleTeachId)
-                    ->count();
-
+        
+        
+        $count = DisbursementTeach::whereIn('schedule_teach_id', $scheduleTeachId)->count();
         return $count;
     }
 
