@@ -46,3 +46,15 @@ export async function getScheduleByTermIdAndTeacherId(data: any) {
         return null;
     }
 }
+
+export async function deleteScheduleByTermIdAndTeacherId(data: any) {
+    const urlEndpoint = `/scheduleTeach/term/${data.termId}/teacher/${data.teacherID}`;
+    const header = generateHeader();
+
+    try {
+        return ServiceUtil.callApi(urlEndpoint, header, undefined, undefined, METHOD_TYPE.DELETE);
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}

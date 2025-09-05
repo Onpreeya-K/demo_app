@@ -26,6 +26,7 @@ import { FaRegFilePdf } from 'react-icons/fa';
 import PopupAlert from '../../components/popupAlert/Popup-Alert';
 import PopupConfirm from '../../components/popupConfirm/Popup-Confirm';
 import appConfig from '../../config/application-config.json';
+import environment from '../../environment/environment.json';
 import { IProfessor } from '../../interface/Professor-interface';
 import { getTermOfYear } from '../../services/Criteria-service';
 import {
@@ -750,7 +751,7 @@ const DisbursementPage = () => {
     };
 
     const onClickViewPdf = () => {
-        const baseUrl = `${window.location.origin}`;
+        const baseUrl = `${window.location.origin}${environment.base_href_content_path}`;
         const path = `/viewpdf/${form.professor?.pdf_path}`;
         const url = `${baseUrl}${path}`;
         window.open(url, '_blank');

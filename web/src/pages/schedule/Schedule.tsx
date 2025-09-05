@@ -1,6 +1,7 @@
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SaveIcon from '@mui/icons-material/Save';
 import {
     Autocomplete,
@@ -22,10 +23,12 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 import PopupAlert from '../../components/popupAlert/Popup-Alert';
+import PopupConfirm from '../../components/popupConfirm/Popup-Confirm';
 import appConfig from '../../config/application-config.json';
 import { IProfessor } from '../../interface/Professor-interface';
 import { getTeacherSchedule, getTermOfYear } from '../../services/Criteria-service';
 import {
+    deleteScheduleByTermIdAndTeacherId,
     getScheduleByTermIdAndTeacherId,
     saveScheduleTeach,
 } from '../../services/Schedule-service';
@@ -120,6 +123,9 @@ const SchedulePage = () => {
 
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+
+    const [isOpenPopupConfirm, setIsOpenPopupConfirm] = useState<boolean>(false);
+    const [messagePopupConfirm, setMessagePopupConfirm] = useState<React.ReactNode>('');
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -565,8 +571,45 @@ const SchedulePage = () => {
         setMessagePopupAlert('');
     };
 
+    const onClickDelete = async () => {
+        setMessagePopupConfirm('คุณต้องการลบตารางสอน ?');
+        setIsOpenPopupConfirm(true);
+    };
+
+    const onConfirm = async () => {
+        let payload = {
+            termId: formSearch.term?.term_of_year_id || '',
+            teacherID: formSearch.professor.teacher_id,
+        };
+        const response = await deleteScheduleByTermIdAndTeacherId(payload);
+        setIsOpenPopupConfirm(false);
+        if (response && response.message === 'Success') {
+            setFormSearch((prev) => ({
+                ...prev,
+                professor: {
+                    ...prev.professor,
+                    dataTable: [],
+                    has_schedule: false,
+                },
+            }));
+            loadingClose();
+            setMessagePopupAlert(response.payload.message ? response.payload.message : '');
+            setOpenPopupAlert(!!response.payload.message);
+            setOpenSectionUpload(true);
+        }
+    };
+
     return (
         <div>
+            <PopupConfirm
+                isOpen={isOpenPopupConfirm}
+                onClose={() => {
+                    setMessagePopupConfirm('');
+                    setIsOpenPopupConfirm(false);
+                }}
+                onConfirm={onConfirm}
+                title={messagePopupConfirm}
+            />
             <Box sx={{ height: '100%' }}>
                 <PopupAlert
                     isOpen={openPopupAlertError}
@@ -755,6 +798,28 @@ const SchedulePage = () => {
                             width: '100%',
                         }}
                     >
+                        {getRoleUser() === appConfig.role.ADMIN &&
+                            formSearch.professor.has_schedule && (
+                                <Grid container spacing={2} mb={2} justifyContent={'flex-end'}>
+                                    <Grid
+                                        item
+                                        xs={12}
+                                        sm={2}
+                                        display={'flex'}
+                                        justifyContent={'flex-end'}
+                                    >
+                                        <Button
+                                            fullWidth
+                                            startIcon={<DeleteOutlineIcon />}
+                                            variant="contained"
+                                            onClick={onClickDelete}
+                                            color="error"
+                                        >
+                                            ลบตารางสอน
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            )}
                         <TableContainer component={Paper}>
                             <Table>
                                 <TableHead>

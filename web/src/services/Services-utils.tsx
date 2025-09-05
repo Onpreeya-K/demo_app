@@ -79,7 +79,11 @@ const put = async ({
 
 const del = async ({ url, header, params }: { url: string; header: any; params: any }) => {
     try {
-        const response = await fetch(`${url}/${params}`, {
+        let finalUrl = url;
+        if (params !== undefined && params !== null && typeof params !== 'object') {
+            finalUrl += `/${params}`;
+        }
+        const response = await fetch(finalUrl, {
             method: METHOD_TYPE.DELETE,
             headers: header,
         });
