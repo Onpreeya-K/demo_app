@@ -16,6 +16,7 @@ class LoggerMiddleware implements MiddlewareInterface
     public function __construct()
     {
         $this->logger = new Logger('activity_logger');
+        $this->logger->setTimezone(new \DateTimeZone('Asia/Bangkok'));
         $this->logger->pushHandler(new StreamHandler(__DIR__ . '/../../logs/activity.log', Level::Info));
         $this->logger->pushHandler(new StreamHandler(__DIR__ . '/../../logs/error.log', Level::Error));
     }
