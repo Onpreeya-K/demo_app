@@ -2,6 +2,7 @@
 
 namespace App\Modules\Subject;
 
+use Illuminate\Database\QueryException;
 use Exception;
 use App\Constant\ErrorMessage;
 
@@ -77,10 +78,14 @@ class SubjectService
 
     public function deleteSubject($id)
     {
-        $deleted = $this->subjectRepository->deleteSubject($id);
-        if (!$deleted) {
-            throw new Exception(ErrorMessage::DELETE_SUBJECTS_ERROR, 400);
+        try {
+            $this->subjectRepository->deleteSubject($id);
+
+            return ["message" => ErrorMessage::DELETE_SUBJECTS_SUCCESS];
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000' && str_contains($e->getMessage(), '1451')) {
+                throw new Exception(ErrorMessage::DELETE_SUBJECTS_ERROR, 400);
+            }
         }
-        return ["message" => ErrorMessage::DELETE_SUBJECTS_SUCCESS];
     }
 }

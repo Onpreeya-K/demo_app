@@ -8,6 +8,7 @@ class SubjectRepository
     public function getAllSubjects()
     {
         return Subject::with(['courseOfStudy'])
+                        ->where('status', 1)
                         ->orderByRaw('course_of_study_id IS NULL')
                         ->orderBy('course_of_study_id')
                         ->get();
@@ -37,6 +38,6 @@ class SubjectRepository
 
     public function deleteSubject($id)
     {
-        return Subject::where('subject_id', $id)->delete();
+        return Subject::where('subject_id', $id)->update(array('status' => 0));
     }
 }
