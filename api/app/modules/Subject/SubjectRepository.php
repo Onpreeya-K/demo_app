@@ -8,6 +8,8 @@ class SubjectRepository
     public function getAllSubjects()
     {
         return Subject::with(['courseOfStudy'])
+                        ->orderByRaw('course_of_study_id IS NULL')
+                        ->orderBy('course_of_study_id')
                         ->get();
     }
 

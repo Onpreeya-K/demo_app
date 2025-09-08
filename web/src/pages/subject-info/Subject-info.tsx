@@ -567,7 +567,7 @@ const SubjectInfoPage = () => {
                                             align="center"
                                             sx={{ minWidth: '120px', flex: 1 }}
                                         >
-                                            {row.course_of_study ? row.course_of_study.name : '-'}
+                                            {row.course_of_study ? row.course_of_study.name : 'ศึกษาทั่วไป'}
                                         </TableCell>
                                         <TableCell align="center" sx={{ minWidth: '120px' }}>
                                             {`${row.unit}${row.type}`}

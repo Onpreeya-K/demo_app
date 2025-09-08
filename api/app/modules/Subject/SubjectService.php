@@ -63,6 +63,10 @@ class SubjectService
 
     public function updateSubject($id, $data)
     {
+        if (isset($data['course_of_study_id']) && (!empty($data['course_of_study_id']) || $data['course_of_study_id'] === 0)) {
+            $data['is_internal'] = 1;
+        }
+        
         $updated = $this->subjectRepository->updateSubject($id, $data);
         if (!$updated) {
             throw new Exception(ErrorMessage::UPDATE_SUBJECTS_ERROR, 400);
